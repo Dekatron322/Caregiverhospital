@@ -1,6 +1,5 @@
 "use client"
 import React, { useEffect, useRef, useState } from "react"
-import { HiMiniStar } from "react-icons/hi2"
 import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
 import { RiImageAddLine } from "react-icons/ri"
@@ -10,32 +9,56 @@ import { useRouter } from "next/navigation"
 import { IoMdArrowBack } from "react-icons/io"
 import Image from "next/image"
 
-interface RateIconProps {
-  filled: boolean
-  onClick: () => void
+type Hmo = {
+  id: string
+  name: string
 }
 
-const RateIcon: React.FC<RateIconProps> = ({ filled, onClick }) => {
-  return (
-    <span onClick={onClick} style={{ cursor: "pointer" }}>
-      {filled ? (
-        <HiMiniStar className="h-5 w-5 text-[#FFC70066]" />
-      ) : (
-        <HiMiniStar className="h-5 w-5 text-[#FFC70066] opacity-40" />
-      )}
-    </span>
-  )
-}
 const page = () => {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  const [rating, setRating] = useState<number>(0)
   const [isAnonymous, setIsAnonymous] = useState<boolean>(false)
-  const [comment, setComment] = useState<string>("")
-  const [selectedAmenities, setSelectedAmenities] = useState<number[]>([])
+  const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [showDropdown, setShowDropdown] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [showSuccessNotification, setShowSuccessNotification] = useState(false)
+  const [showErrorNotification, setShowErrorNotification] = useState(false)
+  const [formData, setFormData] = useState({
+    name: "",
+    gender: "",
+    dob: "",
+    membership_no: "",
+    policy_id: "",
+    email_address: "",
+    phone_no: "",
+    address: "",
+    nok_name: "",
+    nok_phone_no: "",
+    nok_address: "",
+    allergies: "",
+    hmo: "",
+  })
+  const [hmos, setHmos] = useState<Hmo[]>([])
   const departments = ["Medical Consultants", "Pharmacy", "Medical Laboratory", "Finance", "Nurse", "Patients"]
   const dropdownRef = useRef<HTMLDivElement>(null)
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
+  }
+
+  useEffect(() => {
+    const fetchHmos = async () => {
+      try {
+        const response = await fetch("https://api.caregiverhospital.com/hmo/hmo/")
+        const data = await response.json()
+        setHmos(data as Hmo[])
+      } catch (error) {
+        console.error("Error fetching HMOs:", error)
+      }
+    }
+
+    fetchHmos()
+  }, [])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -59,8 +82,15 @@ const page = () => {
     setShowDropdown(true)
   }
 
-  const handleDropdownSelect = (state: React.SetStateAction<string>) => {
-    setSearchTerm(state)
+  const handleDropdownSelect = (selectedHmoId: string) => {
+    const selectedHmo = hmos.find((hmo) => hmo.id === selectedHmoId)
+    if (selectedHmo) {
+      setSearchTerm(selectedHmo.name) // Set the name in the input field
+      setFormData((prev) => ({
+        ...prev,
+        hmo: selectedHmoId, // Store the ID in the formData
+      }))
+    }
     setShowDropdown(false)
   }
 
@@ -74,11 +104,56 @@ const page = () => {
     router.back()
   }
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+
+    // Basic validation (can be enhanced as needed)
+    if (!formData.name || !formData.email_address || !formData.phone_no || !formData.hmo) {
+      alert("Please fill out all required fields.")
+      setLoading(false)
+      return
+    }
+
+    try {
+      const response = await fetch("https://api.caregiverhospital.com/patient/patient/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        console.error("Error response:", errorData)
+        throw new Error("Something went wrong!")
+      }
+
+      const data = await response.json()
+      console.log(data)
+
+      setShowSuccessNotification(true)
+      setTimeout(() => setShowSuccessNotification(false), 5000)
+      setTimeout(() => {
+        router.push(`/patients/`)
+      }, 5000)
+      // Handle success (e.g., redirect to another page or show a success message)
+    } catch (error) {
+      console.error("Error:", error)
+      setShowErrorNotification(true)
+      setTimeout(() => setShowErrorNotification(false), 5000)
+      // Handle error (e.g., show an error message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <>
       <section className="h-full ">
-        <div className=" flex min-h-screen ">
-          <div className="flex  w-screen flex-col ">
+        <div className="flex min-h-screen ">
+          <div className="flex w-screen flex-col ">
             <DashboardNav />
             <div className="flex justify-between px-16 py-4 max-md:px-3">
               <button onClick={handleGoBack} className="redirect">
@@ -88,76 +163,121 @@ const page = () => {
             </div>
             <div className="flex h-full w-full items-center justify-center ">
               <div className="auth flex rounded-lg shadow md:w-2/3">
-                <div className="w-full px-6 py-8 max-md:px-3">
+                <form className="w-full px-6 py-8 max-md:px-3" onSubmit={handleSubmit}>
                   <h6 className="text-lg font-medium">Register Patient</h6>
                   <p className="text-sm">Please enter user essentials to give them access to the platform</p>
                   <div className="mt-6">
-                    <div className="mb-3">
+                    {/* <div className="mb-3">
                       <div className="search-bg flex h-20 w-full content-center items-center justify-center rounded border border-dotted">
                         <RiImageAddLine className="text-[#087A43]" />
                       </div>
-                    </div>
+                    </div> */}
                     <div className="mb-3 grid grid-cols-3 gap-3 max-sm:grid-cols-2">
-                      <div className="search-bg  flex h-[50px] w-[100%] items-center justify-between gap-3  rounded   px-3 py-1  hover:border-[#5378F6]  focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+                      <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                         <input
                           type="text"
-                          id="search"
+                          name="name"
                           placeholder="Full Name"
-                          className="h-[50px] w-full bg-transparent text-xs  outline-none focus:outline-none"
+                          className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
                           style={{ width: "100%", height: "50px" }}
+                          value={formData.name}
+                          onChange={handleChange}
                         />
                       </div>
-                      <div className="search-bg  flex h-[50px] w-[100%] items-center justify-between gap-3  rounded   px-3 py-1  hover:border-[#5378F6]  focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+                      <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                         <input
                           type="text"
-                          id="search"
+                          name="gender"
                           placeholder="Gender"
-                          className="h-[50px] w-full bg-transparent text-xs  outline-none focus:outline-none"
+                          className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
                           style={{ width: "100%", height: "50px" }}
+                          value={formData.gender}
+                          onChange={handleChange}
                         />
                         <IoChevronDownOutline />
                       </div>
-                      <div className="search-bg  flex h-[50px] w-[100%] items-center justify-between gap-3  rounded   px-3 py-1  hover:border-[#5378F6]  focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+                      <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                         <input
                           type="text"
-                          id="search"
+                          name="dob"
                           placeholder="Date of Birth"
-                          className="h-[50px] w-full bg-transparent text-xs  outline-none focus:outline-none"
+                          className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
                           style={{ width: "100%", height: "50px" }}
+                          value={formData.dob}
+                          onChange={handleChange}
                         />
                         <RxCalendar />
                       </div>
-                      <div className="search-bg  flex h-[50px] w-[100%] items-center justify-between gap-3  rounded   px-3 py-1  hover:border-[#5378F6]  focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+                      <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                         <input
                           type="text"
-                          id="search"
+                          name="email_address"
                           placeholder="Email Address"
-                          className="h-[50px] w-full bg-transparent text-xs  outline-none focus:outline-none"
+                          className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
                           style={{ width: "100%", height: "50px" }}
+                          value={formData.email_address}
+                          onChange={handleChange}
                         />
                       </div>
-                      <div className="search-bg  flex h-[50px] w-[100%] items-center justify-between gap-3  rounded   px-3 py-1  hover:border-[#5378F6]  focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+                      <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                         <input
                           type="text"
-                          id="search"
+                          name="phone_no"
                           placeholder="Phone number"
-                          className="h-[50px] w-full bg-transparent text-xs  outline-none focus:outline-none"
+                          className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
                           style={{ width: "100%", height: "40px" }}
+                          value={formData.phone_no}
+                          onChange={handleChange}
                         />
                       </div>
-                      <div className="search-bg  flex h-[50px] w-[100%] items-center justify-between gap-3  rounded   px-3 py-1  hover:border-[#5378F6]  focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+                      <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                         <input
                           type="text"
-                          id="search"
+                          name="address"
                           placeholder="Address"
-                          className="h-[50px] w-full bg-transparent text-xs  outline-none focus:outline-none"
+                          className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
                           style={{ width: "100%", height: "50px" }}
+                          value={formData.address}
+                          onChange={handleChange}
                         />
+                      </div>
+                    </div>
+                    <div className="mb-3">
+                      <div className="relative">
+                        <div className="search-bg relative flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+                          <input
+                            type="text"
+                            name="hmo"
+                            placeholder="Select HMO"
+                            className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
+                            style={{ width: "100%", height: "50px" }}
+                            value={searchTerm}
+                            onChange={handleInputChange}
+                            onClick={() => setShowDropdown(!showDropdown)}
+                          />
+                          {showDropdown && (
+                            <div
+                              ref={dropdownRef}
+                              className="dropdown absolute left-0 top-[55px] z-10 w-full rounded bg-[#FBFAFC] shadow-md"
+                            >
+                              {hmos.map((hmo) => (
+                                <div
+                                  key={hmo.id}
+                                  className="cursor-pointer px-4 py-2 text-sm hover:bg-gray-200"
+                                  onClick={() => handleDropdownSelect(hmo.id)}
+                                >
+                                  {hmo.name}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          <IoChevronDownOutline />
+                        </div>
                       </div>
                     </div>
                     <div className="mb-3 flex gap-3">
                       <div
-                        className="search-bg relative flex h-[50px] w-[100%] items-center justify-between gap-3  rounded   px-3 py-1  hover:border-[#5378F6]  focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2"
+                        className="search-bg relative flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2"
                         ref={dropdownRef}
                       >
                         <div className="flex w-[100%] items-center justify-between gap-3">
@@ -171,115 +291,106 @@ const page = () => {
                           />
                           <input
                             type="text"
-                            id="search"
-                            placeholder="Select department"
-                            className="h-[50px] w-full bg-transparent text-xs  outline-none focus:outline-none"
+                            name="policy_id"
+                            placeholder="Policy ID"
+                            className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
                             style={{ width: "100%", height: "50px" }}
-                            value={searchTerm}
-                            onChange={handleInputChange}
-                            onFocus={() => setShowDropdown(true)}
+                            value={formData.policy_id}
+                            onChange={handleChange}
                           />
-                          {searchTerm && (
-                            <button className="focus:outline-none" onClick={handleCancelSearch}>
-                              <Image className="icon-style" src="/cancel.svg" width={16} height={16} alt="cancel" />
-                              <Image
-                                className="dark-icon-style"
-                                src="/dark_cancel.svg"
-                                width={16}
-                                height={16}
-                                alt="cancel"
-                              />
-                            </button>
-                          )}
                         </div>
-                        {showDropdown && (
-                          <div className="dropdown absolute left-0 top-full z-10 w-full rounded-md">
-                            {departments
-                              .filter((department) => department.toLowerCase().includes(searchTerm.toLowerCase()))
-                              .map((department, index) => (
-                                <div
-                                  key={index}
-                                  className="cursor-pointer overflow-hidden px-4 py-2 hover:bg-[#747A80]"
-                                  onClick={() => handleDropdownSelect(department)}
-                                >
-                                  <p className="text-xs font-medium">{department}</p>
-                                </div>
-                              ))}
-                          </div>
-                        )}
                       </div>
-                      <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3  rounded   px-3 py-1  hover:border-[#5378F6]  focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+                      <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                         <input
                           type="text"
-                          id="search"
+                          name="membership_no"
                           placeholder="Membership number"
-                          className="h-[50px] w-full bg-transparent text-xs  outline-none focus:outline-none"
+                          className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
                           style={{ width: "100%", height: "50px" }}
+                          value={formData.membership_no}
+                          onChange={handleChange}
                         />
                       </div>
                     </div>
-
-                    <div className="mb-3  gap-3">
-                      <div className="search-bg  flex h-[50px] w-[100%] items-center justify-between gap-3  rounded   px-3 py-1  hover:border-[#5378F6]  focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+                    <div className="mb-3 gap-3">
+                      <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                         <input
                           type="text"
-                          id="search"
+                          name="allergies"
                           placeholder="Allergies"
                           className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
                           style={{ width: "100%", height: "50px" }}
+                          value={formData.allergies}
+                          onChange={handleChange}
                         />
                       </div>
-                      <p className="my-2 text-xs">Seperate allergies with ","</p>
+                      <p className="my-2 text-xs">Separate allergies with ","</p>
                     </div>
-
                     <h6 className="text-lg font-medium">Next of Kin Information</h6>
-
                     <div className="mt-3">
                       <div className="mb-3 grid grid-cols-3 gap-3 max-sm:grid-cols-1">
-                        <div className="search-bg  flex h-[50px] w-[100%] items-center justify-between gap-3  rounded   px-3 py-1  hover:border-[#5378F6]  focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+                        <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                           <input
                             type="text"
-                            id="search"
+                            name="nok_name"
                             placeholder="Name"
-                            className="h-[50px] w-full bg-transparent text-xs  outline-none focus:outline-none"
+                            className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
                             style={{ width: "100%", height: "50px" }}
+                            value={formData.nok_name}
+                            onChange={handleChange}
                           />
                         </div>
-                        <div className="search-bg  flex h-[50px] w-[100%] items-center justify-between gap-3  rounded   px-3 py-1  hover:border-[#5378F6]  focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+                        <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                           <input
                             type="text"
-                            id="search"
+                            name="nok_phone_no"
                             placeholder="Phone number"
-                            className="h-[50px] w-full bg-transparent text-xs  outline-none focus:outline-none"
+                            className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
                             style={{ width: "100%", height: "40px" }}
+                            value={formData.nok_phone_no}
+                            onChange={handleChange}
                           />
                         </div>
-                        <div className="search-bg  flex h-[50px] w-[100%] items-center justify-between gap-3  rounded   px-3 py-1  hover:border-[#5378F6]  focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+                        <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                           <input
                             type="text"
-                            id="search"
+                            name="nok_address"
                             placeholder="Address"
-                            className="h-[50px] w-full bg-transparent text-xs  outline-none focus:outline-none"
+                            className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
                             style={{ width: "100%", height: "50px" }}
+                            value={formData.nok_address}
+                            onChange={handleChange}
                           />
                         </div>
                       </div>
                     </div>
-
                     <button
-                      className="button-primary h-[50px] w-full rounded-md  max-sm:h-[45px]
-                  "
+                      className="button-primary h-[50px] w-full rounded-md max-sm:h-[45px]"
+                      type="submit"
+                      disabled={loading}
                     >
-                      REGISTER
+                      {loading ? "Adding Patient..." : "REGISTER"}
                     </button>
                   </div>
-                </div>
+                </form>
               </div>
             </div>
             <Footer />
           </div>
         </div>
       </section>
+      {showSuccessNotification && (
+        <div className="animation-fade-in absolute bottom-16  right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
+          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
+          <span className="clash-font text-sm  text-[#0F920F]">Login Successfully</span>
+        </div>
+      )}
+      {showErrorNotification && (
+        <div className="animation-fade-in absolute bottom-16  right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#D14343] bg-[#FEE5E5] text-[#D14343] shadow-[#05420514]">
+          <Image src="/check-circle-failed.svg" width={16} height={16} alt="dekalo" />
+          <span className="clash-font text-sm  text-[#D14343]">Error registering patient.</span>
+        </div>
+      )}
     </>
   )
 }
