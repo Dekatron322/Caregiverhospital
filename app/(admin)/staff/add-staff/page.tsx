@@ -91,10 +91,12 @@ const page: React.FC = () => {
       })
       console.log("Response:", response.data)
       setShowSuccessNotification(true)
+      setTimeout(() => setShowSuccessNotification(false), 5000)
     } catch (error) {
       console.error("Error:", error)
       setError("Failed to register user")
       setShowErrorNotification(true)
+      setTimeout(() => setShowErrorNotification(false), 5000)
     } finally {
       setLoading(false)
     }

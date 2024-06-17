@@ -9,6 +9,7 @@ import { IoMdSearch } from "react-icons/io"
 interface Appointment {
   id: number
   doctor: string
+  pub_date: string
 }
 
 interface Prescription {
@@ -39,6 +40,17 @@ interface PatientDetail {
   appointments: Appointment[]
   prescriptions: Prescription[]
   medical_records: MedicalRecord[]
+}
+
+const formatDateTime = (dateString: string) => {
+  const options: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }
+  return new Date(dateString).toLocaleDateString(undefined, options)
 }
 
 export default function PatientDetails({ params }: { params: { patientId: string } }) {
@@ -120,6 +132,12 @@ export default function PatientDetails({ params }: { params: { patientId: string
             <div>
               <p>{appointment.doctor}</p>
               <small className="text-xm ">Doctor Assigned</small>
+            </div>
+          </div>
+          <div className="flex items-center gap-1 text-sm font-bold">
+            <div>
+              <p>{formatDateTime(appointment.pub_date)}</p>
+              <small className="text-xm ">Appointment Date</small>
             </div>
           </div>
 

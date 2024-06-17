@@ -194,7 +194,7 @@ export default function Patients() {
                     className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2 "
                   >
                     <div className="flex w-[20%] items-center gap-1 text-sm font-bold">
-                      {patient.image ? (
+                      {/* {patient.image ? (
                         <img
                           src={`https://api.caregiverhospital.com${patient.image}`}
                           alt={patient.name}
@@ -202,11 +202,11 @@ export default function Patients() {
                           height={32}
                           className="rounded-full"
                         />
-                      ) : (
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46ffa6]">
-                          <p className="capitalize text-[#000000]">{patient.name.charAt(0)}</p>
-                        </div>
-                      )}
+                      ) : ( */}
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46ffa6]">
+                        <p className="capitalize text-[#000000]">{patient.name.charAt(0)}</p>
+                      </div>
+                      {/* )} */}
                     </div>
                     <div className="flex w-full items-center gap-1 text-sm font-bold">
                       <div>

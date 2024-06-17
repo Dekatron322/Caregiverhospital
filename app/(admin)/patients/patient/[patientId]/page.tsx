@@ -9,6 +9,7 @@ import { IoMdArrowBack } from "react-icons/io"
 import Link from "next/link"
 import PatientDetails from "components/Patient/PatientDetails"
 import AdmissionModal from "components/Modals/AdmissionModal"
+import AppointmentModal from "components/Modals/AppointmentModal"
 
 interface PatientDetail {
   id: string
@@ -65,7 +66,9 @@ interface PatientDetailPageProps {
 export default function PatientDetailPage({ params }: PatientDetailPageProps) {
   const [patientDetail, setPatientDetail] = useState<PatientDetail | null>(null)
   const [isAdmissionOpen, setIsAdmissionOpen] = useState(false)
+  const [isAppointmentOpen, setIsAppointmentOpen] = useState(false)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
+  const [showDeleteNotification, setShowDeleteNotification] = useState(false)
   const router = useRouter()
   const { patientId } = params
 
@@ -94,13 +97,35 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
     setIsAdmissionOpen(true)
   }
 
+  const openAppointmentModal = () => {
+    setIsAppointmentOpen(true)
+  }
+
   const closeAdmissionModal = () => {
     setIsAdmissionOpen(false)
+  }
+
+  const closeAppointmentModal = () => {
+    setIsAppointmentOpen(false)
   }
 
   const handleHmoSubmissionSuccess = () => {
     setShowSuccessNotification(true)
     setTimeout(() => setShowSuccessNotification(false), 5000)
+    refreshPatientDetails()
+  }
+
+  const refreshPatientDetails = async () => {
+    try {
+      const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${patientId}`)
+      if (!response.ok) {
+        throw new Error("Network response was not ok")
+      }
+      const data = (await response.json()) as PatientDetail
+      setPatientDetail(data)
+    } catch (error) {
+      console.error("Error refreshing patient details:", error)
+    }
   }
 
   if (!patientDetail) {
@@ -211,7 +236,10 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
                             <p className="xl:text-sm">{patientDetail.policy_id || "N/A"}</p>
                           </div>
                           <div className="mt-6 flex w-full gap-2">
-                            <button className="button-primary h-[40px] w-[60%] whitespace-nowrap rounded-md max-sm:h-[40px] xl:text-sm">
+                            <button
+                              onClick={openAppointmentModal}
+                              className="button-primary h-[40px] w-[60%] whitespace-nowrap rounded-md max-sm:h-[40px] xl:text-sm"
+                            >
                               Book Appointment
                             </button>
                             <button
@@ -270,6 +298,27 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
         onSubmitSuccess={handleHmoSubmissionSuccess}
         patientId={patientId}
       />
+
+      <AppointmentModal
+        isOpen={isAppointmentOpen}
+        onClose={closeAppointmentModal}
+        onSubmitSuccess={handleHmoSubmissionSuccess}
+        patientId={patientId}
+      />
+
+      {showSuccessNotification && (
+        <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
+          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
+          <span className="clash-font text-sm text-[#0F920F]">Successfully added</span>
+        </div>
+      )}
+
+      {showDeleteNotification && (
+        <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
+          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
+          <span className="clash-font text-sm text-[#0F920F]">Successfully deleted</span>
+        </div>
+      )}
     </>
   )
 }

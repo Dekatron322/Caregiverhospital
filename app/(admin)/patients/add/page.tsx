@@ -8,6 +8,8 @@ import { RxCalendar } from "react-icons/rx"
 import { useRouter } from "next/navigation"
 import { IoMdArrowBack } from "react-icons/io"
 import Image from "next/image"
+import DatePicker from "react-datepicker"
+import "react-datepicker/dist/react-datepicker.css"
 
 type Hmo = {
   id: string
@@ -19,13 +21,14 @@ const page = () => {
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [showDropdown, setShowDropdown] = useState(false)
+  const [showGenderDropdown, setShowGenderDropdown] = useState(false) // State for gender dropdown
   const [error, setError] = useState<string | null>(null)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const [showErrorNotification, setShowErrorNotification] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
     gender: "",
-    dob: "",
+    dob: null,
     membership_no: "",
     policy_id: "",
     email_address: "",
@@ -46,6 +49,15 @@ const page = () => {
     setFormData((prev) => ({ ...prev, [name]: value }))
   }
 
+  const handleDateChange = (date: any) => {
+    setFormData((prev) => ({ ...prev, dob: date }))
+  }
+
+  const handleGenderChange = (selectedGender: string) => {
+    setFormData((prev) => ({ ...prev, gender: selectedGender }))
+    setShowGenderDropdown(false)
+  }
+
   useEffect(() => {
     const fetchHmos = async () => {
       try {
@@ -64,6 +76,7 @@ const page = () => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setShowDropdown(false)
+        setShowGenderDropdown(false) // Close gender dropdown when clicking outside
       }
     }
 
@@ -85,10 +98,10 @@ const page = () => {
   const handleDropdownSelect = (selectedHmoId: string) => {
     const selectedHmo = hmos.find((hmo) => hmo.id === selectedHmoId)
     if (selectedHmo) {
-      setSearchTerm(selectedHmo.name) // Set the name in the input field
+      setSearchTerm(selectedHmo.name)
       setFormData((prev) => ({
         ...prev,
-        hmo: selectedHmoId, // Store the ID in the formData
+        hmo: selectedHmoId,
       }))
     }
     setShowDropdown(false)
@@ -108,7 +121,6 @@ const page = () => {
     e.preventDefault()
     setLoading(true)
 
-    // Basic validation (can be enhanced as needed)
     if (!formData.name || !formData.email_address || !formData.phone_no || !formData.hmo) {
       alert("Please fill out all required fields.")
       setLoading(false)
@@ -138,12 +150,10 @@ const page = () => {
       setTimeout(() => {
         router.push(`/patients/`)
       }, 5000)
-      // Handle success (e.g., redirect to another page or show a success message)
     } catch (error) {
       console.error("Error:", error)
       setShowErrorNotification(true)
       setTimeout(() => setShowErrorNotification(false), 5000)
-      // Handle error (e.g., show an error message)
     } finally {
       setLoading(false)
     }
@@ -184,27 +194,48 @@ const page = () => {
                           onChange={handleChange}
                         />
                       </div>
-                      <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
-                        <input
-                          type="text"
-                          name="gender"
-                          placeholder="Gender"
-                          className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
-                          style={{ width: "100%", height: "50px" }}
-                          value={formData.gender}
-                          onChange={handleChange}
-                        />
-                        <IoChevronDownOutline />
+
+                      <div className="relative flex items-center">
+                        <div
+                          className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2"
+                          onClick={() => setShowGenderDropdown(!showGenderDropdown)}
+                        >
+                          <input
+                            type="text"
+                            name="gender"
+                            value={formData.gender}
+                            onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+                            placeholder="Gender"
+                            className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
+                            style={{ width: "100%", height: "50px" }}
+                          />
+                          <IoChevronDownOutline />
+                        </div>
+                        {showGenderDropdown && (
+                          <div
+                            ref={dropdownRef}
+                            className="dropdown absolute top-[55px] z-10 w-full rounded-lg shadow-lg"
+                          >
+                            {["Male", "Female"].map((gender) => (
+                              <div
+                                key={gender}
+                                className="cursor-pointer p-2 text-sm hover:bg-[#747A80]"
+                                onClick={() => handleGenderChange(gender)}
+                              >
+                                {gender}
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
+
                       <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
-                        <input
-                          type="text"
-                          name="dob"
-                          placeholder="Date of Birth"
+                        <DatePicker
+                          selected={formData.dob}
+                          onChange={handleDateChange}
+                          placeholderText="Date of Birth"
                           className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
-                          style={{ width: "100%", height: "50px" }}
-                          value={formData.dob}
-                          onChange={handleChange}
+                          dateFormat="yyyy/MM/dd"
                         />
                         <RxCalendar />
                       </div>
@@ -258,12 +289,12 @@ const page = () => {
                           {showDropdown && (
                             <div
                               ref={dropdownRef}
-                              className="dropdown absolute left-0 top-[55px] z-10 w-full rounded bg-[#FBFAFC] shadow-md"
+                              className="dropdown shadow-mdc absolute left-0 top-[55px] z-10 w-full  rounded"
                             >
                               {hmos.map((hmo) => (
                                 <div
                                   key={hmo.id}
-                                  className="cursor-pointer px-4 py-2 text-sm hover:bg-gray-200"
+                                  className="cursor-pointer px-4 py-2 text-sm hover:overflow-hidden hover:bg-[#747A80]"
                                   onClick={() => handleDropdownSelect(hmo.id)}
                                 >
                                   {hmo.name}
