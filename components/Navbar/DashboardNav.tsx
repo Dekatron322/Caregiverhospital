@@ -8,7 +8,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { MdAccountCircle } from "react-icons/md"
 import { RiLogoutCircleRLine } from "react-icons/ri"
 import { BiMessageDetail } from "react-icons/bi"
-import { IoIosArrowDown, IoMdAddCircleOutline, IoMdLock, IoMdSearch, IoIosNotificationsOutline } from "react-icons/io"
+import { IoIosArrowDown, IoIosNotificationsOutline, IoMdAddCircleOutline, IoMdLock, IoMdSearch } from "react-icons/io"
 import LogoutModal from "components/Modals/LogoutModal"
 import Search from "components/Search/Search"
 

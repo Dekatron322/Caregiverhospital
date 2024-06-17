@@ -1,12 +1,9 @@
 "use client"
 import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
-import { useState } from "react"
-import { PharmacyReports, Pharmacy } from "utils"
+import { Pharmacy } from "utils"
 import Image from "next/image"
 import Link from "next/link"
-import Appointments from "components/Dashboard/Dashboard"
-import { PiDotsThree } from "react-icons/pi"
 import { MdKeyboardDoubleArrowRight } from "react-icons/md"
 import LabTests from "components/Dashboard/LabTests"
 

@@ -355,7 +355,7 @@ const Page = () => {
                           onChange={handleChange}
                         />
                       </div>
-                      <p className="my-2 text-xs">Separate allergies with ","</p>
+                      <p className="my-2 text-xs">Separate allergies with &rdquo;,&rdquo;</p>
                     </div>
                     <h6 className="text-lg font-medium">Next of Kin Information</h6>
                     <div className="mt-3">

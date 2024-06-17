@@ -1,7 +1,7 @@
 "use client"
 import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
-import { IoIosArrowForward, IoMdSearch, IoIosArrowBack, IoMdArrowBack } from "react-icons/io"
+import { IoIosArrowBack, IoIosArrowForward, IoMdSearch } from "react-icons/io"
 import { usePathname, useRouter } from "next/navigation"
 import { SetStateAction, useEffect, useState } from "react"
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye"
