@@ -1,8 +1,22 @@
 import LaboratorySideBar from "components/Sidebar/LaboratorySidebar"
+import { Metadata } from "next"
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Laboratory Dashboard | Caregivers Hospital",
-  description: "Dashboard",
+  description: "We are a family with a major focus in both primary and secondary healthcare service.",
+  twitter: {
+    card: "summary_large_image",
+  },
+  openGraph: {
+    url: "https://app.caregiverhospital.com/",
+    images: [
+      {
+        width: 1200,
+        height: 630,
+        url: "https://raw.githubusercontent.com/Dekatron322/venusthe2facedcat/main/public/venus.png",
+      },
+    ],
+  },
 }
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
