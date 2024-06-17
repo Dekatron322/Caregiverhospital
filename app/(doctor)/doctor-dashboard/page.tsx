@@ -2,7 +2,6 @@
 import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
 import { Pharmacy } from "utils"
-import "aos/dist/aos.css"
 import Image from "next/image"
 import Link from "next/link"
 import DoctorsAppointments from "components/Dashboard/DoctorsAppointments"

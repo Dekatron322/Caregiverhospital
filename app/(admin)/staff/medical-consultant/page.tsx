@@ -1,16 +1,12 @@
 "use client"
 import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
-import { useState } from "react"
 import { MedicalConsultant, MedicalStatistics } from "utils"
-import "aos/dist/aos.css"
 import Image from "next/image"
 import Link from "next/link"
-import Appointments from "components/Dashboard/Dashboard"
 import { PiDotsThree } from "react-icons/pi"
 import { IoMdArrowBack } from "react-icons/io"
 import { useRouter } from "next/navigation"
-import { IoAddCircleSharp } from "react-icons/io5"
 import { GoPlus } from "react-icons/go"
 
 export default function Dashboard() {

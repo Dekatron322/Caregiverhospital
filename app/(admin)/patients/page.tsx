@@ -7,8 +7,6 @@ import { SetStateAction, useEffect, useState } from "react"
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye"
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
 import BorderColorOutlinedIcon from "@mui/icons-material/BorderColorOutlined"
-
-import "aos/dist/aos.css"
 import Image from "next/image"
 import Link from "next/link"
 import { PiDotsThree } from "react-icons/pi"
