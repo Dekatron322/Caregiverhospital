@@ -7,7 +7,6 @@ import { HMOs } from "utils"
 import { IoIosArrowForward, IoMdArrowBack } from "react-icons/io"
 import { useState } from "react"
 
-import "aos/dist/aos.css"
 import Hmo from "components/Hmo/Hmo"
 
 export default function Dashboard() {

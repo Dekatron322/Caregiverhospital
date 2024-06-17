@@ -1,7 +1,6 @@
 "use client"
 import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
-import "aos/dist/aos.css"
 import AllAdmission from "components/Dashboard/AllAdmission"
 import { useRouter } from "next/navigation"
 import { IoMdArrowBack } from "react-icons/io"

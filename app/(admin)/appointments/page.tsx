@@ -1,13 +1,7 @@
 "use client"
 import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
-import { useState } from "react"
-import { Statistics, Admissions } from "utils"
-import "aos/dist/aos.css"
-import Image from "next/image"
-import Link from "next/link"
 import Appointments from "components/Dashboard/Dashboard"
-import { PiDotsThree } from "react-icons/pi"
 
 export default function Appointment() {
   return (

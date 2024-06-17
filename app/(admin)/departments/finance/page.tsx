@@ -7,7 +7,6 @@ import { Finance } from "utils"
 import { IoMdArrowBack } from "react-icons/io"
 import { useState } from "react"
 
-import "aos/dist/aos.css"
 import Image from "next/image"
 import Link from "next/link"
 
