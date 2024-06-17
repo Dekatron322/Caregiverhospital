@@ -6,9 +6,10 @@ import { SetStateAction, useState } from "react"
 
 import { IoMdArrowBack } from "react-icons/io"
 import Image from "next/image"
-import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined"
-import KeyboardArrowDownOutlinedIcon from "@mui/icons-material/KeyboardArrowDownOutlined"
-import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined"
+
+import { FaCalendarAlt } from "react-icons/fa"
+import { MdOutlinePrint } from "react-icons/md"
+import { IoIosArrowDown } from "react-icons/io"
 
 export default function Pocket() {
   const router = useRouter()
@@ -44,7 +45,7 @@ export default function Pocket() {
                 <div className="mb-2 flex items-center justify-between">
                   <p className="text-sm font-bold">HMO1 MONTHLY INVOICE</p>
                   <div className="flex items-center gap-1 ">
-                    <CalendarMonthOutlinedIcon className="text-lg" />
+                    <FaCalendarAlt className="text-lg" />
                     <p className="text-xs">February, 2024</p>
                   </div>
                 </div>
@@ -64,7 +65,7 @@ export default function Pocket() {
                   <div className="tab-bg mt-2 w-full rounded p-4">
                     <div className="flex items-center justify-between" onClick={() => toggleOpen(0)}>
                       <p>Orders (₦1200.00)</p>
-                      <KeyboardArrowDownOutlinedIcon />
+                      <IoIosArrowDown />
                     </div>
                     {openSection === 0 && (
                       <div className="mt-4 flex-col">
@@ -104,7 +105,7 @@ export default function Pocket() {
                   <div className="tab-bg mt-2 w-full rounded p-4">
                     <div className="flex items-center justify-between" onClick={() => toggleOpen(1)}>
                       <p>Orders (₦1200.00)</p>
-                      <KeyboardArrowDownOutlinedIcon />
+                      <IoIosArrowDown />
                     </div>
                     {openSection === 1 && (
                       <div className="mt-4 flex-col">
@@ -143,7 +144,7 @@ export default function Pocket() {
                   <div className="tab-bg mt-2 w-full rounded p-4">
                     <div className="flex items-center justify-between" onClick={() => toggleOpen(2)}>
                       <p>Orders (₦1200.00)</p>
-                      <KeyboardArrowDownOutlinedIcon />
+                      <IoIosArrowDown />
                     </div>
                     {openSection === 2 && (
                       <div className="mt-4 flex-col">
@@ -173,7 +174,7 @@ export default function Pocket() {
                     <p className="text-sm font-bold">₦1200.00</p>
                   </div>
                   <div className="mt-4 flex items-center gap-1">
-                    <LocalPrintshopOutlinedIcon />
+                    <MdOutlinePrint />
                     <p className="text-sm">Print</p>
                   </div>
                 </div>
@@ -181,24 +182,24 @@ export default function Pocket() {
               <div className="w-[20%]">
                 <div className="flex items-center justify-between rounded border p-3">
                   <div className="flex items-center gap-2">
-                    <CalendarMonthOutlinedIcon className="text-lg" />
+                    <FaCalendarAlt className="text-lg" />
                     <p className="text-xs">2024 Invoice</p>
                   </div>
-                  <KeyboardArrowDownOutlinedIcon />
+                  <IoIosArrowDown />
                 </div>
                 <div className="mt-1 flex items-center justify-between rounded border p-3">
                   <div className="flex items-center gap-2">
-                    <CalendarMonthOutlinedIcon className="text-lg" />
+                    <FaCalendarAlt className="text-lg" />
                     <p className="text-xs">2024 Invoice</p>
                   </div>
-                  <KeyboardArrowDownOutlinedIcon />
+                  <IoIosArrowDown />
                 </div>
                 <div className="mt-1 flex items-center justify-between rounded border p-3">
                   <div className="flex items-center gap-2">
-                    <CalendarMonthOutlinedIcon className="text-lg" />
+                    <FaCalendarAlt className="text-lg" />
                     <p className="text-xs">2024 Invoice</p>
                   </div>
-                  <KeyboardArrowDownOutlinedIcon />
+                  <IoIosArrowDown />
                 </div>
               </div>
             </div>
