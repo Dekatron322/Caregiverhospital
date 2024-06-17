@@ -68,7 +68,7 @@ export default function Dashboard() {
 
                           <div>
                             <p>{item.name}</p>
-                            <small className="text-xm ">Doctor's name</small>
+                            <small className="text-xm ">Doctor&lsquo;s&lsquo; name</small>
                           </div>
                         </div>
 

@@ -2,10 +2,10 @@
 import React, { useState } from "react"
 
 import Image from "next/image"
-import { PiWalletLight, PiDotsThree } from "react-icons/pi"
+import { PiDotsThree, PiWalletLight } from "react-icons/pi"
 import { CiTrophy } from "react-icons/ci"
 import { HiOutlineBuildingOffice2 } from "react-icons/hi2"
-import { MdOutlineDevices, MdCreditScore } from "react-icons/md"
+import { MdCreditScore, MdOutlineDevices } from "react-icons/md"
 import { useRouter } from "next/navigation"
 import { Accounts, Credits, OpenDeposits } from "utils"
 
@@ -166,7 +166,7 @@ const UserAccount = () => {
       <>
         <div className="flex flex-col gap-2 max-md:hidden">
           {Credits.map((credit) => (
-            <div className="flex w-full  items-center justify-between rounded-lg border p-2">
+            <div key={credit.id} className="flex w-full  items-center justify-between rounded-lg border p-2">
               {renderIcon(credit.name)}
               <div>
                 <p className="text-sm font-bold">{credit.name}</p>

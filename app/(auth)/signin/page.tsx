@@ -135,13 +135,12 @@ const Page: React.FC = () => {
       localStorage.setItem("id", userId.toString())
       console.log("User ID set in localStorage:", localStorage.getItem("id")) // Log the value to confirm
 
-      
       // Redirect based on department
       if (searchTerm) {
         const route = departmentRoutes[searchTerm]
         router.push(route)
         setShowSuccessNotification(true)
-      setTimeout(() => setShowSuccessNotification(false), 5000)
+        setTimeout(() => setShowSuccessNotification(false), 5000)
       }
     } catch (error) {
       setError("Login failed. Please try again.")
@@ -243,8 +242,6 @@ const Page: React.FC = () => {
                 <p className="text-sm">Remember me</p>
               </div>
 
-              
-
               <div className="flex w-full gap-6">
                 <button
                   type="submit"
@@ -262,7 +259,7 @@ const Page: React.FC = () => {
               <Image src="/stroke.svg" width={140} height={1} alt="checkbox" />
             </div>
             <div className="flex justify-center gap-1">
-              <p>Don't have an account? </p>
+              <p>Don&apos;t&apos; have an account? </p>
               <Link href="/signup" className="text-[#46FFA6]">
                 Create Account
               </Link>
@@ -272,14 +269,14 @@ const Page: React.FC = () => {
       </div>
       {showSuccessNotification && (
         <div className="animation-fade-in absolute bottom-16  right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
-        <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
-        <span className="clash-font text-sm  text-[#0F920F]">Login Successfully</span>
-      </div>
+          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
+          <span className="clash-font text-sm  text-[#0F920F]">Login Successfully</span>
+        </div>
       )}
       {showErrorNotification && (
         <div className="animation-fade-in absolute bottom-16  right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#D14343] bg-[#FEE5E5] text-[#D14343] shadow-[#05420514]">
-        <Image src="/check-circle-failed.svg" width={16} height={16} alt="dekalo" />
-        <span className="clash-font text-sm  text-[#D14343]">{error}</span>
+          <Image src="/check-circle-failed.svg" width={16} height={16} alt="dekalo" />
+          <span className="clash-font text-sm  text-[#D14343]">{error}</span>
         </div>
       )}
     </>

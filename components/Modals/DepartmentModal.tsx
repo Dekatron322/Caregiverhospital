@@ -1,5 +1,5 @@
 "use client"
-import React, { useState, FormEvent } from "react"
+import React, { FormEvent, useState } from "react"
 import styles from "./modal.module.css"
 import { LiaTimesSolid } from "react-icons/lia"
 

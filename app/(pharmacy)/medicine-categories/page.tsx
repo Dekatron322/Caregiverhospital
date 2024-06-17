@@ -1,16 +1,15 @@
 "use client"
+import AddCategoryModal from "components/Modals/AddCategoryModal"
 import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
-import { IoIosArrowForward, IoMdSearch, IoIosArrowBack, IoMdArrowBack } from "react-icons/io"
-import { usePathname, useRouter } from "next/navigation"
-import { MedicineCategory } from "utils"
-import { SetStateAction, useState } from "react"
-
 import Image from "next/image"
 import Link from "next/link"
 import { GoPlus } from "react-icons/go"
 import { IoAddCircleSharp } from "react-icons/io5"
-import AddCategoryModal from "components/Modals/AddCategoryModal"
+import { IoIosArrowBack, IoIosArrowForward, IoMdArrowBack, IoMdSearch } from "react-icons/io"
+import { usePathname, useRouter } from "next/navigation"
+import { MedicineCategory } from "utils"
+import { SetStateAction, useState } from "react"
 
 export default function MedicineCategories() {
   const pathname = usePathname()

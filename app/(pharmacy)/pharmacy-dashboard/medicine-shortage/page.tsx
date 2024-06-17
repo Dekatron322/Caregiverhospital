@@ -1,7 +1,7 @@
 "use client"
 import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
-import { IoIosArrowForward, IoMdSearch, IoIosArrowBack, IoMdArrowBack } from "react-icons/io"
+import { IoIosArrowBack, IoIosArrowForward, IoMdArrowBack, IoMdSearch } from "react-icons/io"
 import { usePathname, useRouter } from "next/navigation"
 import { Shortage } from "utils"
 import { SetStateAction, useState } from "react"

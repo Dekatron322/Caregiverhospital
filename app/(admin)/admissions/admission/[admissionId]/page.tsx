@@ -131,7 +131,7 @@ export default function PatientDetailPage({ params }: { params: { admissionId: s
                     </div>
                     <div className="mb-2 flex w-full flex-col">
                       <div className="w-[50%]">
-                        <h3 className="mb-6 text-xl font-bold">Doctor's Prescription</h3>
+                        <h3 className="mb-6 text-xl font-bold">Doctor&apos;s&apos; Prescription</h3>
                         <p className="mb-4 font-semibold">Drugs to Administer</p>
 
                         <p className="my-6">{patientDetail.doctor_prescription}</p>

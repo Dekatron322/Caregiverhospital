@@ -1,16 +1,16 @@
 "use client"
-import React, { useEffect, useState, useRef } from "react"
+import { Skeleton, Tooltip } from "@mui/material"
+import React, { useEffect, useRef, useState } from "react"
 import axios from "axios"
-import Search from "components/Search/Search"
-import { IoIosNotificationsOutline, IoMdAddCircleOutline, IoMdLock, IoMdSearch, IoIosArrowDown } from "react-icons/io"
 import Image from "next/image"
 import { useTheme } from "next-themes"
 import { usePathname, useRouter } from "next/navigation"
-import { Tooltip, Skeleton } from "@mui/material"
 import { MdAccountCircle } from "react-icons/md"
 import { RiLogoutCircleRLine } from "react-icons/ri"
 import { BiMessageDetail } from "react-icons/bi"
+import { IoIosArrowDown, IoMdAddCircleOutline, IoMdLock, IoMdSearch, IoIosNotificationsOutline } from "react-icons/io"
 import LogoutModal from "components/Modals/LogoutModal"
+import Search from "components/Search/Search"
 
 interface UserDetails {
   id: number

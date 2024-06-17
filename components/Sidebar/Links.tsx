@@ -3,9 +3,7 @@
 import clsx from "clsx"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Departments, Appointments, DashboardIcon, Staff, Patients, Admissions } from "./Icons"
-import { useState } from "react"
-import { Box, Skeleton } from "@mui/material"
+import { Admissions, Appointments, DashboardIcon, Departments, Patients, Staff } from "./Icons"
 
 const links = [
   { name: "Dashboard", href: "/dashboard", icon: DashboardIcon },

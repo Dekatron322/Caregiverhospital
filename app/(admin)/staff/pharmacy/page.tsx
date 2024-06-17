@@ -46,7 +46,7 @@ export default function Dashboard() {
                 </div>
                 <>
                   {Phermacy.map((item, index) => (
-                    <div className="flex w-full gap-4 max-md:flex-col">
+                    <div className="flex w-full gap-4 max-md:flex-col" key={item.id}>
                       <div className="gap-3 md:w-[30%]">
                         <div className="flex flex-col  justify-center rounded-md border px-4 py-4">
                           <div className="flex items-center justify-center">

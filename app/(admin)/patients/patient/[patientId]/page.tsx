@@ -1,15 +1,15 @@
 "use client"
-import React, { useState, useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import AdmissionModal from "components/Modals/AdmissionModal"
+import AppointmentModal from "components/Modals/AppointmentModal"
 import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
 import Image from "next/image"
-import { MdLocationPin } from "react-icons/md"
-import { IoMdArrowBack } from "react-icons/io"
 import Link from "next/link"
 import PatientDetails from "components/Patient/PatientDetails"
-import AdmissionModal from "components/Modals/AdmissionModal"
-import AppointmentModal from "components/Modals/AppointmentModal"
+import { IoMdArrowBack } from "react-icons/io"
+import { MdLocationPin } from "react-icons/md"
 
 interface PatientDetail {
   id: string

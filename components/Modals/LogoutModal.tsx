@@ -1,7 +1,7 @@
+import { Box, Modal, Typography } from "@mui/material"
 import React from "react"
-import { Box, Modal, Typography, Button } from "@mui/material"
-import styles from "./modal.module.css"
 import { LiaTimesSolid } from "react-icons/lia"
+import styles from "./modal.module.css"
 
 interface LogoutModalProps {
   open: boolean

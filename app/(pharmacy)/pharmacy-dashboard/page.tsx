@@ -1,13 +1,10 @@
 "use client"
 import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
-import { useState } from "react"
-import { PharmacyReports, Pharmacy } from "utils"
 import Image from "next/image"
 import Link from "next/link"
-import Appointments from "components/Dashboard/Dashboard"
-import { PiDotsThree } from "react-icons/pi"
 import { MdKeyboardDoubleArrowRight } from "react-icons/md"
+import { Pharmacy, PharmacyReports } from "utils"
 
 export default function PharmacyDashboard() {
   return (
@@ -23,7 +20,10 @@ export default function PharmacyDashboard() {
             </div>
             <div className="mb-3 grid w-full grid-cols-3 gap-2 px-16 max-md:grid-cols-1 max-md:px-3">
               {Pharmacy.map((pharmacy) => (
-                <div className="auth flex w-full flex-col items-center justify-center rounded border border-[#01A768] pt-2  ">
+                <div
+                  className="auth flex w-full flex-col items-center justify-center rounded border border-[#01A768] pt-2 "
+                  key={pharmacy.inventory_status}
+                >
                   <Image src="/inventory-status.svg" height={40} width={40} alt="" />
                   <h3 className="py-2  font-bold capitalize">{pharmacy.inventory_status} </h3>
                   <p>Inventory Status</p>
@@ -34,7 +34,10 @@ export default function PharmacyDashboard() {
                 </div>
               ))}
               {Pharmacy.map((pharmacy) => (
-                <div className="auth flex w-full flex-col items-center justify-center rounded border border-[#03A9F5] pt-2 ">
+                <div
+                  className="auth flex w-full flex-col items-center justify-center rounded border border-[#03A9F5] pt-2"
+                  key={pharmacy.inventory_status}
+                >
                   <Image src="/medicines-available.svg" height={40} width={40} alt="" />
                   <h3 className="py-2  font-bold">{pharmacy.medicines_available}</h3>
                   <p>Medicines Available</p>
@@ -48,7 +51,10 @@ export default function PharmacyDashboard() {
                 </div>
               ))}
               {Pharmacy.map((pharmacy) => (
-                <div className="auth flex w-full flex-col items-center justify-center rounded border border-[#FED600] pt-2 ">
+                <div
+                  className="auth flex w-full flex-col items-center justify-center rounded border border-[#FED600] pt-2 "
+                  key={pharmacy.inventory_status}
+                >
                   <Image src="/revenue.svg" height={38} width={38} alt="" />
                   <h3 className="py-2  font-bold">{pharmacy.revenue_status}</h3>
                   <p>Revenue Status</p>
@@ -61,7 +67,10 @@ export default function PharmacyDashboard() {
             </div>
             <div className="mb-3 flex w-full gap-2 px-16 max-md:px-3">
               {Pharmacy.map((pharmacy) => (
-                <div className="auth flex w-full flex-col items-center justify-center rounded border border-[#F2C0BD] pt-2 ">
+                <div
+                  className="auth flex w-full flex-col items-center justify-center rounded border border-[#F2C0BD] pt-2 "
+                  key={pharmacy.inventory_status}
+                >
                   <Image src="/shortage.svg" height={38} width={38} alt="" />
                   <h3 className="py-2  font-bold capitalize">{pharmacy.medicine_shortage} </h3>
                   <p>Medicine Shortage</p>
@@ -75,7 +84,10 @@ export default function PharmacyDashboard() {
                 </div>
               ))}
               {Pharmacy.map((pharmacy) => (
-                <div className="auth flex w-full flex-col items-center justify-center rounded border border-[#C20505] pt-2">
+                <div
+                  className="auth flex w-full flex-col items-center justify-center rounded border border-[#C20505] pt-2"
+                  key={pharmacy.inventory_status}
+                >
                   <Image src="/expiring.svg" height={34} width={34} alt="" />
                   <h3 className="py-2  font-bold">{pharmacy.medicines_expiring}</h3>
                   <p>Medicines Expiring</p>
@@ -92,7 +104,7 @@ export default function PharmacyDashboard() {
             <div className="auth mt-16 flex gap-6 py-6 pt-16">
               <div className="grid w-full grid-cols-2 gap-2 px-16 max-md:grid-cols-1 max-md:px-3">
                 {PharmacyReports.map((report) => (
-                  <div key={report.id} className="auth flex flex-col justify-center rounded-sm border ">
+                  <div key={report.id} className="auth flex flex-col justify-center rounded-sm border">
                     <p className="px-4 py-2 font-semibold">{report.title}</p>
                     <div className="border"></div>
                     <div className="flex justify-between">

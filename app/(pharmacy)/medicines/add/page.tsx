@@ -25,7 +25,7 @@ const RateIcon: React.FC<RateIconProps> = ({ filled, onClick }) => {
     </span>
   )
 }
-const page = () => {
+const Page = () => {
   const router = useRouter()
 
   const handleGoBack = () => {
@@ -139,4 +139,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Page

@@ -1,22 +1,22 @@
 "use client"
 import React, { useEffect, useRef, useState } from "react"
-import DashboardNav from "components/Navbar/DashboardNav"
-import Footer from "components/Footer/Footer"
-import { RiImageAddLine } from "react-icons/ri"
-import { IoChevronDownOutline } from "react-icons/io5"
-import { RxCalendar } from "react-icons/rx"
-import { useRouter } from "next/navigation"
-import { IoMdArrowBack } from "react-icons/io"
-import Image from "next/image"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
+import DashboardNav from "components/Navbar/DashboardNav"
+import Footer from "components/Footer/Footer"
+import Image from "next/image"
+import { IoMdArrowBack } from "react-icons/io"
+import { IoChevronDownOutline } from "react-icons/io5"
+import { RiImageAddLine } from "react-icons/ri"
+import { RxCalendar } from "react-icons/rx"
+import { useRouter } from "next/navigation"
 
 type Hmo = {
   id: string
   name: string
 }
 
-const page = () => {
+const Page = () => {
   const [isAnonymous, setIsAnonymous] = useState<boolean>(false)
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
@@ -426,4 +426,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Page

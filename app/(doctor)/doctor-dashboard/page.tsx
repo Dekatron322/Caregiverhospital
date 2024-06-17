@@ -21,7 +21,10 @@ export default function PharmacyDashboard() {
             </div>
             <div className="mb-3 flex w-full gap-2 px-16">
               {Pharmacy.map((pharmacy) => (
-                <div className="auth flex w-full flex-col items-center justify-center rounded border border-[#01A768] pt-2  max-xl:h-[171px]">
+                <div
+                  className="auth flex w-full flex-col items-center justify-center rounded border border-[#01A768] pt-2  max-xl:h-[171px]"
+                  key={pharmacy.revenue_status}
+                >
                   <Image src="/inventory-status.svg" height={40} width={40} alt="" />
                   <h3 className="max-xl:h-[171px]:py-4 py-2 font-bold capitalize">{pharmacy.inventory_status} </h3>
                   <p>Inventory Status</p>
@@ -32,7 +35,10 @@ export default function PharmacyDashboard() {
                 </div>
               ))}
               {Pharmacy.map((pharmacy) => (
-                <div className="auth flex w-full flex-col items-center justify-center rounded border border-[#03A9F5] pt-2 max-xl:h-[171px]">
+                <div
+                  className="auth flex w-full flex-col items-center justify-center rounded border border-[#03A9F5] pt-2 max-xl:h-[171px]"
+                  key={pharmacy.inventory_status}
+                >
                   <Image src="/medicines-available.svg" height={40} width={40} alt="" />
                   <h3 className="max-xl:h-[171px]:py-4 py-2 font-bold">{pharmacy.medicines_available}</h3>
                   <p>Medicines Available</p>
@@ -46,7 +52,10 @@ export default function PharmacyDashboard() {
                 </div>
               ))}
               {Pharmacy.map((pharmacy) => (
-                <div className="auth flex w-full flex-col items-center justify-center rounded border border-[#FED600] pt-2 max-xl:h-[171px]">
+                <div
+                  className="auth flex w-full flex-col items-center justify-center rounded border border-[#FED600] pt-2 max-xl:h-[171px]"
+                  key={pharmacy.inventory_status}
+                >
                   <Image src="/revenue.svg" height={38} width={38} alt="" />
                   <h3 className="max-xl:h-[171px]:py-4 py-2 font-bold">{pharmacy.revenue_status}</h3>
                   <p>Revenue Status</p>

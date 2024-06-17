@@ -2,7 +2,7 @@
 import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
 import { useEffect, useState } from "react"
-import { Statistics, Admissions } from "utils"
+import { Admissions } from "utils"
 import Image from "next/image"
 import Link from "next/link"
 import Appointments from "components/Dashboard/Dashboard"

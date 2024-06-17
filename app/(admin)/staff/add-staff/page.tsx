@@ -28,7 +28,7 @@ const RateIcon: React.FC<RateIconProps> = ({ filled, onClick }) => {
     </span>
   )
 }
-const page: React.FC = () => {
+const Page: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [rating, setRating] = useState<number>(0)
   const [isAnonymous, setIsAnonymous] = useState<boolean>(false)
@@ -309,4 +309,4 @@ const page: React.FC = () => {
   )
 }
 
-export default page
+export default Page
