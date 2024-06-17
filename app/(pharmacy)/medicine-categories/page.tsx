@@ -6,7 +6,6 @@ import { usePathname, useRouter } from "next/navigation"
 import { MedicineCategory } from "utils"
 import { SetStateAction, useState } from "react"
 
-import "aos/dist/aos.css"
 import Image from "next/image"
 import Link from "next/link"
 import { GoPlus } from "react-icons/go"

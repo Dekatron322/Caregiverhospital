@@ -6,7 +6,6 @@ import { usePathname, useRouter } from "next/navigation"
 import { Shortage } from "utils"
 import { SetStateAction, useState } from "react"
 
-import "aos/dist/aos.css"
 import Image from "next/image"
 import Link from "next/link"
 import { PiDotsThree } from "react-icons/pi"
