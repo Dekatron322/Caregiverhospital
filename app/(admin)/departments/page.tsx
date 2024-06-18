@@ -112,8 +112,8 @@ export default function Dashboard() {
             <div className="flex items-center justify-between px-16 pt-4 max-md:px-3">
               <div className="flex items-center gap-2  ">
                 <p className="font-bold">Admin Dashboard</p>
-                <IoIosArrowForward />
-                <p className="capitalize">{pathname.split("/").pop()}</p>
+                <IoIosArrowForward className="max-md:hidden" />
+                <p className="capitalize max-md:hidden">{pathname.split("/").pop()}</p>
               </div>
               <button className="add-button" onClick={openDepartmentModal}>
                 <p className="text-xs">Add Department</p>
@@ -129,7 +129,7 @@ export default function Dashboard() {
                 ))}
               </div>
             ) : (
-              <div className="max-md:grid-col-1 mt-10 grid grid-cols-2 gap-4 px-16 max-md:mt-4 max-md:px-3">
+              <div className="mt-10 grid grid-cols-2 gap-4 px-16 max-md:mt-4 max-md:grid-cols-1 max-md:px-3">
                 {departments.map((department) => (
                   <div key={department.id} className="w-full rounded border p-4">
                     <div className="mb-4 flex justify-between">

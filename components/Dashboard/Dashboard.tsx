@@ -101,7 +101,7 @@ const Appointments = () => {
 
     return (
       <div key={patient.id} className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2">
-        <div className="flex w-[20%] flex-col ">
+        <div className="flex w-[20%] flex-col max-md:hidden">
           {lastAppointment && (
             <div
               className="my-4 flex content-center items-center gap-2"
@@ -117,7 +117,7 @@ const Appointments = () => {
         </div>
         <div className="flex w-full items-center gap-2">
           {/* <Image src={patient.image} width={40} height={40} alt={`${patient.name}'s image`} className="rounded-full" /> */}
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46ffa6]">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46ffa6] max-md:hidden">
             <p className="capitalize text-[#000000]">{patient.name.charAt(0)}</p>
           </div>
           <div>
@@ -125,7 +125,7 @@ const Appointments = () => {
             <p className="text-xs">Patient Name</p>
           </div>
         </div>
-        <div className="flex w-full flex-col">
+        <div className="flex w-full flex-col max-md:hidden">
           <p className="text-sm font-bold">{patient.phone_no}</p>
           <p className="text-xs">Phone Number</p>
         </div>
@@ -135,11 +135,11 @@ const Appointments = () => {
               <p className="text-sm font-bold">{lastAppointment.doctor}</p>
               <p className="text-xs">Doctor Assigned</p>
             </div>
-            <div className="flex w-full flex-col">
+            <div className="flex w-full flex-col max-md:hidden">
               <p className="text-sm font-bold">{formatDate(lastAppointment.pub_date)}</p>
               <p className="text-xs">Last Appointment</p>
             </div>
-            <div className="flex w-full flex-col items-center">
+            <div className="md:flex md:w-full md:flex-col md:items-center">
               <p className="rounded bg-[#46FFA6] px-2 py-[2px] text-center text-xs font-bold text-black">
                 {lastAppointment.detail}
               </p>
@@ -147,7 +147,7 @@ const Appointments = () => {
             </div>
           </>
         )}
-        <div>
+        <div className="max-md:hidden">
           <PiDotsThree />
         </div>
       </div>
