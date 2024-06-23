@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react"
 import { IoIosArrowForward } from "react-icons/io"
 import { useRouter } from "next/navigation"
+import { HiOutlineTrash } from "react-icons/hi2"
+import DeleteModal from "components/Modals/DeleteModal"
+import Image from "next/image"
+import DeleteHmoCategoryModal from "components/Modals/DeleteHmoCategoryModal"
 
 interface HmoDetail {
   id: string
@@ -27,6 +31,9 @@ const HmoComponent: React.FC<HmoComponentProps> = ({ refreshKey }) => {
   const [hmoCategories, setHmoCategories] = useState<HmoDetail[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
+  const [hmoToDelete, setHmoToDelete] = useState<string | null>(null) // State to store HMO ID to delete
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
+  const [showSuccessNotification, setShowSuccessNotification] = useState(false)
 
   useEffect(() => {
     fetchHmoCategories()
@@ -65,13 +72,35 @@ const HmoComponent: React.FC<HmoComponentProps> = ({ refreshKey }) => {
     )
   if (error) return <p>{error}</p>
 
+  const openDeleteModal = (hmoId: string) => {
+    setHmoToDelete(hmoId)
+    setIsDeleteOpen(true)
+  }
+
+  const closeDeleteModal = () => {
+    setIsDeleteOpen(false)
+  }
+
+  const handleHmoSubmissionSuccess = () => {
+    setShowSuccessNotification(true)
+    fetchHmoCategories() // Refresh the list of HMOs after successful deletion
+    setTimeout(() => setShowSuccessNotification(false), 5000)
+  }
+
   return (
     <>
       {hmoCategories.map((category) => (
         <div key={category.id} className="mb-3 w-full rounded border p-4 shadow-md">
           <div className="flex items-center justify-between">
             <div>
-              <h6 className="font-bold">{category.name}</h6>
+              <div className="flex items-center gap-2">
+                <h6 className="font-bold">{category.name}</h6>
+
+                <HiOutlineTrash
+                  onClick={() => openDeleteModal(category.id)}
+                  className="cursor-pointer text-[#F20089]  transition-colors duration-500 hover:text-[#F2B8B5]"
+                />
+              </div>
               <p className="text-sm">{category.detail}</p>
             </div>
             <div
@@ -83,6 +112,20 @@ const HmoComponent: React.FC<HmoComponentProps> = ({ refreshKey }) => {
           </div>
         </div>
       ))}
+
+      <DeleteHmoCategoryModal
+        isOpen={isDeleteOpen}
+        onClose={closeDeleteModal}
+        onSubmitSuccess={handleHmoSubmissionSuccess}
+        hmoId={hmoToDelete}
+      />
+
+      {showSuccessNotification && (
+        <div className="animation-fade-in absolute bottom-16  right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
+          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
+          <span className="clash-font text-sm  text-[#0F920F]">HMO added successfully</span>
+        </div>
+      )}
     </>
   )
 }

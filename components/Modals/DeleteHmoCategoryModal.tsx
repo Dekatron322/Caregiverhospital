@@ -9,14 +9,14 @@ interface DeleteModalProps {
   hmoId: string | null
 }
 
-const DeleteModal: React.FC<DeleteModalProps> = ({ isOpen, onClose, onSubmitSuccess, hmoId }) => {
+const DeleteHmoCategoryModal: React.FC<DeleteModalProps> = ({ isOpen, onClose, onSubmitSuccess, hmoId }) => {
   const [isLoading, setIsLoading] = useState(false)
 
   const submitForm = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): Promise<void> => {
     if (!hmoId) return
     setIsLoading(true)
     try {
-      const response = await fetch(`https://api.caregiverhospital.com/hmo/hmo/${hmoId}/`, {
+      const response = await fetch(`https://api.caregiverhospital.com/hmo-category/hmo_category/${hmoId}/`, {
         method: "DELETE",
       })
       if (!response.ok) {
@@ -69,4 +69,4 @@ const DeleteModal: React.FC<DeleteModalProps> = ({ isOpen, onClose, onSubmitSucc
   )
 }
 
-export default DeleteModal
+export default DeleteHmoCategoryModal
