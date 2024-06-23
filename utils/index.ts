@@ -393,7 +393,7 @@ export const Finance = [
     name: "HMOs",
     income: "88,234,000",
     status: "active",
-    url: "hmos",
+    url: "/finance/hmos",
   },
 ]
 

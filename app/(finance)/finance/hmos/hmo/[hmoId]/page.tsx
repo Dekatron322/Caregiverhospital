@@ -1,7 +1,6 @@
 "use client"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { HMOs } from "utils"
 import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
 import { IoMdArrowBack, IoMdSearch } from "react-icons/io"
@@ -13,25 +12,61 @@ import Image from "next/image"
 import DeleteModal from "components/Modals/DeleteModal"
 import EditModal from "components/Modals/EditModal"
 import { IoAddCircleSharp, IoReceipt } from "react-icons/io5"
-import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined"
 
-export default function HmoDetailPage({ params }: { params: { hmoId: string } }) {
+interface HmoDetail {
+  id: string
+  name: string
+  detail: string
+  status: boolean
+  pub_date: string
+  hmos: {
+    id: string
+    name: string
+    category: string
+    description: string
+    status: boolean
+    pub_date: string
+  }[]
+}
+
+interface HmoDetailPageProps {
+  params: { hmoId: string }
+}
+
+export default function HmoDetailPage({ params }: HmoDetailPageProps) {
+  const [hmoDetail, setHmoDetail] = useState<HmoDetail | null>(null)
   const [isAddHmoOpen, setIsAddHmoOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
+  const [searchQuery, setSearchQuery] = useState<string>("")
+  const [refreshKey, setRefreshKey] = useState(0) // State to trigger refresh
+  const [hmoToDelete, setHmoToDelete] = useState<string | null>(null) // State to store HMO ID to delete
   const router = useRouter()
   const { hmoId } = params
 
-  const [searchQuery, setSearchQuery] = useState<string>("")
+  useEffect(() => {
+    const fetchHmoDetails = async () => {
+      try {
+        const response = await fetch(`https://api.caregiverhospital.com/hmo-category/hmo_category/${hmoId}/`)
+        if (!response.ok) {
+          throw new Error("Network response was not ok")
+        }
+        const data = (await response.json()) as HmoDetail
+        setHmoDetail(data)
+      } catch (error) {
+        console.error("Error fetching HMO details:", error)
+      }
+    }
+
+    fetchHmoDetails()
+  }, [hmoId, refreshKey]) // Add refreshKey to dependency array
 
   const handleGoBack = () => {
     router.back()
   }
 
-  const hmoDetail = HMOs.find((hmo) => hmo.id === parseInt(hmoId as string))
-
-  let filteredList = hmoDetail ? hmoDetail.list : []
+  let filteredList = hmoDetail?.hmos || []
 
   if (searchQuery) {
     filteredList = filteredList.filter((item) => item.name.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -49,7 +84,8 @@ export default function HmoDetailPage({ params }: { params: { hmoId: string } })
     setIsAddHmoOpen(false)
   }
 
-  const openDeleteModal = () => {
+  const openDeleteModal = (hmoId: string) => {
+    setHmoToDelete(hmoId)
     setIsDeleteOpen(true)
   }
 
@@ -68,6 +104,7 @@ export default function HmoDetailPage({ params }: { params: { hmoId: string } })
   const handleHmoSubmissionSuccess = () => {
     setShowSuccessNotification(true)
     setTimeout(() => setShowSuccessNotification(false), 5000)
+    setRefreshKey((prevKey) => prevKey + 1) // Trigger refresh
   }
 
   return (
@@ -91,20 +128,18 @@ export default function HmoDetailPage({ params }: { params: { hmoId: string } })
                   </div>
                   <div></div>
                 </div>
-
                 <Footer />
               </>
             ) : (
               <>
                 {" "}
                 {hmoDetail && (
-                  <div className="px-16 max-md:px-3">
+                  <div className="px-16 py-3 max-md:px-3">
                     <div className="flex justify-between pt-4">
                       <button onClick={handleGoBack} className="redirect">
                         <IoMdArrowBack />
-                        <p className=" capitalize">Go back</p>
+                        <p className="capitalize">Go back</p>
                       </button>
-
                       <button className="add-button" onClick={openHmoModal}>
                         <p className="text-[12px]">Add new HMO</p>
                         <GoPlus />
@@ -119,15 +154,13 @@ export default function HmoDetailPage({ params }: { params: { hmoId: string } })
                             type="text"
                             id="search"
                             placeholder="Search"
-                            className="w-full bg-transparent  outline-none focus:outline-none"
-                            style={{ width: "100%" }}
+                            className="w-full bg-transparent outline-none focus:outline-none"
                             value={searchQuery}
                             onChange={handleSearch}
                           />
                         </div>
                       </div>
-
-                      <div className="grid grid-cols-2 gap-2 pt-4 md:grid-cols-3 ">
+                      <div className="grid grid-cols-2 gap-2 pt-4 md:grid-cols-3">
                         {filteredList.map((item) => (
                           <div key={item.id} className="rounded-md border p-6 max-md:p-3">
                             <h3 className="font-semibold max-md:text-sm">{item.name}</h3>
@@ -135,7 +168,7 @@ export default function HmoDetailPage({ params }: { params: { hmoId: string } })
                             <div>
                               <div className="flex items-center justify-between pt-6">
                                 <div className="max-md:hidden">
-                                  <button className="button-primary h-[50px] rounded-sm max-md:h-[40px]  ">
+                                  <button className="button-primary h-[50px] rounded-sm max-md:h-[40px]">
                                     View invoice
                                   </button>
                                 </div>
@@ -144,9 +177,9 @@ export default function HmoDetailPage({ params }: { params: { hmoId: string } })
                                     <IoReceipt />
                                   </button>
                                 </div>
-                                <div className="flex items-center gap-1 ">
+                                <div className="flex items-center gap-1">
                                   <div
-                                    onClick={openDeleteModal}
+                                    onClick={() => openDeleteModal(item.id)}
                                     className="flex cursor-pointer content-center items-center justify-center rounded bg-[#F20089] text-[#ffffff] transition-colors duration-500 hover:bg-[#601410] hover:text-[#F2B8B5] max-md:p-2 md:h-[50px] md:w-[50px]"
                                   >
                                     <HiOutlineTrash />
@@ -171,14 +204,24 @@ export default function HmoDetailPage({ params }: { params: { hmoId: string } })
             )}
           </div>
         </div>
-        <DeleteModal isOpen={isDeleteOpen} onClose={closeDeleteModal} onSubmitSuccess={handleHmoSubmissionSuccess} />
-        <HmoModal isOpen={isAddHmoOpen} onClose={closeHmoModal} onSubmitSuccess={handleHmoSubmissionSuccess} />
+        <DeleteModal
+          isOpen={isDeleteOpen}
+          onClose={closeDeleteModal}
+          onSubmitSuccess={handleHmoSubmissionSuccess}
+          hmoId={hmoToDelete}
+        />
+        <HmoModal
+          isOpen={isAddHmoOpen}
+          onClose={closeHmoModal}
+          onSubmitSuccess={handleHmoSubmissionSuccess}
+          hmoCategoryId={hmoId}
+        />
         <EditModal isOpen={isEditOpen} onClose={closeEditModal} onSubmitSuccess={handleHmoSubmissionSuccess} />
       </section>
       {showSuccessNotification && (
         <div className="animation-fade-in absolute bottom-16  right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
           <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm  text-[#0F920F]">Review submitted</span>
+          <span className="clash-font text-sm  text-[#0F920F]">HMO added successfully</span>
         </div>
       )}
     </>

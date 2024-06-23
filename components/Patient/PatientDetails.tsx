@@ -10,10 +10,12 @@ interface Appointment {
   id: number
   doctor: string
   pub_date: string
+  detail: string
 }
 
 interface Prescription {
   id: string
+  doctor_name: string
   category: string
   name: string
   complain: string
@@ -128,20 +130,27 @@ export default function PatientDetails({ params }: { params: { patientId: string
           key={appointment.id}
           className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
         >
-          <div className="flex items-center gap-1 text-sm font-bold">
+          <div className="flex w-full items-center gap-1 text-sm font-bold">
             <div>
               <p>{appointment.doctor}</p>
               <small className="text-xm ">Doctor Assigned</small>
             </div>
           </div>
-          <div className="flex items-center gap-1 text-sm font-bold">
+          <div className="flex w-full items-center gap-1 text-sm font-bold">
             <div>
               <p>{formatDateTime(appointment.pub_date)}</p>
               <small className="text-xm ">Appointment Date</small>
             </div>
           </div>
-
-          <PiDotsThree />
+          <div className="md:flex md:w-full md:flex-col md:items-center">
+            <p className="rounded bg-[#46FFA6] px-2 py-[2px] text-center text-xs font-bold text-black">
+              {appointment.detail}
+            </p>
+            <p className="text-xs">Complain</p>
+          </div>
+          <div>
+            <PiDotsThree />
+          </div>
         </div>
       ))}
     </div>
@@ -155,7 +164,7 @@ export default function PatientDetails({ params }: { params: { patientId: string
           className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
         >
           <div className="">
-            <p className="text-sm font-bold">xxxx</p>
+            <p className="text-sm font-bold">{prescription.doctor_name}</p>
             <small className="text-xm ">doctor</small>
           </div>
           <div className="">

@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Admissions } from "utils"
 import DashboardNav from "components/Navbar/DashboardNav"
@@ -12,9 +12,83 @@ import { PiDotsThree } from "react-icons/pi"
 import { GoPlus } from "react-icons/go"
 import AdmissionModal from "components/Modals/AdmissionModal"
 import AdministerDrugModal from "components/Modals/AdministerDrugModal"
+import CheckoutModal from "components/Modals/CheckoutModal"
 
-export default function PatientDetailPage({ params }: { params: { admissionId: string } }) {
+interface PatientDetail {
+  id: string
+  name: string
+  heart_rate?: string
+  body_temperature?: string
+  glucose_level?: string
+  blood_pressure?: string
+  address: string
+  phone_no: string
+  dob: string
+  blood_group?: string
+  hmo: {
+    id: string
+    name: string
+    category: string
+    description: string
+    status: boolean
+    pub_date: string
+  }
+  policy_id?: string
+  allergies?: string
+  nok_name: string
+  nok_phone_no: string
+  appointments: { id: number; doctor: string; pub_date: string }[]
+  prescriptions: {
+    id: string
+    category: string
+    name: string
+    complain: string
+    code: string
+    unit: number
+    dosage: number
+    rate: string
+    usage: string
+    note: string
+    status: boolean
+    pub_date: string
+  }[]
+  medicals: {
+    id: string
+    name: string
+    doctor_image: string
+    test: string
+    result: string
+    pub_date: string
+  }[]
+  check_apps: {
+    id: string
+    doctor_prescription?: {
+      id: string
+      doctor_name: string
+      prescription: string
+      pub_date: string
+    }
+    drugs: {
+      id: string
+      category: string
+      name: string
+      unit: string
+      pub_date: string
+    }[]
+    ward: string
+    reason: string
+    checkout_date: string
+    pub_date: string
+  }[]
+}
+
+interface PatientDetailPageProps {
+  params: { admissionId: string }
+}
+
+export default function PatientDetailPage({ params }: PatientDetailPageProps) {
   const [isAdmissionOpen, setIsAdmissionOpen] = useState(false)
+  const [patientDetail, setPatientDetail] = useState<PatientDetail | null>(null)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const router = useRouter()
   const { admissionId } = params
@@ -25,9 +99,22 @@ export default function PatientDetailPage({ params }: { params: { admissionId: s
     router.back()
   }
 
-  const patientDetail = Admissions.find((patient) => patient.id === admissionId)
+  useEffect(() => {
+    const fetchPatientDetails = async () => {
+      try {
+        const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${admissionId}`)
+        if (!response.ok) {
+          throw new Error("Network response was not ok")
+        }
+        const data = (await response.json()) as PatientDetail
+        setPatientDetail(data)
+      } catch (error) {
+        console.error("Error fetching patient details:", error)
+      }
+    }
 
-  let filteredList = patientDetail ? patientDetail.administered : []
+    fetchPatientDetails()
+  }, [admissionId])
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value)
@@ -46,6 +133,18 @@ export default function PatientDetailPage({ params }: { params: { admissionId: s
     setTimeout(() => setShowSuccessNotification(false), 5000)
   }
 
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }
+    return new Date(dateString).toLocaleDateString(undefined, options)
+  }
+
   return (
     <>
       <section className="h-full">
@@ -59,7 +158,7 @@ export default function PatientDetailPage({ params }: { params: { admissionId: s
                   <IoMdArrowBack />
                   <p className="capitalize">Go back</p>
                 </button>
-                <div className=" mt-10 flex items-center justify-between">
+                <div className="mt-10 flex items-center justify-between">
                   <h3 className="font-semibold">Details</h3>
                   <button onClick={openAdmissionModal} className="add-button">
                     <p className="text-xs">Administer Drug</p>
@@ -67,36 +166,35 @@ export default function PatientDetailPage({ params }: { params: { admissionId: s
                   </button>
                 </div>
                 <div className="pt-10">
-                  <div className="flex  justify-between gap-4 ">
+                  <div className="flex justify-between gap-4">
                     <div className="w-[30%]">
-                      <div className="flex flex-col  justify-center rounded-md border px-4 py-8">
+                      <div className="flex flex-col justify-center rounded-md border px-4 py-8">
                         <div className="flex items-center justify-center">
-                          <Image src={patientDetail.image} height={60} width={60} alt="" />
+                          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#46ffa6]">
+                            <p className="capitalize text-[#000000]">{patientDetail.name.charAt(0)}</p>
+                          </div>
                         </div>
-                        <h1 className="mt-3 text-center font-bold">{patientDetail.name}</h1>
+                        <h1 className="mt-3 text-center font-bold capitalize">{patientDetail.name}</h1>
                         <p className="text-center text-base font-bold">
                           Patient ID: <span className="font-normal">{patientDetail.id}</span>
                         </p>
                         <div className="flex items-center justify-center gap-2">
                           <MdLocationPin />
-                          {patientDetail.location}
+                          {patientDetail.address}
                         </div>
                         <div className="my-4 flex w-full border"></div>
-                        <div className="">
+                        <div>
                           <div className="flex justify-between pb-2">
                             <p>Phone</p>
-                            <p>{patientDetail.contact}</p>
+                            <p>{patientDetail.phone_no}</p>
                           </div>
                           <div className="flex justify-between pb-2">
                             <p>Age</p>
-                            <p>{patientDetail.age}</p>
+                            <p>{patientDetail.dob}</p>
                           </div>
 
-                          <div className="mt-6 flex w-full gap-2 ">
-                            <button
-                              onClick={openAdmissionModal}
-                              className="button-primary h-[40px] w-full whitespace-nowrap rounded-md max-sm:h-[40px]"
-                            >
+                          <div className="mt-6 flex w-full gap-2">
+                            <button className="button-primary h-[40px] w-full whitespace-nowrap rounded-md max-sm:h-[40px]">
                               Check Out
                             </button>
                           </div>
@@ -106,13 +204,15 @@ export default function PatientDetailPage({ params }: { params: { admissionId: s
                       <div className="py-2">
                         <h3 className="mb-1 font-bold">Allergies</h3>
                         <div className="flex flex-wrap">
-                          {patientDetail.allergies.split(",").map((allergy, index) => (
-                            <div key={index} className="w-1/2">
-                              <p className="m-1 rounded bg-[#F2B8B5] p-1 text-center text-sm font-medium capitalize text-[#601410]">
-                                {allergy.trim()}
-                              </p>
-                            </div>
-                          ))}
+                          {patientDetail.allergies
+                            ? patientDetail.allergies.split(",").map((allergy, index) => (
+                                <div key={index} className="w-1/2">
+                                  <p className="m-1 rounded bg-[#F2B8B5] p-1 text-center text-sm font-medium capitalize text-[#601410]">
+                                    {allergy.trim()}
+                                  </p>
+                                </div>
+                              ))
+                            : "No allergies"}
                         </div>
                         <p className="mt-4 text-right font-medium">see all</p>
                       </div>
@@ -121,58 +221,66 @@ export default function PatientDetailPage({ params }: { params: { admissionId: s
                         <div className="nok_area">
                           <h4 className="mb-2 font-medium">Next of Kin</h4>
                           <div className="flex justify-between">
-                            <p>{patientDetail.next_of_kin}</p>
-                            <Link href={patientDetail.nok_contact}>
+                            <p>{patientDetail.nok_name}</p>
+                            <Link href={patientDetail.nok_phone_no}>
                               <Image src="/phone.svg" height={18} width={18} alt="" />
                             </Link>
                           </div>
                         </div>
                       </div>
                     </div>
+
                     <div className="mb-2 flex w-full flex-col">
                       <div className="w-[50%]">
                         <h3 className="mb-6 text-xl font-bold">Doctor&apos;s&apos; Prescription</h3>
                         <p className="mb-4 font-semibold">Drugs to Administer</p>
+                        {patientDetail.check_apps.map((check) => (
+                          <div key={check.id}>
+                            {check.doctor_prescription && (
+                              <div className="mb-4">
+                                <p>{check.doctor_prescription.prescription}</p>
+                              </div>
+                            )}
+                          </div>
+                        ))}
 
-                        <p className="my-6">{patientDetail.doctor_prescription}</p>
                         <h3 className="mb-6 text-xl font-bold">Drugs Administered</h3>
                       </div>
-                      {filteredList.map((appointment) => (
-                        <div
-                          key={appointment.id}
-                          className="mb-2 flex w-full cursor-pointer  items-center justify-between rounded-lg border p-2 "
-                        >
-                          <div className="flex items-center gap-2">
-                            <div>
-                              <Image src={appointment.nurse_image} height={40} width={40} alt="" />
-                            </div>
-                            <div>
-                              <p className="text-sm font-bold">{appointment.nurse}</p>
-                              <small className="text-xm ">nurse</small>
-                            </div>
-                          </div>
-                          <div className="">
-                            <p className="text-sm font-bold">{appointment.medication_name}</p>
-                            <small className="text-xm ">Medication name</small>
-                          </div>
-                          <div className="">
-                            <p className="text-sm font-bold">{appointment.category}</p>
-                            <small className="text-xm ">Category</small>
-                          </div>
-                          <div>
-                            <p className="text-sm font-bold">{appointment.quantity}</p>
-                            <small className="text-xm ">Quantity</small>
-                          </div>
-                          <div>
-                            <p className="text-sm font-bold">{appointment.dosage}</p>
-                            <small className="text-xm ">Dosage</small>
-                          </div>
-                          <div>
-                            <p className="text-sm font-bold">{appointment.time}</p>
-                            <small className="text-xm ">Time and Date Administered</small>
-                          </div>
 
-                          <PiDotsThree />
+                      {patientDetail.check_apps.map((check) => (
+                        <div key={check.id}>
+                          {check.drugs.map((drug) => (
+                            <div
+                              key={drug.id}
+                              className="mb-2 flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
+                            >
+                              <div className="flex items-center gap-2">
+                                <div></div>
+                                <div>
+                                  <p className="text-sm font-bold">Nurse Name</p>
+                                  <small className="text-xm">nurse</small>
+                                </div>
+                              </div>
+                              <div>
+                                <p className="text-sm font-bold">{drug.name}</p>
+                                <small className="text-xm">Medication name</small>
+                              </div>
+                              <div>
+                                <p className="text-sm font-bold">{drug.category}</p>
+                                <small className="text-xm">Category</small>
+                              </div>
+                              <div>
+                                <p className="text-sm font-bold">{drug.unit}</p>
+                                <small className="text-xm">Units</small>
+                              </div>
+                              <div>
+                                <p className="text-sm font-bold">{formatDate(drug.pub_date)}</p>
+                                <small className="text-xm">Time and Date Administered</small>
+                              </div>
+
+                              <PiDotsThree />
+                            </div>
+                          ))}
                         </div>
                       ))}
                     </div>

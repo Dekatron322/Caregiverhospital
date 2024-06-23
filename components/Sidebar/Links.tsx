@@ -3,7 +3,7 @@
 import clsx from "clsx"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Admissions, Appointments, DashboardIcon, Departments, Patients, Staff } from "./Icons"
+import { Admissions, Appointments, DashboardIcon, Departments, Finance, Patients, Staff } from "./Icons"
 
 const links = [
   { name: "Dashboard", href: "/dashboard", icon: DashboardIcon },
@@ -15,6 +15,7 @@ const links = [
   { name: "Appointments", href: "/appointments", icon: Appointments },
   { name: "Staff", href: "/staff", icon: Staff },
   { name: "Patients", href: "/patients", icon: Patients },
+  { name: "Finance", href: "/finance", icon: Finance },
   { name: "Admissions", href: "/admissions", icon: Admissions },
 ]
 

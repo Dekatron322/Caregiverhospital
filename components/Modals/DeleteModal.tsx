@@ -1,64 +1,44 @@
 import React, { useState } from "react"
 import styles from "./modal.module.css"
-import { MdKeyboardArrowDown } from "react-icons/md"
-import { HiMiniStar } from "react-icons/hi2"
 import { LiaTimesSolid } from "react-icons/lia"
 
-import Image from "next/image"
-
-interface RateIconProps {
-  filled: boolean
-  onClick: () => void
-}
-
-const RateIcon: React.FC<RateIconProps> = ({ filled, onClick }) => {
-  return (
-    <span onClick={onClick} style={{ cursor: "pointer" }}>
-      {filled ? (
-        <HiMiniStar className="h-5 w-5 text-[#FFC70066]" />
-      ) : (
-        <HiMiniStar className="h-5 w-5 text-[#FFC70066] opacity-40" />
-      )}
-    </span>
-  )
-}
-
-interface ReviewModalProps {
+interface DeleteModalProps {
   isOpen: boolean
-  onSubmitSuccess: any
   onClose: () => void
+  onSubmitSuccess: () => void
+  hmoId: string | null
 }
 
-const DeleteModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitSuccess }) => {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  const [rating, setRating] = useState<number>(0)
-  const [isAnonymous, setIsAnonymous] = useState<boolean>(false)
-  const [comment, setComment] = useState<string>("")
-  const [selectedAmenities, setSelectedAmenities] = useState<number[]>([])
+const DeleteModal: React.FC<DeleteModalProps> = ({ isOpen, onClose, onSubmitSuccess, hmoId }) => {
+  const [isLoading, setIsLoading] = useState(false)
 
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen)
-  }
-
-  const handleCommentChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setComment(event.target.value)
+  const submitForm = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): Promise<void> => {
+    if (!hmoId) return
+    setIsLoading(true)
+    try {
+      const response = await fetch(`https://api.caregiverhospital.com/hmo-category/hmo_category/${hmoId}/`, {
+        method: "DELETE",
+      })
+      if (!response.ok) {
+        throw new Error("Network response was not ok")
+      }
+      onSubmitSuccess()
+      onClose()
+    } catch (error) {
+      console.error("Error deleting HMO:", error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   if (!isOpen) return null
-
-  const submitForm = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-    onSubmitSuccess()
-    onClose()
-  }
-
-  const isSubmitEnabled = comment.trim() !== "" || selectedAmenities.length > 0 || rating > 0
 
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.deleteModalContent}>
         <div className="px-6 py-6">
           <div className="flex items-center justify-between">
-            <h6 className="text-lg font-medium">Delete Hmo</h6>
+            <h6 className="text-lg font-medium">Delete HMO</h6>
             <LiaTimesSolid className="cursor-pointer" onClick={onClose} />
           </div>
 
@@ -67,11 +47,19 @@ const DeleteModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitSucc
           </div>
 
           <div className="mt-4 flex w-full gap-6">
-            <button className="button-danger h-[50px] w-full rounded-sm max-sm:h-[45px]" onClick={submitForm}>
-              DELETE
+            <button
+              className="button-danger h-[50px] w-full rounded-sm max-sm:h-[45px]"
+              onClick={submitForm}
+              disabled={isLoading}
+            >
+              {isLoading ? "Deleting..." : "DELETE"}
             </button>
 
-            <button className="button-secondary h-[50px] w-full rounded-sm max-sm:h-[45px]" onClick={onClose}>
+            <button
+              className="button-secondary h-[50px] w-full rounded-sm max-sm:h-[45px]"
+              onClick={onClose}
+              disabled={isLoading}
+            >
               CANCEL
             </button>
           </div>

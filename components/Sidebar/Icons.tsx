@@ -1,4 +1,3 @@
-import { IoReceiptOutline } from "react-icons/io5"
 import { GiNurseMale } from "react-icons/gi"
 import Image from "next/image"
 import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined"
@@ -6,6 +5,7 @@ import HomeWorkOutlinedIcon from "@mui/icons-material/HomeWorkOutlined"
 import MedicationLiquidOutlinedIcon from "@mui/icons-material/MedicationLiquidOutlined"
 import VaccinesOutlinedIcon from "@mui/icons-material/VaccinesOutlined"
 import AirlineSeatIndividualSuiteOutlinedIcon from "@mui/icons-material/AirlineSeatIndividualSuiteOutlined"
+import CardTravelIcon from "@mui/icons-material/CardTravel"
 import Link from "next/link"
 
 export const LogoIcon = () => (
@@ -26,6 +26,8 @@ export const Departments = () => <HomeWorkOutlinedIcon className="text-lg" />
 export const Appointments = () => <MedicationLiquidOutlinedIcon className="text-lg" />
 
 export const Staff = () => <GiNurseMale />
+
+export const Finance = () => <CardTravelIcon className="text-lg" />
 
 export const Patients = () => <AirlineSeatIndividualSuiteOutlinedIcon className="text-lg" />
 export const Admissions = () => <VaccinesOutlinedIcon />

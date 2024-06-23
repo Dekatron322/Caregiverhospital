@@ -1,57 +1,63 @@
 "use client"
 import React, { useState } from "react"
 import styles from "./modal.module.css"
-import { HiMiniStar } from "react-icons/hi2"
 import { LiaTimesSolid } from "react-icons/lia"
 import Image from "next/image"
 
-interface RateIconProps {
-  filled: boolean
-  onClick: () => void
-}
-
-const RateIcon: React.FC<RateIconProps> = ({ filled, onClick }) => {
-  return (
-    <span onClick={onClick} style={{ cursor: "pointer" }}>
-      {filled ? (
-        <HiMiniStar className="h-5 w-5 text-[#FFC70066]" />
-      ) : (
-        <HiMiniStar className="h-5 w-5 text-[#FFC70066] opacity-40" />
-      )}
-    </span>
-  )
-}
-
-interface ReviewModalProps {
+interface HmoModalProps {
   isOpen: boolean
   onSubmitSuccess: any
   onClose: () => void
+  hmoCategoryId: string
 }
 
-const HmoModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitSuccess }) => {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  const [rating, setRating] = useState<number>(0)
-  const [isAnonymous, setIsAnonymous] = useState<boolean>(false)
-  const [comment, setComment] = useState<string>("")
-  const [selectedAmenities, setSelectedAmenities] = useState<number[]>([])
+const HmoModal: React.FC<HmoModalProps> = ({ isOpen, onClose, onSubmitSuccess, hmoCategoryId }) => {
+  const [name, setName] = useState<string>("")
+  const [category, setCategory] = useState<string>("")
+  const [description, setDescription] = useState<string>("")
+  const [status, setStatus] = useState<boolean>(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [showDropdown, setShowDropdown] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const departments = ["Medical Consultants", "Pharmacy", "Medical Laboratory", "Finance", "Nurse", "Patients"]
 
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen)
-  }
-
-  const handleCommentChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setComment(event.target.value)
-  }
-
   if (!isOpen) return null
 
-  const submitForm = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-    onSubmitSuccess()
-    onClose()
+  const submitForm = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    event.preventDefault()
+    setLoading(true)
+    const newHmo = {
+      name,
+      category,
+      description,
+      status,
+      pub_date: new Date().toISOString(),
+    }
+
+    try {
+      const response = await fetch(
+        `https://api.caregiverhospital.com/hmo-category/add-hmo-to-hmo_category/${hmoCategoryId}/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newHmo),
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error("Failed to add new HMO")
+      }
+
+      onSubmitSuccess()
+      onClose()
+    } catch (error) {
+      console.error("Error adding HMO:", error)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleInputChange = (event: { target: { value: React.SetStateAction<string> } }) => {
@@ -60,7 +66,7 @@ const HmoModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitSuccess
   }
 
   const handleDropdownSelect = (state: React.SetStateAction<string>) => {
-    setSearchTerm(state)
+    setCategory(state)
     setShowDropdown(false)
   }
 
@@ -69,7 +75,7 @@ const HmoModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitSuccess
     setShowDropdown(false)
   }
 
-  const isSubmitEnabled = comment.trim() !== "" || selectedAmenities.length > 0 || rating > 0
+  const isSubmitEnabled = name.trim() !== "" && category.trim() !== "" && description.trim() !== ""
 
   return (
     <div className={styles.modalOverlay}>
@@ -85,9 +91,11 @@ const HmoModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitSuccess
             <div className="search-bg mt-1 flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
               <input
                 type="text"
-                id="search"
+                id="name"
                 placeholder="Name"
                 className="h-[45px] w-full bg-transparent outline-none focus:outline-none"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 style={{ width: "100%", height: "45px" }}
               />
             </div>
@@ -98,11 +106,11 @@ const HmoModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitSuccess
               <Image className="dark-icon-style" src="/search-dark.svg" width={16} height={16} alt="dekalo" />
               <input
                 type="text"
-                id="search"
+                id="category"
                 placeholder="Select department"
                 className="h-[45px] w-full bg-transparent outline-none focus:outline-none"
                 style={{ width: "100%", height: "45px" }}
-                value={searchTerm}
+                value={category}
                 onChange={handleInputChange}
                 onFocus={() => setShowDropdown(true)}
               />
@@ -133,8 +141,8 @@ const HmoModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitSuccess
           <div className="mt-3">
             <p className="text-sm">Description</p>
             <textarea
-              value={comment}
-              onChange={handleCommentChange}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
               className="mt-1 h-[173px] w-full rounded-md border bg-transparent p-2 outline-none"
               placeholder="Add your description..."
             ></textarea>
@@ -146,8 +154,9 @@ const HmoModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitSuccess
                 !isSubmitEnabled && "cursor-not-allowed opacity-50"
               }`}
               onClick={isSubmitEnabled ? submitForm : undefined}
+              disabled={loading}
             >
-              SUBMIT
+              {loading ? "Submitting..." : "SUBMIT"}
             </button>
           </div>
         </div>

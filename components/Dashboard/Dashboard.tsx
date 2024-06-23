@@ -101,7 +101,7 @@ const Appointments = () => {
 
     return (
       <div key={patient.id} className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2">
-        <div className="flex w-[20%] flex-col max-md:hidden">
+        {/* <div className="flex w-[20%] flex-col max-md:hidden">
           {lastAppointment && (
             <div
               className="my-4 flex content-center items-center gap-2"
@@ -114,7 +114,7 @@ const Appointments = () => {
               )}
             </div>
           )}
-        </div>
+        </div> */}
         <div className="flex w-full items-center gap-2">
           {/* <Image src={patient.image} width={40} height={40} alt={`${patient.name}'s image`} className="rounded-full" /> */}
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46ffa6] max-md:hidden">
@@ -125,10 +125,10 @@ const Appointments = () => {
             <p className="text-xs">Patient Name</p>
           </div>
         </div>
-        <div className="flex w-full flex-col max-md:hidden">
+        {/* <div className="flex w-full flex-col max-md:hidden">
           <p className="text-sm font-bold">{patient.phone_no}</p>
           <p className="text-xs">Phone Number</p>
-        </div>
+        </div> */}
         {lastAppointment && (
           <>
             <div className="flex w-full flex-col">
