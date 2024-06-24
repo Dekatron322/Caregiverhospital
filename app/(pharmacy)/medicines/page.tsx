@@ -1,13 +1,12 @@
 "use client"
-import { useEffect, useState, SetStateAction } from "react"
+import { SetStateAction, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
 import Image from "next/image"
 import Link from "next/link"
-import { IoMdSearch, IoIosArrowBack, IoIosArrowForward } from "react-icons/io"
+import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io"
 import { GoPlus } from "react-icons/go"
-import { PiDotsThree } from "react-icons/pi"
 import { IoAddCircleSharp } from "react-icons/io5"
 
 interface Medicine {
