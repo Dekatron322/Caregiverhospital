@@ -12,6 +12,8 @@ import Link from "next/link"
 import { GoPlus } from "react-icons/go"
 import { IoAddCircleSharp } from "react-icons/io5"
 import DeletePatientModal from "components/Modals/DeletePatientModal"
+import AOS from "aos"
+import "aos/dist/aos.css"
 
 interface Patients {
   id: string
@@ -47,6 +49,13 @@ export default function Patients() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [patientToDelete, setPatientToDelete] = useState<Patients | null>(null)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
+
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+    })
+  }, [])
 
   const handlePatientClick = (patientId: string) => {
     router.push(`/patients/patient/${patientId}`)
@@ -143,7 +152,12 @@ export default function Patients() {
               <p className="capitalize">{pathname.split("/").pop()}</p>
             </div>
 
-            <div className="mb-6 mt-10 flex items-center justify-between px-16 max-md:px-3">
+            <div
+              className="mb-6 mt-10 flex items-center justify-between px-16 max-md:px-3"
+              data-aos="fade-in"
+              data-aos-duration="1000"
+              data-aos-delay="500"
+            >
               <div className="search-bg flex h-10 items-center justify-between gap-2 rounded border border-[#CFDBD5] px-3 py-1 max-md:w-[180px] lg:w-[300px]">
                 <Image className="dark-icon-style" src="/search-dark.svg" width={16} height={16} alt="dekalo" />
                 <input
@@ -189,6 +203,9 @@ export default function Patients() {
                   <div
                     key={patient.id}
                     className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2 "
+                    data-aos="fade-in"
+                    data-aos-duration="1000"
+                    data-aos-delay="500"
                   >
                     <div className="flex w-[20%] items-center gap-1 text-sm font-bold">
                       {/* {patient.image ? (

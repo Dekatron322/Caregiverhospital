@@ -1,15 +1,15 @@
 "use client"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import axios from "axios"
 import { HiMiniStar } from "react-icons/hi2"
 import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
 import { RiImageAddLine } from "react-icons/ri"
-import { IoChevronDownOutline } from "react-icons/io5"
-import { RxCalendar } from "react-icons/rx"
 import { useRouter } from "next/navigation"
 import { IoMdArrowBack } from "react-icons/io"
 import Image from "next/image"
+import AOS from "aos"
+import "aos/dist/aos.css"
 
 interface RateIconProps {
   filled: boolean
@@ -29,12 +29,6 @@ const RateIcon: React.FC<RateIconProps> = ({ filled, onClick }) => {
   )
 }
 const Page: React.FC = () => {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  const [rating, setRating] = useState<number>(0)
-  const [isAnonymous, setIsAnonymous] = useState<boolean>(false)
-  const [comment, setComment] = useState<string>("")
-  const [selectedAmenities, setSelectedAmenities] = useState<number[]>([])
-
   const [searchTerm, setSearchTerm] = useState<Department | "">("")
   const [showDropdown, setShowDropdown] = useState(false)
   const [username, setUsername] = useState("")
@@ -52,6 +46,13 @@ const Page: React.FC = () => {
   const [showErrorNotification, setShowErrorNotification] = useState(false)
   const departments: Department[] = ["Admin", "Doctors", "Pharmacy", "Laboratory", "Nurse", "Patients"]
   const router = useRouter()
+
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+    })
+  }, [])
 
   const handleGoBack = () => {
     router.back()
@@ -114,7 +115,12 @@ const Page: React.FC = () => {
                 <p className="">Go back</p>
               </button>
             </div>
-            <div className="flex h-full w-full items-center justify-center ">
+            <div
+              className="mb-2 flex h-full w-full items-center justify-center"
+              data-aos="fade-in"
+              data-aos-duration="1000"
+              data-aos-delay="500"
+            >
               <div className="auth flex rounded-lg md:w-2/3">
                 <div className="w-full px-6 py-8">
                   <h6 className="text-lg font-medium">Register Staff</h6>

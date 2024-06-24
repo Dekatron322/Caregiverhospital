@@ -1,6 +1,8 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import styles from "./modal.module.css"
 import { LiaTimesSolid } from "react-icons/lia"
+import AOS from "aos"
+import "aos/dist/aos.css"
 
 interface DeleteDepartmentModalProps {
   isOpen: boolean
@@ -16,6 +18,13 @@ const DeleteDepartmentModal: React.FC<DeleteDepartmentModalProps> = ({
   departmentId,
 }) => {
   const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+    })
+  }, [])
 
   if (!isOpen || departmentId === null) return null
 
@@ -38,12 +47,14 @@ const DeleteDepartmentModal: React.FC<DeleteDepartmentModalProps> = ({
   }
 
   return (
-    <div className={styles.modalOverlay}>
+    <div className={styles.modalOverlay} data-aos="fade-up" data-aos-duration="1000" data-aos-delay="500">
       <div className={styles.deleteModalContent}>
         <div className="px-6 py-6">
           <div className="flex items-center justify-between">
             <h6 className="text-lg font-medium">Delete Department</h6>
-            <LiaTimesSolid className="cursor-pointer" onClick={onClose} />
+            <div className="border-black  hover:rounded-md hover:border">
+              <LiaTimesSolid className="m-1 cursor-pointer" onClick={onClose} />
+            </div>
           </div>
 
           <div className="my-6">
