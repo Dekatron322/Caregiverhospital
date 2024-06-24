@@ -1,7 +1,6 @@
 "use client"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { MedicineList } from "utils"
 import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
 import { IoMdArrowBack } from "react-icons/io"
@@ -9,26 +8,49 @@ import { HiOutlineTrash } from "react-icons/hi2"
 import RestockModal from "components/Modals/RestockModal"
 import { FaRegEdit } from "react-icons/fa"
 import DeleteMedicineModal from "components/Modals/DeleteMedicineModal"
+import Image from "next/image"
+
+// Define types
+interface Medicine {
+  id: string
+  name: string
+  quantity: string
+  category: string
+  expiry_date: string
+  price: string
+  how_to_use: string
+  side_effect: string
+  status: boolean
+  pub_date: string
+}
 
 export default function MedicineDetailPage({ params }: { params: { medicineId: string } }) {
+  const [medicineDetail, setMedicineDetail] = useState<Medicine | null>(null)
   const [isAdmissionOpen, setIsAdmissionOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const router = useRouter()
   const { medicineId } = params
 
-  const [searchQuery, setSearchQuery] = useState<string>("")
+  useEffect(() => {
+    const fetchMedicineDetail = async () => {
+      try {
+        const response = await fetch(`https://api.caregiverhospital.com/medicine/medicine/${medicineId}`)
+        if (!response.ok) {
+          throw new Error("Failed to fetch medicine details")
+        }
+        const data = (await response.json()) as Medicine
+        setMedicineDetail(data)
+      } catch (error) {
+        console.error("Error fetching medicine details:", error)
+      }
+    }
+
+    fetchMedicineDetail()
+  }, [medicineId])
 
   const handleGoBack = () => {
     router.back()
-  }
-
-  const medicineDetail = MedicineList.find((medicine) => medicine.id === medicineId)
-
-  let filteredList = medicineDetail
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value)
   }
 
   const openAdmissionModal = () => {
@@ -52,6 +74,18 @@ export default function MedicineDetailPage({ params }: { params: { medicineId: s
     setTimeout(() => setShowSuccessNotification(false), 5000)
   }
 
+  if (!medicineDetail) {
+    return (
+      <div className="loading-text flex h-full items-center justify-center">
+        {"loading...".split("").map((letter, index) => (
+          <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>
+            {letter}
+          </span>
+        ))}
+      </div>
+    )
+  }
+
   return (
     <>
       <section className="h-full">
@@ -66,14 +100,14 @@ export default function MedicineDetailPage({ params }: { params: { medicineId: s
                   <p className="capitalize">Go back</p>
                 </button>
                 <div className="pt-10">
-                  <h3 className="font-bold">{medicineDetail.medicine_name}</h3>
+                  <h3 className="font-bold">{medicineDetail.name}</h3>
                   <div className="mt-4 grid w-full grid-cols-2 gap-2 max-sm:grid-cols-1">
                     <div key={medicineDetail.id} className="auth flex flex-col justify-center rounded-sm border ">
                       <p className="px-4 py-2 font-semibold">Medicine</p>
                       <div className="border"></div>
                       <div className="flex justify-between">
                         <div className="px-4 py-2 ">
-                          <p className="text-sn pb-4 font-bold">{medicineDetail.medicine_id}</p>
+                          <p className="text-sn pb-4 font-bold">{medicineDetail.id}</p>
                           <p className="text-xs">Medicine ID</p>
                         </div>
                         <div className="px-4 py-2">
@@ -87,20 +121,20 @@ export default function MedicineDetailPage({ params }: { params: { medicineId: s
                       <div className="border"></div>
                       <div className="flex justify-between">
                         <div className="px-4 py-2 ">
-                          <p className="pb-4 text-sm font-bold">{medicineDetail.lifetime_supply}</p>
-                          <p className="text-xs">Lifetime Supply</p>
+                          <p className="pb-4 text-sm font-bold">{medicineDetail.quantity}</p>
+                          <p className="text-xs">Quantity</p>
                         </div>
                         <div className="px-4 py-2 ">
-                          <p className="pb-4 text-sm font-bold">{medicineDetail.lifetime_sales}</p>
-                          <p className="text-xs">Lifetime Sales</p>
+                          <p className="pb-4 text-sm font-bold">{medicineDetail.price}</p>
+                          <p className="text-xs">Price</p>
                         </div>
                         <div className="px-4 py-2 ">
-                          <p className="pb-4 text-sm font-bold">{medicineDetail.stock_left}</p>
-                          <p className="text-xs">Stock Left</p>
+                          <p className="pb-4 text-sm font-bold">{medicineDetail.status}</p>
+                          <p className="text-xs">Status</p>
                         </div>
                         <div className="px-4 py-2 max-sm:hidden">
-                          <p className="pb-4 text-sm font-bold">{medicineDetail.expiry}</p>
-                          <p className="text-xs">Expiry</p>
+                          <p className="pb-4 text-sm font-bold">{medicineDetail.expiry_date}</p>
+                          <p className="text-xs">Expiry Date</p>
                         </div>
                       </div>
                     </div>
@@ -119,7 +153,7 @@ export default function MedicineDetailPage({ params }: { params: { medicineId: s
                     <div className="border"></div>
                     <div className="flex">
                       <div className="px-4 py-4 ">
-                        <p className="text-sm">{medicineDetail.side_effects}</p>
+                        <p className="text-sm">{medicineDetail.side_effect}</p>
                       </div>
                     </div>
                   </div>
@@ -146,6 +180,12 @@ export default function MedicineDetailPage({ params }: { params: { medicineId: s
           </div>
         </div>
       </section>
+      {showSuccessNotification && (
+        <div className="animation-fade-in absolute bottom-16  right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
+          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
+          <span className="clash-font text-sm  text-[#0F920F]">deleted Successfully</span>
+        </div>
+      )}
       <RestockModal
         isOpen={isAdmissionOpen}
         onClose={closeAdmissionModal}

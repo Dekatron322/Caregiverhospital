@@ -144,13 +144,13 @@ export default function Patients() {
             </div>
 
             <div className="mb-6 mt-10 flex items-center justify-between px-16 max-md:px-3">
-              <div className="search-bg flex h-8 items-center justify-between gap-2 rounded border border-[#CFDBD5] px-3 py-1 max-md:w-[180px] lg:w-[300px]">
-                <IoMdSearch />
+              <div className="search-bg flex h-10 items-center justify-between gap-2 rounded border border-[#CFDBD5] px-3 py-1 max-md:w-[180px] lg:w-[300px]">
+                <Image className="dark-icon-style" src="/search-dark.svg" width={16} height={16} alt="dekalo" />
                 <input
                   type="text"
                   id="search"
                   placeholder="Search"
-                  className="w-full bg-transparent outline-none focus:outline-none"
+                  className="w-full bg-transparent text-xs outline-none focus:outline-none"
                   style={{ width: "100%" }}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}

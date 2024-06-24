@@ -3,6 +3,8 @@ import styles from "./modal.module.css"
 import { HiMiniStar } from "react-icons/hi2"
 import { LiaTimesSolid } from "react-icons/lia"
 import { MedicineList } from "utils"
+import { useRouter } from "next/navigation"
+import Image from "next/image"
 
 interface RateIconProps {
   filled: boolean
@@ -21,38 +23,44 @@ const RateIcon: React.FC<RateIconProps> = ({ filled, onClick }) => {
   )
 }
 
-interface ReviewModalProps {
+interface DeleteMedicineModalProps {
   isOpen: boolean
-  onSubmitSuccess: any
   onClose: () => void
-  medicineId: string // Assuming patientId is of type string
+  onSubmitSuccess: () => void
+  medicineId: string
 }
 
-const DeleteMedicineModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitSuccess, medicineId }) => {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  const [rating, setRating] = useState<number>(0)
-  const [isAnonymous, setIsAnonymous] = useState<boolean>(false)
-  const [comment, setComment] = useState<string>("")
-  const [selectedAmenities, setSelectedAmenities] = useState<number[]>([])
+const DeleteMedicineModal: React.FC<DeleteMedicineModalProps> = ({ isOpen, onClose, onSubmitSuccess, medicineId }) => {
+  const [error, setError] = useState<string | null>(null)
+  const [showSuccessNotification, setShowSuccessNotification] = useState(false)
+  const router = useRouter()
 
   const medicineDetail = MedicineList.find((medicine) => medicine.id === medicineId)
 
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen)
-  }
-
-  const handleCommentChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setComment(event.target.value)
-  }
-
   if (!isOpen) return null
 
-  const submitForm = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-    onSubmitSuccess()
-    onClose()
-  }
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(`https://api.caregiverhospital.com/medicine/medicine/${medicineId}`, {
+        method: "DELETE",
+      })
 
-  const isSubmitEnabled = comment.trim() !== "" || selectedAmenities.length > 0 || rating > 0
+      if (!response.ok) {
+        throw new Error("Failed to delete medicine")
+      }
+
+      onSubmitSuccess()
+      setShowSuccessNotification(true)
+      setTimeout(() => setShowSuccessNotification(false), 3000)
+      setTimeout(() => {
+        router.push(`/medicines/`)
+      }, 3000)
+      onClose()
+    } catch (error) {
+      console.error("Error deleting medicine:", error)
+      setError("Failed to delete medicine")
+    }
+  }
 
   return (
     <div className={styles.modalOverlay}>
@@ -66,11 +74,13 @@ const DeleteMedicineModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSu
           </div>
 
           <div className="my-6">
-            <p>Are you sure you want to delete this medicine? </p>
+            <p>Are you sure you want to delete this medicine?</p>
           </div>
 
+          {error && <div className="text-red-500">{error}</div>}
+
           <div className="mt-4 flex w-full gap-6">
-            <button className="button-danger h-[50px] w-full rounded-sm max-sm:h-[45px]" onClick={submitForm}>
+            <button className="button-danger h-[50px] w-full rounded-sm max-sm:h-[45px]" onClick={handleDelete}>
               DELETE
             </button>
 
@@ -80,6 +90,12 @@ const DeleteMedicineModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSu
           </div>
         </div>
       </div>
+      {showSuccessNotification && (
+        <div className="animation-fade-in absolute bottom-16  right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
+          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
+          <span className="clash-font text-sm  text-[#0F920F]">Login Successfully</span>
+        </div>
+      )}
     </div>
   )
 }

@@ -149,12 +149,18 @@ export default function HmoDetailPage({ params }: HmoDetailPageProps) {
                       <div className="flex items-center justify-between">
                         <h1 className="font-semibold">{hmoDetail.name}</h1>
                         <div className="search-bg flex h-10 items-center justify-between gap-2 rounded border border-[#CFDBD5] px-3 py-1 max-md:w-[180px] lg:w-[300px]">
-                          <IoMdSearch />
+                          <Image
+                            className="dark-icon-style"
+                            src="/search-dark.svg"
+                            width={16}
+                            height={16}
+                            alt="dekalo"
+                          />
                           <input
                             type="text"
                             id="search"
                             placeholder="Search"
-                            className="w-full bg-transparent outline-none focus:outline-none"
+                            className="w-full bg-transparent text-xs outline-none focus:outline-none"
                             value={searchQuery}
                             onChange={handleSearch}
                           />

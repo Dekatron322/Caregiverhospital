@@ -7,7 +7,6 @@ import Footer from "components/Footer/Footer"
 import Image from "next/image"
 import { IoMdArrowBack } from "react-icons/io"
 import { IoChevronDownOutline } from "react-icons/io5"
-import { RiImageAddLine } from "react-icons/ri"
 import { RxCalendar } from "react-icons/rx"
 import { useRouter } from "next/navigation"
 
@@ -76,7 +75,7 @@ const Page = () => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setShowDropdown(false)
-        setShowGenderDropdown(false) // Close gender dropdown when clicking outside
+        setShowGenderDropdown(false)
       }
     }
 
@@ -400,7 +399,7 @@ const Page = () => {
                       type="submit"
                       disabled={loading}
                     >
-                      {loading ? "Adding Patient..." : "REGISTER"}
+                      {loading ? "Adding Patient..." : "REGISTER PATIENT"}
                     </button>
                   </div>
                 </form>
