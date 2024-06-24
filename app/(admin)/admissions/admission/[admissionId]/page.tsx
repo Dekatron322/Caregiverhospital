@@ -1,7 +1,6 @@
 "use client"
 import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { Admissions } from "utils"
 import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
 import Image from "next/image"
@@ -10,9 +9,9 @@ import { IoMdArrowBack } from "react-icons/io"
 import Link from "next/link"
 import { PiDotsThree } from "react-icons/pi"
 import { GoPlus } from "react-icons/go"
-import AdmissionModal from "components/Modals/AdmissionModal"
 import AdministerDrugModal from "components/Modals/AdministerDrugModal"
-import CheckoutModal from "components/Modals/CheckoutModal"
+import AOS from "aos"
+import "aos/dist/aos.css"
 
 interface PatientDetail {
   id: string
@@ -100,6 +99,13 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
   }
 
   useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+    })
+  }, [])
+
+  useEffect(() => {
     const fetchPatientDetails = async () => {
       try {
         const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${admissionId}`)
@@ -153,7 +159,7 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
             <DashboardNav />
 
             {patientDetail && (
-              <div className="px-16 py-6 ">
+              <div className="px-16 py-6" data-aos="fade-in" data-aos-duration="1000" data-aos-delay="500">
                 <button onClick={handleGoBack} className="redirect">
                   <IoMdArrowBack />
                   <p className="capitalize">Go back</p>

@@ -1,6 +1,9 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import styles from "./modal.module.css"
 import { IoClose } from "react-icons/io5"
+import AOS from "aos"
+import "aos/dist/aos.css"
+import { LiaTimesSolid } from "react-icons/lia"
 
 interface AddCategoryModalProps {
   isOpen: boolean
@@ -35,15 +38,24 @@ const AddCategoryModal: React.FC<AddCategoryModalProps> = ({ isOpen, onClose, on
     }
   }
 
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+    })
+  }, [])
+
   if (!isOpen) return null
 
   return (
-    <div className={styles.modalOverlay}>
+    <div className={styles.modalOverlay} data-aos="fade-up" data-aos-duration="1000" data-aos-delay="500">
       <div className={styles.modalContent}>
         <div className="px-6 py-6">
           <div className="flex items-center justify-between">
             <h6 className="text-lg font-medium">Add Category</h6>
-            <IoClose className="cursor-pointer" onClick={onClose} />
+            <div className="hover:rounded-md hover:border">
+              <LiaTimesSolid className="m-1 cursor-pointer" onClick={onClose} />
+            </div>
           </div>
 
           <div className="my-4">
@@ -53,7 +65,7 @@ const AddCategoryModal: React.FC<AddCategoryModalProps> = ({ isOpen, onClose, on
                 type="text"
                 id="categoryName"
                 placeholder="Enter Category Name"
-                className="h-[45px] w-full bg-transparent outline-none focus:outline-none"
+                className="h-[45px] w-full bg-transparent text-xs outline-none focus:outline-none"
                 style={{ width: "100%" }}
                 value={categoryName}
                 onChange={handleCategoryNameChange}

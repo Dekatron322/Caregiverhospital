@@ -10,6 +10,8 @@ import Link from "next/link"
 import PatientDetails from "components/Patient/PatientDetails"
 import { IoMdArrowBack } from "react-icons/io"
 import { MdLocationPin } from "react-icons/md"
+import AOS from "aos"
+import "aos/dist/aos.css"
 
 interface PatientDetail {
   id: string
@@ -71,6 +73,13 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
   const [showDeleteNotification, setShowDeleteNotification] = useState(false)
   const router = useRouter()
   const { patientId } = params
+
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+    })
+  }, [])
 
   useEffect(() => {
     const fetchPatientDetails = async () => {
@@ -166,12 +175,12 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
             <DashboardNav />
 
             {patientDetail && (
-              <div className="px-16 max-md:px-3 sm:py-10 ">
+              <div className="px-16 max-md:px-3 sm:py-10">
                 <button onClick={handleGoBack} className="redirect">
                   <IoMdArrowBack />
                   <p className="capitalize">Go back</p>
                 </button>
-                <div className="pt-10">
+                <div className="pt-10" data-aos="fade-in" data-aos-duration="1000" data-aos-delay="500">
                   <div className="mb-3 grid w-full grid-cols-4 gap-2 max-sm:grid-cols-2">
                     <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
                       <Image src="/pt-dashboard-01.svg" height={40} width={40} alt="" />

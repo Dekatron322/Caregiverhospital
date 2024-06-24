@@ -1,8 +1,10 @@
 "use client"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import styles from "./modal.module.css"
 import { LiaTimesSolid } from "react-icons/lia"
 import Image from "next/image"
+import AOS from "aos"
+import "aos/dist/aos.css"
 
 interface HmoModalProps {
   isOpen: boolean
@@ -21,6 +23,13 @@ const HmoModal: React.FC<HmoModalProps> = ({ isOpen, onClose, onSubmitSuccess, h
   const [loading, setLoading] = useState(false)
 
   const departments = ["Medical Consultants", "Pharmacy", "Medical Laboratory", "Finance", "Nurse", "Patients"]
+
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+    })
+  }, [])
 
   if (!isOpen) return null
 
@@ -78,17 +87,19 @@ const HmoModal: React.FC<HmoModalProps> = ({ isOpen, onClose, onSubmitSuccess, h
   const isSubmitEnabled = name.trim() !== "" && category.trim() !== "" && description.trim() !== ""
 
   return (
-    <div className={styles.modalOverlay}>
+    <div className={styles.modalOverlay} data-aos="fade-up" data-aos-duration="1000" data-aos-delay="500">
       <div className={styles.modalContent}>
         <div className="px-6 py-6">
           <div className="flex items-center justify-between">
             <h6 className="text-lg font-medium">Add Hmo</h6>
-            <LiaTimesSolid className="cursor-pointer" onClick={onClose} />
+            <div className="hover:rounded-md hover:border">
+              <LiaTimesSolid className="m-1 cursor-pointer" onClick={onClose} />
+            </div>
           </div>
 
           <div className="my-4">
             <p className="text-sm">Name</p>
-            <div className="search-bg mt-1 flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+            <div className="search-bg mt-1 flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 text-xs hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
               <input
                 type="text"
                 id="name"
@@ -108,7 +119,7 @@ const HmoModal: React.FC<HmoModalProps> = ({ isOpen, onClose, onSubmitSuccess, h
                 type="text"
                 id="category"
                 placeholder="Select department"
-                className="h-[45px] w-full bg-transparent outline-none focus:outline-none"
+                className="h-[45px] w-full bg-transparent text-xs outline-none focus:outline-none"
                 style={{ width: "100%", height: "45px" }}
                 value={category}
                 onChange={handleInputChange}
@@ -128,7 +139,7 @@ const HmoModal: React.FC<HmoModalProps> = ({ isOpen, onClose, onSubmitSuccess, h
                   .map((department, index) => (
                     <div
                       key={index}
-                      className="cursor-pointer overflow-hidden px-4 py-2 hover:bg-[#747A80]"
+                      className="cursor-pointer overflow-hidden px-4 py-2 text-xs hover:bg-[#747A80]"
                       onClick={() => handleDropdownSelect(department)}
                     >
                       <p className="text-sm font-medium">{department}</p>

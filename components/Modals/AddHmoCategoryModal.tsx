@@ -1,8 +1,10 @@
 "use client"
-import React, { ChangeEvent, FormEvent, useState } from "react"
+import React, { ChangeEvent, FormEvent, useEffect, useState } from "react"
 import styles from "./modal.module.css"
 import { LiaTimesSolid } from "react-icons/lia"
 import axios from "axios"
+import AOS from "aos"
+import "aos/dist/aos.css"
 
 interface AddHmoCategoryModalProps {
   isOpen: boolean
@@ -15,6 +17,13 @@ const AddHmoCategoryModal: React.FC<AddHmoCategoryModalProps> = ({ isOpen, onClo
   const [description, setDescription] = useState<string>("")
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+    })
+  }, [])
 
   if (!isOpen) return null
 
@@ -53,18 +62,20 @@ const AddHmoCategoryModal: React.FC<AddHmoCategoryModalProps> = ({ isOpen, onClo
   }
 
   return (
-    <div className={styles.modalOverlay}>
+    <div className={styles.modalOverlay} data-aos="fade-up" data-aos-duration="1000" data-aos-delay="500">
       <div className={styles.modalContent}>
         <div className="px-6 py-6">
           <div className="flex items-center justify-between">
             <h6 className="text-lg font-medium">Add Hmo</h6>
-            <LiaTimesSolid className="cursor-pointer" onClick={onClose} />
+            <div className="hover:rounded-md hover:border">
+              <LiaTimesSolid className="m-1 cursor-pointer" onClick={onClose} />
+            </div>
           </div>
 
           <form onSubmit={submitForm}>
             <div className="my-4">
               <p className="text-sm">Name</p>
-              <div className="search-bg mt-1 flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+              <div className="search-bg mt-1 flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 text-xs hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                 <input
                   type="text"
                   placeholder="Name"
@@ -81,7 +92,7 @@ const AddHmoCategoryModal: React.FC<AddHmoCategoryModalProps> = ({ isOpen, onClo
               <textarea
                 value={description}
                 onChange={handleDescriptionChange}
-                className="mt-1 h-[173px] w-full rounded-md border bg-transparent p-2 outline-none"
+                className="mt-1 h-[173px] w-full rounded-md border bg-transparent p-2 text-xs outline-none"
                 placeholder="Add your description..."
               ></textarea>
             </div>

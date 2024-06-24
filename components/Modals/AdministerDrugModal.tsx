@@ -1,9 +1,11 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import styles from "./modal.module.css"
 import { Admissions } from "utils"
 import { HiMiniStar } from "react-icons/hi2"
 import { LiaTimesSolid } from "react-icons/lia"
 import Image from "next/image"
+import AOS from "aos"
+import "aos/dist/aos.css"
 
 interface RateIconProps {
   filled: boolean
@@ -79,6 +81,13 @@ const AdministerDrugModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSu
   const [selectedCategory, setSelectedCategory] = useState<string>("")
   const [selectedMedication, setSelectedMedication] = useState<string>("")
 
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+    })
+  }, [])
+
   const drugCategories = [
     {
       category: "Male Recovery",
@@ -122,12 +131,14 @@ const AdministerDrugModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSu
   const patientDetail = Admissions.find((patient) => patient.id === patientId)
 
   return (
-    <div className={styles.modalOverlay}>
+    <div className={styles.modalOverlay} data-aos="fade-up" data-aos-duration="1000" data-aos-delay="500">
       <div className={styles.modalContent}>
         <div className="px-6 py-6">
           <div className="flex items-center justify-between">
             <h6 className="text-lg font-medium">Administer Drug </h6>
-            <LiaTimesSolid className="cursor-pointer" onClick={onClose} />
+            <div className="hover:rounded-md hover:border">
+              <LiaTimesSolid className="m-1 cursor-pointer" onClick={onClose} />
+            </div>
           </div>
           <p>Administer drug to {patientDetail?.name}</p>
           <div className="flex w-full gap-2">

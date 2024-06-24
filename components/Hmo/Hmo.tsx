@@ -2,9 +2,10 @@ import React, { useEffect, useState } from "react"
 import { IoIosArrowForward } from "react-icons/io"
 import { useRouter } from "next/navigation"
 import { HiOutlineTrash } from "react-icons/hi2"
-import DeleteModal from "components/Modals/DeleteModal"
 import Image from "next/image"
 import DeleteHmoCategoryModal from "components/Modals/DeleteHmoCategoryModal"
+import AOS from "aos"
+import "aos/dist/aos.css"
 
 interface HmoDetail {
   id: string
@@ -38,6 +39,13 @@ const HmoComponent: React.FC<HmoComponentProps> = ({ refreshKey }) => {
   useEffect(() => {
     fetchHmoCategories()
   }, [refreshKey])
+
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+    })
+  }, [])
 
   const fetchHmoCategories = async () => {
     setLoading(true)
@@ -90,7 +98,13 @@ const HmoComponent: React.FC<HmoComponentProps> = ({ refreshKey }) => {
   return (
     <>
       {hmoCategories.map((category) => (
-        <div key={category.id} className="mb-3 w-full rounded border p-4 shadow-md">
+        <div
+          key={category.id}
+          className="mb-3 w-full rounded border p-4 shadow-md"
+          data-aos="fade-in"
+          data-aos-duration="1000"
+          data-aos-delay="500"
+        >
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-2">

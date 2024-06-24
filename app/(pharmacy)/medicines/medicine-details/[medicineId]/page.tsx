@@ -9,6 +9,8 @@ import RestockModal from "components/Modals/RestockModal"
 import { FaRegEdit } from "react-icons/fa"
 import DeleteMedicineModal from "components/Modals/DeleteMedicineModal"
 import Image from "next/image"
+import AOS from "aos"
+import "aos/dist/aos.css"
 
 // Define types
 interface Medicine {
@@ -31,6 +33,13 @@ export default function MedicineDetailPage({ params }: { params: { medicineId: s
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const router = useRouter()
   const { medicineId } = params
+
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+    })
+  }, [])
 
   useEffect(() => {
     const fetchMedicineDetail = async () => {
@@ -94,7 +103,7 @@ export default function MedicineDetailPage({ params }: { params: { medicineId: s
             <DashboardNav />
 
             {medicineDetail && (
-              <div className="px-16 py-6 max-sm:px-3 ">
+              <div className="px-16 py-6 max-sm:px-3" data-aos="fade-in" data-aos-duration="1000" data-aos-delay="500">
                 <button onClick={handleGoBack} className="redirect">
                   <IoMdArrowBack />
                   <p className="capitalize">Go back</p>

@@ -3,9 +3,11 @@ import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
 import { usePathname, useRouter } from "next/navigation"
 import { Finance } from "utils"
+import AOS from "aos"
+import "aos/dist/aos.css"
 
 import { IoMdArrowBack } from "react-icons/io"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import Image from "next/image"
 import Link from "next/link"
@@ -21,19 +23,26 @@ export default function Dashboard() {
     router.back()
   }
 
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+    })
+  }, [])
+
   return (
     <>
       <section className="h-full ">
         <div className=" flex min-h-screen ">
           <div className="flex  w-screen flex-col ">
             <DashboardNav />
-            <div className="px-16 max-md:px-3 md:pt-4">
+            <div className="px-16 max-md:px-3 md:pt-4" data-aos="fade-in" data-aos-duration="1000" data-aos-delay="500">
               <button onClick={handleGoBack} className="redirect">
                 <IoMdArrowBack />
                 <p className="capitalize">Go back</p>
               </button>
             </div>
-            <div className="flex  justify-center ">
+            <div className="flex  justify-center" data-aos="fade-in" data-aos-duration="1000" data-aos-delay="500">
               <div className="flex flex-col items-center max-md:w-full ">
                 <div className="mt-4 w-full px-16 max-md:w-full max-md:flex-col max-md:px-3 md:min-w-[650px]">
                   <p className="mb-4 font-semibold">Finance</p>

@@ -9,6 +9,8 @@ import { IoAddCircleSharp } from "react-icons/io5"
 import { IoIosArrowBack, IoIosArrowForward, IoMdSearch } from "react-icons/io"
 import { usePathname, useRouter } from "next/navigation"
 import { SetStateAction, useEffect, useState } from "react"
+import AOS from "aos"
+import "aos/dist/aos.css"
 
 // Define types
 interface Medicine {
@@ -45,6 +47,13 @@ export default function MedicineCategories() {
 
   useEffect(() => {
     fetchCategories()
+  }, [])
+
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+    })
   }, [])
 
   const fetchCategories = async () => {
@@ -123,7 +132,12 @@ export default function MedicineCategories() {
             {filteredPatients.length === 0 ? (
               <></>
             ) : (
-              <div className="mb-6 mt-10 flex items-center justify-between px-16 max-sm:px-3">
+              <div
+                className="mb-6 mt-10 flex items-center justify-between px-16 max-sm:px-3"
+                data-aos="fade-in"
+                data-aos-duration="1000"
+                data-aos-delay="500"
+              >
                 <div className="search-bg flex h-10 items-center justify-between gap-2 rounded border border-[#CFDBD5] px-3 py-1 max-sm:w-[180px] lg:w-[300px]">
                   <Image className="dark-icon-style" src="/search-dark.svg" width={16} height={16} alt="dekalo" />
                   <input
@@ -156,7 +170,12 @@ export default function MedicineCategories() {
                 <p>{error}</p>
               ) : filteredPatients.length === 0 ? (
                 <>
-                  <div className="mt-auto flex h-full w-full items-center justify-center">
+                  <div
+                    className="mt-auto flex h-full w-full items-center justify-center"
+                    data-aos="fade-in"
+                    data-aos-duration="1000"
+                    data-aos-delay="500"
+                  >
                     <div>
                       <Image src="/undraw_medical_care_movn.svg" height={237} width={341} alt="pharmacy" />
                       <div className="mt-16 items-center justify-center">
@@ -175,6 +194,9 @@ export default function MedicineCategories() {
                   <div
                     key={patient.id}
                     className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
+                    data-aos="fade-in"
+                    data-aos-duration="1000"
+                    data-aos-delay="500"
                   >
                     <div className="w-full">
                       <p className="text-sm font-bold">{patient.name}</p>

@@ -12,6 +12,8 @@ import Image from "next/image"
 import DeleteModal from "components/Modals/DeleteModal"
 import EditModal from "components/Modals/EditModal"
 import { IoAddCircleSharp, IoReceipt } from "react-icons/io5"
+import AOS from "aos"
+import "aos/dist/aos.css"
 
 interface HmoDetail {
   id: string
@@ -44,6 +46,13 @@ export default function HmoDetailPage({ params }: HmoDetailPageProps) {
   const [hmoToDelete, setHmoToDelete] = useState<string | null>(null) // State to store HMO ID to delete
   const router = useRouter()
   const { hmoId } = params
+
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+    })
+  }, [])
 
   useEffect(() => {
     const fetchHmoDetails = async () => {
@@ -134,7 +143,12 @@ export default function HmoDetailPage({ params }: HmoDetailPageProps) {
               <>
                 {" "}
                 {hmoDetail && (
-                  <div className="px-16 py-3 max-md:px-3">
+                  <div
+                    className="px-16 py-3 max-md:px-3"
+                    data-aos="fade-in"
+                    data-aos-duration="1000"
+                    data-aos-delay="500"
+                  >
                     <div className="flex justify-between pt-4">
                       <button onClick={handleGoBack} className="redirect">
                         <IoMdArrowBack />
