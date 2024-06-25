@@ -26,6 +26,14 @@ interface Medicine {
   pub_date: string
 }
 
+interface Category {
+  id: string
+  name: string
+  medicines: Medicine[]
+  status: boolean
+  pub_date: string
+}
+
 export default function MedicineDetailPage({ params }: { params: { medicineId: string } }) {
   const [medicineDetail, setMedicineDetail] = useState<Medicine | null>(null)
   const [isAdmissionOpen, setIsAdmissionOpen] = useState(false)
@@ -49,7 +57,16 @@ export default function MedicineDetailPage({ params }: { params: { medicineId: s
           throw new Error("Failed to fetch medicine details")
         }
         const data = (await response.json()) as Medicine
-        setMedicineDetail(data)
+        // Fetch category name
+        const categoryResponse = await fetch(
+          `https://api.caregiverhospital.com/medicine-category/medicine_category/${data.category}`
+        )
+        if (!categoryResponse.ok) {
+          throw new Error("Failed to fetch category details")
+        }
+        const categoryData = (await categoryResponse.json()) as Category
+        // Replace category ID with category name
+        setMedicineDetail({ ...data, category: categoryData.name })
       } catch (error) {
         console.error("Error fetching medicine details:", error)
       }
@@ -138,7 +155,7 @@ export default function MedicineDetailPage({ params }: { params: { medicineId: s
                           <p className="text-xs">Price</p>
                         </div>
                         <div className="px-4 py-2 ">
-                          <p className="pb-4 text-sm font-bold">{medicineDetail.status}</p>
+                          <p className="pb-4 text-sm font-bold">{medicineDetail.status ? "Active" : "Inactive"}</p>
                           <p className="text-xs">Status</p>
                         </div>
                         <div className="px-4 py-2 max-sm:hidden">

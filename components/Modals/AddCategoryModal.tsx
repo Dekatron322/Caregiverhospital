@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react"
 import styles from "./modal.module.css"
-import { IoClose } from "react-icons/io5"
 import AOS from "aos"
 import "aos/dist/aos.css"
 import { LiaTimesSolid } from "react-icons/lia"

@@ -1,11 +1,13 @@
 "use client"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import axios from "axios"
 import { HiMiniStar } from "react-icons/hi2"
 import Image from "next/image"
 import Navbar from "components/Navbar/Navbar"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import AOS from "aos"
+import "aos/dist/aos.css"
 
 interface RateIconProps {
   filled: boolean
@@ -25,7 +27,7 @@ const RateIcon: React.FC<RateIconProps> = ({ filled, onClick }) => {
 }
 
 // Define a union type for the departments
-type Department = "Admin" | "Medical Consultants" | "Pharmacy" | "Medical Laboratory" | "Nurse" | "Patients"
+type Department = "Admin" | "Medical Consultants" | "Pharmacy" | "Laboratory" | "Nurse" | "Patients"
 
 const Page: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
@@ -42,14 +44,14 @@ const Page: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const [showErrorNotification, setShowErrorNotification] = useState(false)
-  const departments: Department[] = [
-    "Admin",
-    "Medical Consultants",
-    "Pharmacy",
-    "Medical Laboratory",
-    "Nurse",
-    "Patients",
-  ]
+  const departments: Department[] = ["Admin", "Medical Consultants", "Pharmacy", "Laboratory", "Nurse", "Patients"]
+
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+    })
+  }, [])
 
   const router = useRouter() // Initialize the router
 
@@ -57,7 +59,7 @@ const Page: React.FC = () => {
     Admin: "/dashboard",
     "Medical Consultants": "/doctor-dashboard",
     Pharmacy: "/pharmacy-dashboard",
-    "Medical Laboratory": "/laboratory-dashboard",
+    Laboratory: "/laboratory-dashboard",
     Nurse: "/nurse-dashboard",
     Patients: "/patient-dashboard",
   }
@@ -156,7 +158,12 @@ const Page: React.FC = () => {
   return (
     <>
       <Navbar />
-      <div className="flex h-screen w-full items-center justify-center ">
+      <div
+        className="flex h-screen w-full items-center justify-center"
+        data-aos="fade-up"
+        data-aos-duration="1000"
+        data-aos-delay="500"
+      >
         <div className="auth flex rounded-lg max-sm:w-full xl:min-w-[498px]">
           <div className="w-full justify-center px-6 py-6">
             <h6 className="mb-6 text-center text-lg font-medium">Sign In</h6>
@@ -268,13 +275,13 @@ const Page: React.FC = () => {
         </div>
       </div>
       {showSuccessNotification && (
-        <div className="animation-fade-in absolute bottom-16  right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
+        <div className="animation-fade-in absolute bottom-16 m-5  flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514] md:right-16">
           <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
           <span className="clash-font text-sm  text-[#0F920F]">Login Successfully</span>
         </div>
       )}
       {showErrorNotification && (
-        <div className="animation-fade-in absolute bottom-16  right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#D14343] bg-[#FEE5E5] text-[#D14343] shadow-[#05420514]">
+        <div className="animation-fade-in 0 absolute bottom-16  m-5 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#D14343] bg-[#FEE5E5] text-[#D14343] shadow-[#05420514] md:right-16">
           <Image src="/check-circle-failed.svg" width={16} height={16} alt="dekalo" />
           <span className="clash-font text-sm  text-[#D14343]">{error}</span>
         </div>
