@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import axios from "axios"
 import { PiDotsThree } from "react-icons/pi"
 import { useRouter } from "next/navigation"
 import TestModal from "components/Modals/TestModal"
+import AOS from "aos"
+import "aos/dist/aos.css"
 
 interface LabTestResult {
   id: string
@@ -24,6 +26,14 @@ const LabTests = () => {
   const [clickedCard, setClickedCard] = useState<LabTestResult | null>(null)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
   const [labTestResults, setLabTestResults] = useState<LabTestResult[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+    })
+  }, [])
 
   useEffect(() => {
     const fetchLabTestResults = async () => {
@@ -36,7 +46,7 @@ const LabTests = () => {
             test_type: test.test,
             status: test.status_note,
             image: patient.image,
-            hmo_id: patient.hmo.id,
+            hmo_id: patient.hmo.name,
             gender: patient.gender,
             age: new Date().getFullYear() - new Date(patient.dob).getFullYear(),
             doctor: test.doctor_name,
@@ -46,6 +56,8 @@ const LabTests = () => {
         setLabTestResults(results)
       } catch (error) {
         console.error("Error fetching lab test results:", error)
+      } finally {
+        setIsLoading(false)
       }
     }
 
@@ -93,6 +105,9 @@ const LabTests = () => {
           <div
             key={results.id}
             className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
+            data-aos="fade-in"
+            data-aos-duration="1000"
+            data-aos-delay="500"
           >
             <div className="w-full">
               <div className="flex items-center gap-2 text-sm font-bold">
@@ -105,7 +120,7 @@ const LabTests = () => {
 
                 <div>
                   <p className="text-sm">{results.name}</p>
-                  <p className="text-xs">HMO ID: {results.hmo_id}</p>
+                  <p className="text-xs">HMO Name: {results.hmo_id}</p>
                   <p className="text-xs">
                     {results.gender}, {results.age} years old
                   </p>
@@ -142,38 +157,50 @@ const LabTests = () => {
   }
 
   return (
-    <div className="flex w-full flex-col">
-      <div className="tab-bg mb-8 flex items-center gap-3 rounded-lg p-1 md:w-[358px] md:border">
-        <button
-          className={`${activeTab === "all" ? "active-tab" : "inactive-tab"}`}
-          onClick={() => setActiveTab("all")}
-        >
-          All
-        </button>
-        <button
-          className={`${activeTab === "approved" ? "active-tab" : "inactive-tab"}`}
-          onClick={() => setActiveTab("approved")}
-        >
-          Approved
-        </button>
+    <div className="flex w-full flex-col" data-aos="fade-in" data-aos-duration="1000" data-aos-delay="500">
+      {isLoading ? (
+        <div className="loading-text flex h-full items-center justify-center">
+          {"loading...".split("").map((letter, index) => (
+            <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>
+              {letter}
+            </span>
+          ))}
+        </div>
+      ) : (
+        <div className="tab-bg mb-8 flex items-center gap-3 rounded-lg p-1 md:w-[358px] md:border">
+          <button
+            className={`${activeTab === "all" ? "active-tab" : "inactive-tab"}`}
+            onClick={() => setActiveTab("all")}
+          >
+            All
+          </button>
+          <button
+            className={`${activeTab === "approved" ? "active-tab" : "inactive-tab"}`}
+            onClick={() => setActiveTab("approved")}
+          >
+            Approved
+          </button>
 
-        <button
-          className={`${
-            activeTab === "not approved" ? "active-tab whitespace-nowrap" : "inactive-tab whitespace-nowrap"
-          }`}
-          onClick={() => setActiveTab("not approved")}
-        >
-          Not Approved
-        </button>
+          <button
+            className={`${
+              activeTab === "not approved" ? "active-tab whitespace-nowrap" : "inactive-tab whitespace-nowrap"
+            }`}
+            onClick={() => setActiveTab("not approved")}
+          >
+            Not Approved
+          </button>
 
-        <button
-          className={`${activeTab === "discarded" ? "active-tab whitespace-nowrap" : "inactive-tab whitespace-nowrap"}`}
-          onClick={() => setActiveTab("discarded")}
-        >
-          Discarded
-        </button>
-        {isModalOpen && clickedCard && <TestModal results={clickedCard} onClose={() => setIsModalOpen(false)} />}
-      </div>
+          <button
+            className={`${
+              activeTab === "discarded" ? "active-tab whitespace-nowrap" : "inactive-tab whitespace-nowrap"
+            }`}
+            onClick={() => setActiveTab("discarded")}
+          >
+            Discarded
+          </button>
+          {isModalOpen && clickedCard && <TestModal results={clickedCard} onClose={() => setIsModalOpen(false)} />}
+        </div>
+      )}
 
       {activeTab === "all" && renderResults(() => true)}
       {activeTab === "approved" && renderResults((results) => results.status.toLowerCase() === "approved")}

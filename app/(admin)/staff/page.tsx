@@ -49,7 +49,7 @@ const getDepartmentUrl = (departmentName: string): string => {
     case "laboratory":
       return "laboratory"
     case "doctors":
-      return "doctors"
+      return "medical-consultant"
     default:
       return ""
   }

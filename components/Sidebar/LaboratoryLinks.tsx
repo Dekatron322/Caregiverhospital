@@ -12,7 +12,7 @@ const links = [
     href: "/reports",
     icon: Departments,
   },
-  { name: "Patients", href: "/pharmacy-patients", icon: Patients },
+  // { name: "Patients", href: "/pharmacy-patients", icon: Patients },
 ]
 
 export function LaboratoryLinks() {

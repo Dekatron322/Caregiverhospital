@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import axios from "axios"
 import { PiDotsThree } from "react-icons/pi"
 import { useRouter } from "next/navigation"
-import TestModal from "components/Modals/TestModal"
+import AOS from "aos"
+import "aos/dist/aos.css"
 
 interface LabTestResult {
   id: string
@@ -23,6 +24,15 @@ const LabResults = () => {
   const [clickedCard, setClickedCard] = useState<LabTestResult | null>(null)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
   const [labTestResults, setLabTestResults] = useState<LabTestResult[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+    })
+  }, [])
+
   const handlePatientClick = (patientId: any) => {
     router.push(`/reports/report/${patientId}`)
   }
@@ -40,7 +50,7 @@ const LabResults = () => {
               test_type: test.test,
               status: test.status_note,
               image: patient.image,
-              hmo_id: patient.hmo.id,
+              hmo_id: patient.hmo.name,
               gender: patient.gender,
               age: new Date().getFullYear() - new Date(patient.dob).getFullYear(),
               doctor: test.doctor_name,
@@ -50,6 +60,8 @@ const LabResults = () => {
         setLabTestResults(results)
       } catch (error) {
         console.error("Error fetching lab test results:", error)
+      } finally {
+        setIsLoading(false)
       }
     }
 
@@ -92,51 +104,67 @@ const LabResults = () => {
 
   return (
     <div className="flex w-full flex-col gap-2">
-      {labTestResults.map((results) => (
-        <div key={results.id} className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2">
-          <div className="w-full">
-            <div className="flex items-center gap-2 text-sm font-bold">
-              <span className="max-sm:hidden">
-                {/* <Image src={results.image} height={50} width={50} alt="" /> */}
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#46ffa6]">
-                  <p className="capitalize text-[#000000]">{results.name.charAt(0)}</p>
-                </div>
-              </span>
+      {isLoading ? (
+        <div className="loading-text flex h-full items-center justify-center">
+          {"loading...".split("").map((letter, index) => (
+            <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>
+              {letter}
+            </span>
+          ))}
+        </div>
+      ) : (
+        labTestResults.map((results) => (
+          <div
+            key={results.id}
+            className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
+            data-aos="fade-in"
+            data-aos-duration="1000"
+            data-aos-delay="500"
+          >
+            <div className="w-full">
+              <div className="flex items-center gap-2 text-sm font-bold">
+                <span className="max-sm:hidden">
+                  {/* <Image src={results.image} height={50} width={50} alt="" /> */}
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#46ffa6]">
+                    <p className="capitalize text-[#000000]">{results.name.charAt(0)}</p>
+                  </div>
+                </span>
 
-              <div>
-                <p className="text-sm">{results.name}</p>
-                <p className="text-xs">HMO ID: {results.hmo_id}</p>
-                <p className="text-xs">
-                  {results.gender}, {results.age} years old
-                </p>
+                <div>
+                  <p className="text-sm">{results.name}</p>
+                  <p className="text-xs">HMO Name: {results.hmo_id}</p>
+                  <p className="text-xs">
+                    {results.gender}, {results.age} years old
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-          <div className="w-full max-sm:hidden">
-            <p className="text-sm font-bold">{results.test_type}</p>
-            <p className="text-xs">Description</p>
-          </div>
-          <div className="w-full">
-            <p
-              className={`w-32 rounded ${getStatusColor(
-                results.status
-              )} px-2 py-[6px] text-center text-xs text-[#000000]`}
-            >
-              {results.status}
-            </p>
-          </div>
+            <div className="w-full max-sm:hidden">
+              <p className="text-sm font-bold">{results.test_type}</p>
+              <p className="text-xs">Description</p>
+            </div>
+            <div className="w-full">
+              <p
+                className={`w-32 rounded ${getStatusColor(
+                  results.status
+                )} px-2 py-[6px] text-center text-xs text-[#000000]`}
+              >
+                {results.status}
+              </p>
+            </div>
 
-          <div className="w-full max-sm:hidden">
-            <p className="text-sm font-bold">Requested by {results.doctor}</p>
+            <div className="w-full max-sm:hidden">
+              <p className="text-sm font-bold">Requested by {results.doctor}</p>
+            </div>
+            <div className="w-full max-sm:hidden">
+              <p className="text-sm font-bold">{formatDate(results.time)}</p>
+            </div>
+            <div>
+              <PiDotsThree onClick={() => handlePatientClick(results.id)} />
+            </div>
           </div>
-          <div className="w-full max-sm:hidden">
-            <p className="text-sm font-bold">{formatDate(results.time)}</p>
-          </div>
-          <div>
-            <PiDotsThree onClick={() => handlePatientClick(results.id)} />
-          </div>
-        </div>
-      ))}
+        ))
+      )}
     </div>
   )
 }
