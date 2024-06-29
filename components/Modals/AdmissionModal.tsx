@@ -1,10 +1,13 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import styles from "./modal.module.css"
 import { Patient } from "utils"
 import { HiMiniStar } from "react-icons/hi2"
 import { LiaTimesSolid } from "react-icons/lia"
+import AOS from "aos"
+import "aos/dist/aos.css"
 
 import Image from "next/image"
+import CustomDropdown from "components/Patient/CustomDropdown"
 
 interface RateIconProps {
   filled: boolean
@@ -27,31 +30,46 @@ interface ReviewModalProps {
   isOpen: boolean
   onSubmitSuccess: any
   onClose: () => void
-  patientId: string // Assuming patientId is of type string
+  patientId: string
 }
 
 const AdmissionModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitSuccess, patientId }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [rating, setRating] = useState<number>(0)
+  const [ward, setWard] = useState<string>("")
+  const [reason, setReason] = useState<string>("")
   const [comment, setComment] = useState<string>("")
   const [selectedAmenities, setSelectedAmenities] = useState<number[]>([])
+  const [loading, setLoading] = useState(false)
+  const [showSuccessNotification, setShowSuccessNotification] = useState(false)
+  const [showErrorNotification, setShowErrorNotification] = useState(false)
+
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+    })
+  }, [])
+
+  const wardOptions = [
+    { id: "1", name: "Male Recovery" },
+    { id: "2", name: "Female Recovery" },
+    { id: "3", name: "Post Natal Ward" },
+    { id: "4", name: "Pediatric Ward" },
+    { id: "5", name: "Female General Ward" },
+    { id: "6", name: "Male Ward" },
+    { id: "7", name: "Semi-Private Ward (Male)" },
+    { id: "8", name: "Semi-Private Ward (Female)" },
+    { id: "9", name: "Amenity 1" },
+    { id: "10", name: "Amenity 2" },
+    { id: "11", name: "Amenity 3" },
+    { id: "12", name: "Amenity 4" },
+  ]
+
+  const selectedWard = wardOptions.find((comp) => comp.id === ward)
 
   const [searchTerm, setSearchTerm] = useState("")
   const [showDropdown, setShowDropdown] = useState(false)
-  const wards = [
-    "Male Recovery",
-    "Female Recovery",
-    "Post Natal Ward",
-    "Pediatric Ward ",
-    "Female General Ward",
-    "Male Ward",
-    "Semi-Private Ward (Male)",
-    "Semi-Private Ward (Female)",
-    "Amenity 1",
-    "Amenity 2",
-    "Amenity 3",
-    "Amenity 4",
-  ]
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen)
@@ -63,9 +81,41 @@ const AdmissionModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitS
 
   if (!isOpen) return null
 
-  const submitForm = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-    onSubmitSuccess()
-    onClose()
+  const submitForm = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): Promise<void> => {
+    event.preventDefault()
+    console.log("Register button clicked") // Debug log
+    setLoading(true)
+    try {
+      const response = await fetch(`https://api.caregiverhospital.com/patient/add-check-app-to-patient/${patientId}/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ward: selectedWard ? selectedWard.name : "",
+          reason,
+        }),
+      })
+
+      if (response.ok) {
+        console.log("Form submitted successfully") // Debug log
+        onSubmitSuccess()
+        onClose()
+        setShowSuccessNotification(true)
+        setTimeout(() => setShowSuccessNotification(false), 5000)
+      } else {
+        const errorData = await response.json()
+        console.error("Failed to submit form", errorData)
+        setShowErrorNotification(true)
+        setTimeout(() => setShowErrorNotification(false), 5000)
+      }
+    } catch (error) {
+      console.error("Error submitting form", error)
+      setShowErrorNotification(true)
+      setTimeout(() => setShowErrorNotification(false), 5000)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleCancelSearch = () => {
@@ -87,71 +137,64 @@ const AdmissionModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitS
   const patientDetail = Patient.find((patient) => patient.id === patientId)
 
   return (
-    <div className={styles.modalOverlay}>
+    <div className={styles.modalOverlay} data-aos="fade-up" data-aos-duration="1000" data-aos-delay="500">
       <div className={styles.modalContent}>
         <div className="px-6 py-6">
           <div className="flex items-center justify-between">
-            <h6 className="text-lg font-medium">Admission </h6>
+            <h6 className="text-lg font-medium">Admission</h6>
 
-            <LiaTimesSolid className="cursor-pointer" onClick={onClose} />
+            <div className="hover:rounded-md hover:border">
+              <LiaTimesSolid className="m-1 cursor-pointer" onClick={onClose} />
+            </div>
           </div>
           <p>Check in {patientDetail?.name}</p>
 
-          <div className="relative mt-6">
-            <p className="text-sm">Ward </p>
-            <div className="search-bg mb-3 mt-1 flex h-[50px] w-[100%] items-center justify-between gap-3  rounded   px-3 py-1  hover:border-[#5378F6]  focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
-              <Image className="icon-style" src="/icons.svg" width={16} height={16} alt="dekalo" />
-              <Image className="dark-icon-style" src="/search-dark.svg" width={16} height={16} alt="dekalo" />
-              <input
-                type="text"
-                id="search"
-                placeholder="Select ward"
-                className="h-[50px] w-full bg-transparent  outline-none focus:outline-none"
-                style={{ width: "100%", height: "50px" }}
-                value={searchTerm}
-                onChange={handleInputChange}
-                onFocus={() => setShowDropdown(true)}
+          <div className="my-2 w-full">
+            <div className="search-bg mt-1 flex h-[50px] w-[100%] items-center justify-between gap-3 rounded py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+              <CustomDropdown
+                options={wardOptions.map((comp) => ({ id: comp.id, name: comp.name }))}
+                selectedOption={ward}
+                onChange={(selected) => setWard(selected)}
+                placeholder="Select Ward"
               />
-              {searchTerm && (
-                <button className="focus:outline-none" onClick={handleCancelSearch}>
-                  <Image className="icon-style" src="/cancel.svg" width={16} height={16} alt="cancel" />
-                  <Image className="dark-icon-style" src="/dark_cancel.svg" width={16} height={16} alt="cancel" />
-                </button>
-              )}
             </div>
-            {showDropdown && (
-              <div className="dropdown absolute left-0 top-full z-10 max-h-40 w-full overflow-auto rounded-md">
-                {wards
-                  .filter((ward) => ward.toLowerCase().includes(searchTerm.toLowerCase()))
-                  .map((ward, index) => (
-                    <div
-                      key={index}
-                      className="cursor-pointer overflow-hidden px-4 py-2 hover:bg-[#D4DCF1]"
-                      onClick={() => handleDropdownSelect(ward)}
-                    >
-                      <p className="text-sm font-medium">{ward}</p>
-                    </div>
-                  ))}
-              </div>
-            )}
           </div>
 
           <div className="my-4">
             <p className="text-sm">Reason for check in</p>
 
             <textarea
-              value={comment}
-              onChange={handleCommentChange}
+              id="reason"
               className="mt-1 h-[173px] w-full rounded-md border bg-transparent p-2 outline-none"
               placeholder="Add your description..."
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
             ></textarea>
           </div>
 
           <div className="mt-4 flex w-full gap-6">
-            <button className="button-primary h-[50px] w-full rounded-sm max-sm:h-[45px]">REGISTER</button>
+            <button
+              className="button-primary h-[50px] w-full rounded-sm max-sm:h-[45px]"
+              onClick={submitForm}
+              disabled={!isSubmitEnabled || loading}
+            >
+              REGISTER
+            </button>
           </div>
         </div>
       </div>
+      {showSuccessNotification && (
+        <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
+          <Image src="/check-circle.svg" width={16} height={16} alt="success" />
+          <span className="clash-font text-sm text-[#0F920F]">User registered successfully</span>
+        </div>
+      )}
+      {showErrorNotification && (
+        <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#D14343] bg-[#FEE5E5] text-[#D14343] shadow-[#05420514]">
+          <Image src="/check-circle-failed.svg" width={16} height={16} alt="error" />
+          <span className="clash-font text-sm text-[#D14343]">Error registering user</span>
+        </div>
+      )}
     </div>
   )
 }

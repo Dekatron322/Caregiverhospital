@@ -17,7 +17,7 @@ const DoctorSideBar = () => {
         </div>
 
         <div className="h-full border-0 border-primary-700 lg:h-auto lg:space-y-1">
-          <p className="hidden px-7 text-sm lg:block">Navigation</p>
+          <p className="hidden px-7 text-xs lg:block">Navigation</p>
 
           <DoctorLinks />
         </div>

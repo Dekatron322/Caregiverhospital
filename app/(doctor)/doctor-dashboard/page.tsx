@@ -19,16 +19,16 @@ export default function PharmacyDashboard() {
               <h4 className="font-semibold">Pharmacy Dashboard</h4>
               <p className="text-xs">A Quick overview of your pharmacy</p>
             </div>
-            <div className="mb-3 flex w-full gap-2 px-16">
+            <div className="mb-3 grid w-full grid-cols-3 gap-2 px-16 max-sm:grid-cols-1 max-sm:px-3">
               {Pharmacy.map((pharmacy) => (
                 <div
-                  className="auth flex w-full flex-col items-center justify-center rounded border border-[#01A768] pt-2  max-xl:h-[171px]"
-                  key={pharmacy.revenue_status}
+                  className="auth flex w-full flex-col items-center justify-center rounded border border-[#01A768] pt-2"
+                  key={pharmacy.inventory_status}
                 >
                   <Image src="/inventory-status.svg" height={40} width={40} alt="" />
-                  <h3 className="max-xl:h-[171px]:py-4 py-2 font-bold capitalize">{pharmacy.inventory_status} </h3>
+                  <h3 className=" py-2 font-bold capitalize">{pharmacy.inventory_status} </h3>
                   <p>Inventory Status</p>
-                  <div className="mt-2 flex w-full items-center justify-center gap-2 overflow-hidden bg-[#AADCC9] py-1">
+                  <div className="mt-2 flex w-full items-center justify-center gap-2 overflow-hidden bg-[#AADCC9] py-1 text-[#000000]">
                     <p className="text-xs">View Inventory Status</p>
                     <MdKeyboardDoubleArrowRight />
                   </div>
@@ -36,15 +36,15 @@ export default function PharmacyDashboard() {
               ))}
               {Pharmacy.map((pharmacy) => (
                 <div
-                  className="auth flex w-full flex-col items-center justify-center rounded border border-[#03A9F5] pt-2 max-xl:h-[171px]"
+                  className="auth flex w-full flex-col items-center justify-center rounded border border-[#03A9F5] pt-2 "
                   key={pharmacy.inventory_status}
                 >
                   <Image src="/medicines-available.svg" height={40} width={40} alt="" />
-                  <h3 className="max-xl:h-[171px]:py-4 py-2 font-bold">{pharmacy.medicines_available}</h3>
+                  <h3 className=" py-2 font-bold">{pharmacy.medicines_available}</h3>
                   <p>Medicines Available</p>
                   <Link
                     href="/medicines/"
-                    className="mt-2 flex w-full items-center justify-center gap-2 overflow-hidden bg-[#ABDDF4] py-1"
+                    className="mt-2 flex w-full items-center justify-center gap-2 overflow-hidden bg-[#ABDDF4] py-1 text-[#000000]"
                   >
                     <p className="text-xs">View Inventory</p>
                     <MdKeyboardDoubleArrowRight />
@@ -53,13 +53,13 @@ export default function PharmacyDashboard() {
               ))}
               {Pharmacy.map((pharmacy) => (
                 <div
-                  className="auth flex w-full flex-col items-center justify-center rounded border border-[#FED600] pt-2 max-xl:h-[171px]"
+                  className="auth flex w-full flex-col items-center justify-center rounded border border-[#FED600] pt-2 "
                   key={pharmacy.inventory_status}
                 >
                   <Image src="/revenue.svg" height={38} width={38} alt="" />
-                  <h3 className="max-xl:h-[171px]:py-4 py-2 font-bold">{pharmacy.revenue_status}</h3>
+                  <h3 className="py-2 font-bold">{pharmacy.revenue_status}</h3>
                   <p>Revenue Status</p>
-                  <div className="mt-2 flex w-full items-center justify-center gap-2 overflow-hidden bg-[#F6EAAA] py-1">
+                  <div className="mt-2 flex w-full items-center justify-center gap-2 overflow-hidden bg-[#F6EAAA] py-1 text-[#000000]">
                     <p className="text-xs">View Detailed report</p>
                     <MdKeyboardDoubleArrowRight />
                   </div>

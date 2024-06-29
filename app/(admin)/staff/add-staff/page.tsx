@@ -10,6 +10,7 @@ import { IoMdArrowBack } from "react-icons/io"
 import Image from "next/image"
 import AOS from "aos"
 import "aos/dist/aos.css"
+import CustomDropdown from "components/Patient/CustomDropdown"
 
 interface RateIconProps {
   filled: boolean
@@ -77,6 +78,8 @@ const Page: React.FC = () => {
     event.preventDefault()
     setLoading(true)
 
+    const selectedGender = genderOptions.find((gend) => gend.id === gender)
+
     try {
       const response = await axios.post("https://api.caregiverhospital.com/app_user/sign-up/", {
         username,
@@ -86,7 +89,7 @@ const Page: React.FC = () => {
         address,
         account_type: searchTerm,
         name: fullName,
-        gender,
+        gender: selectedGender ? selectedGender.name : "",
         dob: new Date().toISOString(), // This should be replaced with the actual date of birth from your form
         qualification,
       })
@@ -102,6 +105,11 @@ const Page: React.FC = () => {
       setLoading(false)
     }
   }
+
+  const genderOptions = [
+    { id: "1", name: "Male" },
+    { id: "2", name: "Female" },
+  ]
 
   return (
     <>
@@ -246,16 +254,12 @@ const Page: React.FC = () => {
                       </div>
                     </div>
                     <div className="mb-3 flex gap-3">
-                      <div className="search-bg  flex h-[50px] w-[100%] items-center justify-between gap-3  rounded   px-3 py-1  hover:border-[#5378F6]  focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
-                        <input
-                          type="text"
-                          id="gender"
-                          placeholder="Gender"
-                          className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
-                          style={{ width: "100%", height: "50px" }}
-                          value={gender}
-                          onChange={(e) => setGender(e.target.value)}
-                          required
+                      <div className="search-bg  flex h-[50px] w-[100%] items-center justify-between gap-3 rounded  py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+                        <CustomDropdown
+                          options={genderOptions.map((gend) => ({ id: gend.id, name: gend.name }))}
+                          selectedOption={gender}
+                          onChange={(selected) => setGender(selected)}
+                          placeholder="Select Complain"
                         />
                       </div>
                       <div className="search-bg  flex h-[50px] w-[100%] items-center justify-between gap-3  rounded   px-3 py-1  hover:border-[#5378F6]  focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">

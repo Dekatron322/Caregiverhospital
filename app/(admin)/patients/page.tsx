@@ -225,21 +225,21 @@ export default function Patients() {
                     <div className="flex w-full items-center gap-1 text-sm font-bold">
                       <div>
                         <p>{patient.name}</p>
-                        <small className="text-xm">ID: {patient.id}</small>
+                        <small className="text-xs">{patient.email_address}</small>
                       </div>
                     </div>
 
                     <div className="w-full max-md:hidden">
                       <p className="text-sm font-bold">{patient.dob}</p>
-                      <small className="text-xm">Date of Birth</small>
+                      <small className="text-xs">Date of Birth</small>
                     </div>
                     <div className="w-full max-md:hidden">
                       <div className="flex gap-1 text-sm font-bold">{patient.membership_no}</div>
-                      <small className="text-xm">Hmo ID</small>
+                      <small className="text-xs">Hmo ID</small>
                     </div>
                     <div className="w-full">
                       <p className="text-sm font-bold">{patient.hmo.name}</p>
-                      <small className="text-xm">Hmo name</small>
+                      <small className="text-xs">Hmo name</small>
                     </div>
                     <div className="w-full max-md:hidden">
                       <p className="w-[100px] rounded bg-[#46FFA6] px-2 py-[2px] text-center text-xs text-[#000000]">

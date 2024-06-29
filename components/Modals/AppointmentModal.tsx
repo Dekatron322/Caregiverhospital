@@ -1,9 +1,12 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import styles from "./modal.module.css"
 import { Patient } from "utils"
 import { HiMiniStar } from "react-icons/hi2"
 import { LiaTimesSolid } from "react-icons/lia"
 import Image from "next/image"
+import AOS from "aos"
+import "aos/dist/aos.css"
+import CustomDropdown from "components/Patient/CustomDropdown"
 
 interface RateIconProps {
   filled: boolean
@@ -26,15 +29,40 @@ interface ReviewModalProps {
   isOpen: boolean
   onSubmitSuccess: () => void
   onClose: () => void
-  patientId: string // Assuming patientId is of type string
+  patientId: string
 }
 
 const AppointmentModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitSuccess, patientId }) => {
   const [doctor, setDoctor] = useState<string>("")
   const [detail, setDetail] = useState<string>("")
   const [loading, setLoading] = useState(false)
+  const [doctors, setDoctors] = useState<any[]>([])
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const [showErrorNotification, setShowErrorNotification] = useState(false)
+
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+    })
+  }, [])
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchDoctors()
+    }
+  }, [isOpen])
+
+  const fetchDoctors = async () => {
+    try {
+      const response = await fetch("https://api.caregiverhospital.com/app_user/all/")
+      const data = await response.json()
+      const filteredDoctors = data.filter((user: any) => user.account_type === "Doctors")
+      setDoctors(filteredDoctors)
+    } catch (error) {
+      console.error("Error fetching doctors", error)
+    }
+  }
 
   if (!isOpen) return null
 
@@ -58,7 +86,6 @@ const AppointmentModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmi
 
       if (response.ok) {
         onSubmitSuccess()
-
         onClose()
         setShowSuccessNotification(true)
         setTimeout(() => setShowSuccessNotification(false), 5000)
@@ -77,26 +104,25 @@ const AppointmentModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmi
   }
 
   return (
-    <div className={styles.modalOverlay}>
+    <div className={styles.modalOverlay} data-aos="fade-up" data-aos-duration="1000" data-aos-delay="500">
       <div className={styles.modalContent}>
         <div className="px-6 py-6">
           <div className="flex items-center justify-between">
             <h6 className="text-lg font-medium">Admission </h6>
-            <LiaTimesSolid className="cursor-pointer" onClick={onClose} />
+            <div className="hover:rounded-md hover:border">
+              <LiaTimesSolid className="m-1 cursor-pointer" onClick={onClose} />
+            </div>
           </div>
           <p>Check in {Patient.find((patient) => patient.id === patientId)?.name}</p>
 
           <div className="relative mt-6">
-            <p className="mb-1 text-sm">Doctor </p>
-            <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
-              <input
-                type="text"
-                id="doctor"
-                placeholder="Doctor"
-                className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
-                value={doctor}
-                onChange={(e) => setDoctor(e.target.value)}
-                required
+            <p className="mb-1 text-sm">Doctor</p>
+            <div className="search-bg mt-1 flex h-[50px] w-[100%] items-center justify-between gap-3 rounded  py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+              <CustomDropdown
+                options={doctors.map((doc) => ({ id: doc.id, name: doc.username }))}
+                selectedOption={doctor}
+                onChange={setDoctor}
+                placeholder="Select Doctor"
               />
             </div>
           </div>
@@ -127,15 +153,15 @@ const AppointmentModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmi
         </div>
       </div>
       {showSuccessNotification && (
-        <div className="animation-fade-in absolute bottom-16  right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
+        <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
           <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm  text-[#0F920F]">User registered successfully</span>
+          <span className="clash-font text-sm text-[#0F920F]">User registered successfully</span>
         </div>
       )}
       {showErrorNotification && (
-        <div className="animation-fade-in absolute bottom-16  right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#D14343] bg-[#FEE5E5] text-[#D14343] shadow-[#05420514]">
+        <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#D14343] bg-[#FEE5E5] text-[#D14343] shadow-[#05420514]">
           <Image src="/check-circle-failed.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm  text-[#D14343]">User registered successfully</span>
+          <span className="clash-font text-sm text-[#D14343]">Error registering user</span>
         </div>
       )}
     </div>

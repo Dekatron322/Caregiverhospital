@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation"
 import { IoMdArrowBack } from "react-icons/io"
 import AOS from "aos"
 import "aos/dist/aos.css"
+import CustomDropdown from "components/Patient/CustomDropdown"
 
 interface RateIconProps {
   filled: boolean
@@ -160,22 +161,12 @@ const Page: React.FC = () => {
                         />
                       </div>
                       <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
-                        <select
-                          id="category"
-                          value={selectedCategory}
-                          onChange={(e) => setSelectedCategory(e.target.value)}
-                          className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
-                          style={{ width: "100%", height: "50px" }}
-                        >
-                          <option value="" disabled>
-                            Select Category
-                          </option>
-                          {categories.map((category) => (
-                            <option key={category.id} value={category.id}>
-                              {category.name}
-                            </option>
-                          ))}
-                        </select>
+                        <CustomDropdown
+                          options={categories}
+                          selectedOption={selectedCategory}
+                          onChange={(selected) => setSelectedCategory(selected)}
+                          placeholder="Select Category"
+                        />
                       </div>
                       <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                         <input
@@ -248,13 +239,13 @@ const Page: React.FC = () => {
       {showSuccessNotification && (
         <div className="animation-fade-in absolute bottom-16  right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
           <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm  text-[#0F920F]">Login Successfully</span>
+          <span className="clash-font text-sm  text-[#0F920F]">Medicine added successfully</span>
         </div>
       )}
       {showErrorNotification && (
         <div className="animation-fade-in absolute bottom-16  right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#D14343] bg-[#FEE5E5] text-[#D14343] shadow-[#05420514]">
           <Image src="/check-circle-failed.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm  text-[#D14343]">Error registering patient.</span>
+          <span className="clash-font text-sm  text-[#D14343]">Error registering medicine.</span>
         </div>
       )}
     </>

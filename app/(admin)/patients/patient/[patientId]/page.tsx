@@ -216,11 +216,11 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
                         </div>
                         <h1 className="mt-3 text-center font-bold capitalize xl:text-sm">{patientDetail.name}</h1>
                         <p className="text-center text-base font-bold xl:text-sm">
-                          Patient ID: <span className="font-normal xl:text-sm">{patientDetail.id}</span>
+                          Patient ID: <span className="font-normal xl:text-sm">{patientDetail.policy_id}</span>
                         </p>
-                        <div className="flex items-center justify-center gap-2">
-                          <MdLocationPin />
-                          {patientDetail.address}
+                        <div className="flex items-center justify-center gap-1 text-center">
+                          <MdLocationPin className="" />
+                          <p className="text-center">{patientDetail.address}</p>
                         </div>
                         <div className="my-4 flex w-full border"></div>
                         <div className="">
