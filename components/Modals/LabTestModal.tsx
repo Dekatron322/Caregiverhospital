@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react"
 import styles from "./modal.module.css"
 import { LiaTimesSolid } from "react-icons/lia"
 import axios from "axios"
+import AOS from "aos"
+import "aos/dist/aos.css"
+import Image from "next/image"
 
 interface RequestTest {
   id: string
@@ -35,6 +38,15 @@ const LabTestModal: React.FC<ModalProps> = ({ results, onClose, userId }) => {
   const [note, setNote] = useState<string>("")
   const [diagnosis, SetDiagnosis] = useState<string>("")
   const [status, SetStatus] = useState<string>("Not Approved")
+  const [showSuccessNotification, setShowSuccessNotification] = useState(false)
+  const [showErrorNotification, setShowErrorNotification] = useState(false)
+
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+    })
+  }, [])
 
   useEffect(() => {
     setMounted(true)
@@ -95,22 +107,24 @@ const LabTestModal: React.FC<ModalProps> = ({ results, onClose, userId }) => {
         throw new Error("Failed to add prescription")
       }
 
-      // setShowSuccessNotification(true)
-      // setTimeout(() => setShowSuccessNotification(false), 5000)
+      setShowSuccessNotification(true)
+      setTimeout(() => setShowSuccessNotification(false), 5000)
       onClose()
     } catch (error) {
       console.error("Error adding prescription:", error)
-      // setShowErrorNotification(true)
-      // setTimeout(() => setShowErrorNotification(false), 5000)
+      setShowErrorNotification(true)
+      setTimeout(() => setShowErrorNotification(false), 5000)
     }
   }
   return (
-    <div className={styles.modalOverlay}>
+    <div className={styles.modalOverlay} data-aos="fade-up" data-aos-duration="1000" data-aos-delay="500">
       <div className={styles.modalContent}>
         <div className="px-6 py-6">
           <div className="flex items-center justify-between">
             <p className="text-lg font-semibold">Request Lab Test</p>
-            <LiaTimesSolid className="close" onClick={onClose} />
+            <div className="hover:rounded-md hover:border">
+              <LiaTimesSolid className="m-1 cursor-pointer" onClick={onClose} />
+            </div>
           </div>
 
           <p>Enter test result for {results.name}</p>
@@ -122,7 +136,7 @@ const LabTestModal: React.FC<ModalProps> = ({ results, onClose, userId }) => {
                   type="text"
                   id="test"
                   placeholder="Enter test type"
-                  className="h-[45px] w-full bg-transparent  outline-none focus:outline-none"
+                  className="w-fullc h-[45px] bg-transparent text-xs  outline-none focus:outline-none"
                   style={{ width: "100%", height: "45px" }}
                   value={test}
                   onChange={(e) => setTest(e.target.value)}
@@ -136,7 +150,7 @@ const LabTestModal: React.FC<ModalProps> = ({ results, onClose, userId }) => {
                   type="text"
                   id="diagnosis"
                   placeholder=""
-                  className="h-[45px] w-full bg-transparent  outline-none focus:outline-none"
+                  className="h-[45px] w-full bg-transparent text-xs  outline-none focus:outline-none"
                   style={{ width: "100%", height: "45px" }}
                   value={diagnosis}
                   onChange={(e) => SetDiagnosis(e.target.value)}
@@ -149,8 +163,8 @@ const LabTestModal: React.FC<ModalProps> = ({ results, onClose, userId }) => {
             {/* <p>Note</p> */}
             <textarea
               id="note"
-              className="search-bg  h-[100px] w-full rounded border bg-transparent p-2 outline-none"
-              placeholder="Add how to use..."
+              className="search-bg h-[100px] w-full rounded border bg-transparent p-2 text-xs outline-none"
+              placeholder="Add note..."
               value={note}
               onChange={(e) => setNote(e.target.value)}
             ></textarea>
@@ -166,6 +180,18 @@ const LabTestModal: React.FC<ModalProps> = ({ results, onClose, userId }) => {
           </div>
         </div>
       </div>
+      {showSuccessNotification && (
+        <div className="animation-fade-in absolute bottom-16 m-5  flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514] md:right-16">
+          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
+          <span className="clash-font text-sm  text-[#0F920F]">Sent Successfully</span>
+        </div>
+      )}
+      {showErrorNotification && (
+        <div className="animation-fade-in 0 absolute bottom-16  m-5 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#D14343] bg-[#FEE5E5] text-[#D14343] shadow-[#05420514] md:right-16">
+          <Image src="/check-circle-failed.svg" width={16} height={16} alt="dekalo" />
+          <span className="clash-font text-sm  text-[#D14343]">Failed to add prescription</span>
+        </div>
+      )}
     </div>
   )
 }

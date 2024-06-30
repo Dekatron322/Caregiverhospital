@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react"
 import styles from "./modal.module.css"
-import { Admissions } from "utils"
 import { HiMiniStar } from "react-icons/hi2"
 import { LiaTimesSolid } from "react-icons/lia"
 import Image from "next/image"
@@ -29,7 +28,7 @@ interface ReviewModalProps {
   isOpen: boolean
   onSubmitSuccess: any
   onClose: () => void
-  patientId: string // Assuming patientId is of type string
+  patientId: string
 }
 
 interface UserDetails {

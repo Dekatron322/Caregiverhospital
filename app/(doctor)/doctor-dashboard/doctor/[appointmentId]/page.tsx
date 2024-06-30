@@ -180,11 +180,11 @@ export default function PatientDetailPage() {
                         </div>
                         <h1 className="mt-3 text-center font-bold capitalize xl:text-sm">{patient.name}</h1>
                         <p className="text-center text-base font-bold xl:text-sm">
-                          Patient ID: <span className="font-normal xl:text-sm">{patient.id}</span>
+                          Patient ID: <span className="font-normal xl:text-sm">{patient.policy_id}</span>
                         </p>
                         <div className="flex items-center justify-center gap-2">
                           <MdLocationPin />
-                          {patient.address}
+                          <p className="text-sm">{patient.address}</p>
                         </div>
                         <div className="my-4 flex w-full border"></div>
                         <div className="">
@@ -238,7 +238,6 @@ export default function PatientDetailPage() {
                               ))
                             : "No allergies"}
                         </div>
-                        <p className="mt-4 text-right font-medium">see all</p>
                       </div>
 
                       <div className="py-2">

@@ -159,6 +159,7 @@ export default function Patients() {
               data-aos-delay="500"
             >
               <div className="search-bg flex h-10 items-center justify-between gap-2 rounded border border-[#CFDBD5] px-3 py-1 max-md:w-[180px] lg:w-[300px]">
+                <Image className="icon-style" src="/icons.svg" width={16} height={16} alt="dekalo" />
                 <Image className="dark-icon-style" src="/search-dark.svg" width={16} height={16} alt="dekalo" />
                 <input
                   type="text"

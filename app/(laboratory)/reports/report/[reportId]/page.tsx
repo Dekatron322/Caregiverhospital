@@ -109,6 +109,15 @@ export default function PatientDetailPage() {
   const handleGoBack = () => {
     router.back()
   }
+
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }
+    return new Date(dateString).toLocaleDateString(undefined, options)
+  }
   return (
     <>
       <section className="h-full">
@@ -158,11 +167,11 @@ export default function PatientDetailPage() {
                         </div>
                         <h1 className="mt-3 text-center font-bold capitalize xl:text-sm">{patient.name}</h1>
                         <p className="text-center text-base font-bold xl:text-sm">
-                          Patient ID: <span className="font-normal xl:text-sm">{patient.id}</span>
+                          Patient ID: <span className="font-normal xl:text-sm">{patient.policy_id}</span>
                         </p>
                         <div className="flex items-center justify-center gap-2">
                           <MdLocationPin />
-                          {patient.address}
+                          <p className="text-sm">{patient.address}</p>
                         </div>
                         <div className="my-4 flex w-full border"></div>
                         <div className="">
@@ -226,11 +235,6 @@ export default function PatientDetailPage() {
                               key={record.id}
                               className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
                             >
-                              <div className=" w-full">
-                                <p className="flex w-full text-sm font-bold">{record.id}</p>
-                                <small className="text-xm">{record.pub_date}</small>
-                              </div>
-
                               <div className="flex w-full items-center gap-1 text-sm font-bold">
                                 <span>
                                   {/* <Image src={record.doctor_image} height={40} width={40} alt="" /> */}
@@ -240,14 +244,20 @@ export default function PatientDetailPage() {
                                 </span>
                                 <div>
                                   <p className="text-sm font-bold">{record.doctor_name}</p>
-                                  <small className="text-xm">Doctor Name</small>
+                                  <small className="text-xs">Doctor Name</small>
                                 </div>
                               </div>
 
-                              <div className=" w-full">
-                                <p className="text-sm font-bold">{record.test}</p>
-                                <small className="text-xm">Test</small>
+                              <div className="w-full">
+                                <p className="flex w-full text-sm font-bold">{formatDate(record.pub_date)}</p>
+                                <small className="text-xs">Date</small>
                               </div>
+
+                              <div className="w-full">
+                                <p className="text-sm font-bold">{record.test}</p>
+                                <small className="text-xs">Test</small>
+                              </div>
+
                               <div className="flex gap-2">
                                 <button className="flex w-28 items-center justify-center gap-1 rounded bg-[#46FFA6] px-2 py-[2px] text-xs text-[#000000]">
                                   <IoPrintOutline /> Print

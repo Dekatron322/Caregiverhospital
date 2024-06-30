@@ -7,7 +7,6 @@ import Image from "next/image"
 import { MdLocationPin } from "react-icons/md"
 import { IoMdArrowBack } from "react-icons/io"
 import Link from "next/link"
-import { PiDotsThree } from "react-icons/pi"
 import { GoPlus } from "react-icons/go"
 import AdministerDrugModal from "components/Modals/AdministerDrugModal"
 import AOS from "aos"
@@ -72,6 +71,7 @@ interface PatientDetail {
       category: string
       name: string
       unit: string
+      nurse_name: string
       pub_date: string
     }[]
     ward: string
@@ -89,10 +89,10 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
   const [isAdmissionOpen, setIsAdmissionOpen] = useState(false)
   const [patientDetail, setPatientDetail] = useState<PatientDetail | null>(null)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
+  const [refreshKey, setRefreshKey] = useState(0)
+  const [loading, setLoading] = useState(true)
   const router = useRouter()
   const { admissionId } = params
-
-  const [searchQuery, setSearchQuery] = useState<string>("")
 
   const handleGoBack = () => {
     router.back()
@@ -105,26 +105,22 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
     })
   }, [])
 
-  useEffect(() => {
-    const fetchPatientDetails = async () => {
-      try {
-        const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${admissionId}`)
-        if (!response.ok) {
-          throw new Error("Network response was not ok")
-        }
-        const data = (await response.json()) as PatientDetail
-        setPatientDetail(data)
-      } catch (error) {
-        console.error("Error fetching patient details:", error)
+  const fetchPatientDetails = async () => {
+    try {
+      const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${admissionId}`)
+      if (!response.ok) {
+        throw new Error("Network response was not ok")
       }
+      const data = (await response.json()) as PatientDetail
+      setPatientDetail(data)
+    } catch (error) {
+      console.error("Error fetching patient details:", error)
     }
-
-    fetchPatientDetails()
-  }, [admissionId])
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value)
   }
+
+  useEffect(() => {
+    fetchPatientDetails()
+  }, [admissionId, refreshKey])
 
   const openAdmissionModal = () => {
     setIsAdmissionOpen(true)
@@ -136,6 +132,8 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
 
   const handleHmoSubmissionSuccess = () => {
     setShowSuccessNotification(true)
+    setRefreshKey((prevKey) => prevKey + 1)
+    fetchPatientDetails() // Refetch patient details to update the drug list
     setTimeout(() => setShowSuccessNotification(false), 5000)
   }
 
@@ -149,6 +147,25 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
       second: "2-digit",
     }
     return new Date(dateString).toLocaleDateString(undefined, options)
+  }
+
+  if (!patientDetail) {
+    return (
+      <section className="h-full">
+        <div className="flex min-h-screen">
+          <div className="flex w-screen flex-col">
+            <DashboardNav />
+            <div className="loading-text flex h-full items-center justify-center">
+              {"loading...".split("").map((letter, index) => (
+                <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>
+                  {letter}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+    )
   }
 
   return (
@@ -182,11 +199,11 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
                         </div>
                         <h1 className="mt-3 text-center font-bold capitalize">{patientDetail.name}</h1>
                         <p className="text-center text-base font-bold">
-                          Patient ID: <span className="font-normal">{patientDetail.id}</span>
+                          Patient ID: <span className="font-normal">{patientDetail.policy_id}</span>
                         </p>
-                        <div className="flex items-center justify-center gap-2">
+                        <div className="flex items-center justify-center gap-1">
                           <MdLocationPin />
-                          {patientDetail.address}
+                          <p className="text-center text-sm">{patientDetail.address}</p>
                         </div>
                         <div className="my-4 flex w-full border"></div>
                         <div>
@@ -220,7 +237,6 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
                               ))
                             : "No allergies"}
                         </div>
-                        <p className="mt-4 text-right font-medium">see all</p>
                       </div>
 
                       <div className="py-2">
@@ -260,31 +276,28 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
                               key={drug.id}
                               className="mb-2 flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
                             >
-                              <div className="flex items-center gap-2">
-                                <div></div>
-                                <div>
-                                  <p className="text-sm font-bold">Nurse Name</p>
+                              <div className="flex w-full items-center gap-2">
+                                <div className="">
+                                  <p className="text-sm font-bold capitalize">{drug.nurse_name}</p>
                                   <small className="text-xm">nurse</small>
                                 </div>
                               </div>
-                              <div>
-                                <p className="text-sm font-bold">{drug.name}</p>
+                              <div className="w-full">
+                                <p className="text-sm font-bold capitalize">{drug.name}</p>
                                 <small className="text-xm">Medication name</small>
                               </div>
-                              <div>
-                                <p className="text-sm font-bold">{drug.category}</p>
+                              <div className="w-full">
+                                <p className="text-sm font-bold capitalize">{drug.category}</p>
                                 <small className="text-xm">Category</small>
                               </div>
-                              <div>
-                                <p className="text-sm font-bold">{drug.unit}</p>
+                              <div className="w-full">
+                                <p className="text-sm font-bold capitalize">{drug.unit}</p>
                                 <small className="text-xm">Units</small>
                               </div>
-                              <div>
-                                <p className="text-sm font-bold">{formatDate(drug.pub_date)}</p>
+                              <div className="w-full">
+                                <p className="whitespace-nowrap text-xs font-bold">{formatDate(drug.pub_date)}</p>
                                 <small className="text-xm">Time and Date Administered</small>
                               </div>
-
-                              <PiDotsThree />
                             </div>
                           ))}
                         </div>
@@ -298,6 +311,12 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
           </div>
         </div>
       </section>
+      {showSuccessNotification && (
+        <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
+          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
+          <span className="clash-font text-sm text-[#0F920F]">Category Created Successfully</span>
+        </div>
+      )}
       <AdministerDrugModal
         isOpen={isAdmissionOpen}
         onClose={closeAdmissionModal}

@@ -233,12 +233,12 @@ const PrescriptionModal: React.FC<ModalProps> = ({ results, onClose, userId }) =
           </div>
           <div className="my-2 flex w-full gap-2">
             <div className="w-full">
-              <div className="search-bg mt-1 flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+              <div className="search-bg last: mt-1 flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                 <input
                   type="text"
                   id="code"
                   placeholder="Code"
-                  className="h-[45px] w-full bg-transparent text-xs outline-none focus:outline-none"
+                  className="-xs h-[45px] w-full bg-transparent text-xs outline-none focus:outline-none"
                   style={{ width: "100%", height: "45px" }}
                   value={code}
                   onChange={(e) => setCode(e.target.value)}

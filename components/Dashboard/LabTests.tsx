@@ -9,14 +9,10 @@ import "aos/dist/aos.css"
 interface LabTestResult {
   id: string
   name: string
+  doctor_name: string
   test_type: string
-  status: string
-  image: string
-  hmo_id: string
-  gender: string
-  age: number
-  doctor: string
-  time: string
+  status_note: string
+  pub_date: string
 }
 
 const LabTests = () => {
@@ -38,22 +34,9 @@ const LabTests = () => {
   useEffect(() => {
     const fetchLabTestResults = async () => {
       try {
-        const response = await axios.get("https://api.caregiverhospital.com/patient/patient/")
-        const results = response.data.flatMap((patient: any) =>
-          patient.lab_tests.map((test: any) => ({
-            id: test.id,
-            name: patient.name,
-            test_type: test.test_type,
-            status: test.status_note,
-            image: patient.image,
-            hmo_id: patient.hmo.name,
-            gender: patient.gender,
-            age: new Date().getFullYear() - new Date(patient.dob).getFullYear(),
-            doctor: test.doctor_name,
-            time: test.pub_date,
-          }))
-        )
-        setLabTestResults(results)
+        const response = await axios.get("https://api.caregiverhospital.com/lab-test/lab-test/")
+        console.log(response.data) // Check the complete data
+        setLabTestResults(response.data) // Set the full response directly
       } catch (error) {
         console.error("Error fetching lab test results:", error)
       } finally {
@@ -77,7 +60,7 @@ const LabTests = () => {
     switch (status.toLowerCase()) {
       case "approved":
         return "bg-green-200"
-      case "awaiting specimen":
+      case "not approved":
         return "bg-[#F2B8B5]"
       case "discarded":
         return "bg-gray-200"
@@ -105,47 +88,31 @@ const LabTests = () => {
           <div
             key={results.id}
             className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
-            data-aos="fade-in"
-            data-aos-duration="1000"
-            data-aos-delay="500"
           >
             <div className="w-full">
               <div className="flex items-center gap-2 text-sm font-bold">
                 <span className="max-sm:hidden">
-                  {/* <Image src={results.image} height={50} width={50} alt="" /> */}
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#46ffa6]">
-                    <p className="capitalize text-[#000000]">{results.name.charAt(0)}</p>
+                    <p className="capitalize text-[#000000]">{results.doctor_name.charAt(0)}</p>
                   </div>
                 </span>
-
                 <div>
-                  <p className="text-sm">{results.name}</p>
-                  <p className="text-xs">HMO Name: {results.hmo_id}</p>
-                  <p className="text-xs">
-                    {results.gender}, {results.age} years old
-                  </p>
+                  <p className="text-sm">Doctor: {results.doctor_name}</p>
+                  <p className="text-xs">Test Type: {results.test_type || "N/A"}</p>
                 </div>
               </div>
-            </div>
-            <div className="w-full max-sm:hidden">
-              <p className="text-sm font-bold">{results.test_type}</p>
-              <p className="text-xs">Description</p>
             </div>
             <div className="w-full">
               <p
                 className={`w-32 rounded ${getStatusColor(
-                  results.status
+                  results.status_note
                 )} px-2 py-[6px] text-center text-xs text-[#000000]`}
               >
-                {results.status}
+                {results.status_note}
               </p>
             </div>
-
             <div className="w-full max-sm:hidden">
-              <p className="text-sm font-bold">Requested by {results.doctor}</p>
-            </div>
-            <div className="w-full max-sm:hidden">
-              <p className="text-sm font-bold">{formatDate(results.time)}</p>
+              <p className="text-sm font-bold">{formatDate(results.pub_date)}</p>
             </div>
             <div>
               <PiDotsThree onClick={() => handleCardClick(results)} />
@@ -203,9 +170,10 @@ const LabTests = () => {
         )}
 
         {activeTab === "all" && renderResults(() => true)}
-        {activeTab === "approved" && renderResults((results) => results.status.toLowerCase() === "approved")}
-        {activeTab === "not approved" && renderResults((results) => results.status.toLowerCase() === "not approved")}
-        {activeTab === "discarded" && renderResults((results) => results.status.toLowerCase() === "discarded")}
+        {activeTab === "approved" && renderResults((results) => results.status_note.toLowerCase() === "approved")}
+        {activeTab === "not approved" &&
+          renderResults((results) => results.status_note.toLowerCase() === "not approved")}
+        {activeTab === "discarded" && renderResults((results) => results.status_note.toLowerCase() === "discarded")}
       </div>
       {isModalOpen && clickedCard && <TestModal results={clickedCard} onClose={() => setIsModalOpen(false)} />}
     </>

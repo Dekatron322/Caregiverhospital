@@ -25,9 +25,10 @@ interface HmoDetail {
 
 interface HmoComponentProps {
   refreshKey: number
+  openDeleteModal: (hmoId: string) => void
 }
 
-const HmoComponent: React.FC<HmoComponentProps> = ({ refreshKey }) => {
+const HmoComponent: React.FC<HmoComponentProps> = ({ refreshKey, openDeleteModal }) => {
   const router = useRouter()
   const [hmoCategories, setHmoCategories] = useState<HmoDetail[]>([])
   const [loading, setLoading] = useState<boolean>(true)
@@ -79,11 +80,6 @@ const HmoComponent: React.FC<HmoComponentProps> = ({ refreshKey }) => {
       </div>
     )
   if (error) return <p>{error}</p>
-
-  const openDeleteModal = (hmoId: string) => {
-    setHmoToDelete(hmoId)
-    setIsDeleteOpen(true)
-  }
 
   const closeDeleteModal = () => {
     setIsDeleteOpen(false)

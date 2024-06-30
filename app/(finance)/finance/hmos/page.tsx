@@ -12,10 +12,13 @@ import { GoPlus } from "react-icons/go"
 
 import HmoComponent from "components/Hmo/Hmo"
 import AddHmoCategoryModal from "components/Modals/AddHmoCategoryModal"
+import DeleteHmoCategoryModal from "components/Modals/DeleteHmoCategoryModal"
 
 const Dashboard: React.FC = () => {
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const [isAddHmoOpen, setIsAddHmoOpen] = useState(false)
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
+  const [hmoToDelete, setHmoToDelete] = useState<string | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
   const router = useRouter()
   const pathname = usePathname()
@@ -41,17 +44,26 @@ const Dashboard: React.FC = () => {
     setIsAddHmoOpen(false)
   }
 
+  const openDeleteModal = (hmoId: string) => {
+    setHmoToDelete(hmoId)
+    setIsDeleteOpen(true)
+  }
+
+  const closeDeleteModal = () => {
+    setIsDeleteOpen(false)
+  }
+
   const handleHmoSubmissionSuccess = () => {
     setShowSuccessNotification(true)
-    setTimeout(() => setShowSuccessNotification(false), 5000)
     setRefreshKey((prevKey) => prevKey + 1) // Trigger refresh
+    setTimeout(() => setShowSuccessNotification(false), 5000)
   }
 
   return (
     <>
-      <section className="h-full ">
-        <div className=" flex min-h-screen ">
-          <div className="flex  w-screen flex-col ">
+      <section className="h-full">
+        <div className="flex min-h-screen">
+          <div className="flex w-screen flex-col">
             <DashboardNav />
             <div
               className="flex justify-between px-16 max-md:px-3 md:pt-4"
@@ -77,7 +89,7 @@ const Dashboard: React.FC = () => {
                   data-aos-delay="500"
                 >
                   <p className="mb-4 font-semibold">HMOs</p>
-                  <HmoComponent refreshKey={refreshKey} />
+                  <HmoComponent refreshKey={refreshKey} openDeleteModal={openDeleteModal} />
                 </div>
               </div>
             </div>
@@ -89,11 +101,17 @@ const Dashboard: React.FC = () => {
           onClose={closeHmoModal}
           onSubmitSuccess={handleHmoSubmissionSuccess}
         />
+        <DeleteHmoCategoryModal
+          isOpen={isDeleteOpen}
+          onClose={closeDeleteModal}
+          onSubmitSuccess={handleHmoSubmissionSuccess}
+          hmoId={hmoToDelete}
+        />
       </section>
       {showSuccessNotification && (
-        <div className="animation-fade-in absolute bottom-16  right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
+        <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
           <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm  text-[#0F920F]">Category Created Successfully</span>
+          <span className="clash-font text-sm text-[#0F920F]">Category Created Successfully</span>
         </div>
       )}
     </>

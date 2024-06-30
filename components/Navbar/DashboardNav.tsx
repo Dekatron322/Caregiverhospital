@@ -129,7 +129,7 @@ const DashboardNav: React.FC = () => {
     <>
       <nav className="hidden border-b px-16 py-4 md:block">
         <div className="flex items-center justify-between">
-          <h5 className="font-bold capitalize">Admin {pathname.split("/").pop()}</h5>
+          <h5 className="font-bold capitalize">Admin Dashboard</h5>
 
           <div className="flex items-center gap-2">
             <Search />

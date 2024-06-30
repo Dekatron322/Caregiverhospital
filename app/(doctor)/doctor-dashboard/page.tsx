@@ -16,7 +16,7 @@ export default function PharmacyDashboard() {
             <DashboardNav />
 
             <div className="mt-10 px-16 pb-4">
-              <h4 className="font-semibold">Pharmacy Dashboard</h4>
+              <h4 className="font-semibold">Doctor's Dashboard</h4>
               <p className="text-xs">A Quick overview of your pharmacy</p>
             </div>
             <div className="mb-3 grid w-full grid-cols-3 gap-2 px-16 max-sm:grid-cols-1 max-sm:px-3">

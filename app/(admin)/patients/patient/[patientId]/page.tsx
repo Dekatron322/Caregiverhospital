@@ -274,7 +274,7 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
                               ))
                             : "No allergies"}
                         </div>
-                        <p className="mt-4 text-right font-medium">see all</p>
+                        {/* <p className="mt-4 text-right font-medium">see all</p> */}
                       </div>
 
                       <div className="py-2">
