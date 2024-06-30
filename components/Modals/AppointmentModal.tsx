@@ -56,7 +56,7 @@ const AppointmentModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmi
   const fetchDoctors = async () => {
     try {
       const response = await fetch("https://api.caregiverhospital.com/app_user/all/")
-      const data = await response.json()
+      const data = (await response.json()) as any[]
       const filteredDoctors = data.filter((user: any) => user.account_type === "Doctors")
       setDoctors(filteredDoctors)
     } catch (error) {
