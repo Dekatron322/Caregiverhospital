@@ -262,8 +262,9 @@ export default function PatientDetails({ params }: { params: { patientId: string
       </div>
 
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div className="search-bg mb-4 flex h-8 items-center justify-between gap-2 rounded border border-[#CFDBD5] px-3 py-1 max-md:w-[180px] lg:w-[300px]">
-          <IoMdSearch />
+        <div className="search-bg mb-4 flex h-8 items-center justify-between gap-2 rounded border border-[#CFDBD5] px-3 py-2 max-md:w-[180px] lg:w-[300px]">
+          <Image className="icon-style" src="/icons.svg" width={16} height={16} alt="dekalo" />
+          <Image className="dark-icon-style" src="/search-dark.svg" width={16} height={16} alt="dekalo" />
           <input
             type="search"
             name="search"

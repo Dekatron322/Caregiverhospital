@@ -66,7 +66,7 @@ interface Patient {
     doctor_name: string
     doctor_request_title: string
     doctor_request_description: string
-    test: string
+    test_type: string
     result: string
     pub_date: string
   }[]
@@ -254,7 +254,7 @@ export default function PatientDetailPage() {
                               </div>
 
                               <div className="w-full">
-                                <p className="text-sm font-bold">{record.test}</p>
+                                <p className="text-sm font-bold">{record.test_type}</p>
                                 <small className="text-xs">Test</small>
                               </div>
 

@@ -28,12 +28,13 @@ interface Prescription {
 
 interface MedicalRecord {
   id: string
-  name: string
-  doctor_assigned: string
-  doctor_image: string
-  test: string
+  doctor_name: string
+  doctor_request_title: string
+  doctor_request_description: string
+  test_type: string
   result: string
   pub_date: string
+  status_note: string
 }
 
 interface PatientDetail {
@@ -41,7 +42,7 @@ interface PatientDetail {
   name: string
   appointments: Appointment[]
   prescriptions: Prescription[]
-  medical_records: MedicalRecord[]
+  lab_tests: MedicalRecord[]
 }
 
 const formatDateTime = (dateString: string) => {
@@ -110,8 +111,9 @@ export default function PatientDetailsForDoctor({ params }: { params: { patientI
     prescription.name.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  const filteredMedicalRecords = patientDetail.medical_records.filter((medical) =>
-    medical.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredMedicalRecords = patientDetail.lab_tests.filter(
+    (medical) =>
+      medical.test_type.toLowerCase().includes(searchQuery.toLowerCase()) && medical.status_note === "Approved"
   )
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -197,25 +199,28 @@ export default function PatientDetailsForDoctor({ params }: { params: { patientI
     <div className="flex flex-col gap-2">
       {filteredMedicalRecords.map((medical) => (
         <div key={medical.id} className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2">
-          <div className="max-md:hidden">
-            <p className="text-sm font-bold">{medical.id}</p>
-            <small className="text-xm ">{medical.pub_date}</small>
+          <div className="w-full max-md:hidden">
+            <p className="text-sm font-bold">{formatDateTime(medical.pub_date)}</p>
+            <small className="text-xm ">Date and Time</small>
           </div>
-          <div className="">
-            <p className="text-sm font-bold">{medical.name}</p>
-            <small className="text-xm ">Name</small>
-          </div>
-          <div className="flex items-center gap-1 text-sm font-bold max-md:hidden">
+          {/* <div className="">
+            <p className="text-sm font-bold">{medical.test_type}</p>
+            <small className="text-xm ">Test Type</small>
+          </div> */}
+          <div className="flex w-full items-center gap-2 text-sm font-bold max-md:hidden">
             <span>
-              <Image src={medical.doctor_image} height={40} width={40} alt="" />
+              {/* <Image src={medical.doctor_image} height={40} width={40} alt="" /> */}
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46ffa6]">
+                <p className="capitalize text-[#000000]">{medical.doctor_name.charAt(0)}</p>
+              </div>
             </span>
             <div>
-              <p>{medical.doctor_assigned}</p>
-              <small className="text-xm ">Doctor Assigned</small>
+              <p>{medical.doctor_name}</p>
+              <small className="text-xm ">Doctor Name</small>
             </div>
           </div>
-          <div className="max-md:hidden">
-            <p className="text-sm font-bold">{medical.test}</p>
+          <div className="w-full max-md:hidden">
+            <p className="text-sm font-bold">{medical.test_type}</p>
             <small className="text-xm ">Test</small>
           </div>
           <div className="flex gap-2">
@@ -258,8 +263,9 @@ export default function PatientDetailsForDoctor({ params }: { params: { patientI
       </div>
 
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div className="search-bg mb-4 flex h-8 items-center justify-between gap-2 rounded border border-[#CFDBD5] px-3 py-1 max-md:w-[180px] lg:w-[300px]">
-          <IoMdSearch />
+        <div className="search-bg mb-4 flex h-8 items-center justify-between gap-2 rounded border border-[#CFDBD5] px-3 py-2 max-md:w-[180px] lg:w-[300px]">
+          <Image className="icon-style" src="/icons.svg" width={16} height={16} alt="dekalo" />
+          <Image className="dark-icon-style" src="/search-dark.svg" width={16} height={16} alt="dekalo" />
           <input
             type="search"
             name="search"

@@ -27,7 +27,7 @@ const RateIcon: React.FC<RateIconProps> = ({ filled, onClick }) => {
 }
 
 // Define a union type for the departments
-type Department = "Admin" | "Doctors" | "Pharmacy" | "Laboratory" | "Nurse" | "Patients"
+type Department = "Admin" | "Doctors" | "Pharmacy" | "Laboratory" | "Nurses" | "Patients"
 
 const Page: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
@@ -44,7 +44,7 @@ const Page: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const [showErrorNotification, setShowErrorNotification] = useState(false)
-  const departments: Department[] = ["Admin", "Doctors", "Pharmacy", "Laboratory", "Nurse", "Patients"]
+  const departments: Department[] = ["Admin", "Doctors", "Pharmacy", "Laboratory", "Nurses", "Patients"]
 
   useEffect(() => {
     AOS.init({
@@ -60,7 +60,7 @@ const Page: React.FC = () => {
     Doctors: "/doctor-dashboard",
     Pharmacy: "/pharmacy-dashboard",
     Laboratory: "/laboratory-dashboard",
-    Nurse: "/nurse-dashboard",
+    Nurses: "/nurses-dashboard",
     Patients: "/patient-dashboard",
   }
 

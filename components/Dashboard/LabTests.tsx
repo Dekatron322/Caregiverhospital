@@ -5,14 +5,16 @@ import { useRouter } from "next/navigation"
 import TestModal from "components/Modals/TestModal"
 import AOS from "aos"
 import "aos/dist/aos.css"
+import Image from "next/image"
 
 interface LabTestResult {
   id: string
-  name: string
   doctor_name: string
   test_type: string
   status_note: string
   pub_date: string
+  patient_name: string
+  name: string
 }
 
 const LabTests = () => {
@@ -23,6 +25,8 @@ const LabTests = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
   const [labTestResults, setLabTestResults] = useState<LabTestResult[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [showSuccessNotification, setShowSuccessNotification] = useState(false)
+  const [refresh, setRefresh] = useState(false)
 
   useEffect(() => {
     AOS.init({
@@ -33,10 +37,26 @@ const LabTests = () => {
 
   useEffect(() => {
     const fetchLabTestResults = async () => {
+      setIsLoading(true)
       try {
-        const response = await axios.get("https://api.caregiverhospital.com/lab-test/lab-test/")
+        const response = await axios.get("https://api.caregiverhospital.com/patient/patient/")
         console.log(response.data) // Check the complete data
-        setLabTestResults(response.data) // Set the full response directly
+
+        const patientData = response.data
+
+        if (Array.isArray(patientData)) {
+          const tests = patientData.flatMap((patient: any) => {
+            return patient.lab_tests.map((test: any) => ({
+              ...test,
+              patient_name: patient.name,
+            }))
+          })
+
+          console.log(tests) // Check the extracted tests
+          setLabTestResults(tests)
+        } else {
+          console.error("Unexpected response format")
+        }
       } catch (error) {
         console.error("Error fetching lab test results:", error)
       } finally {
@@ -45,11 +65,20 @@ const LabTests = () => {
     }
 
     fetchLabTestResults()
-  }, [])
+  }, [refresh])
 
   const handleCardClick = (results: LabTestResult) => {
     setClickedCard(results)
     setIsModalOpen(true)
+  }
+
+  const handleModalClose = (isSuccess: boolean) => {
+    if (isSuccess) {
+      setShowSuccessNotification(true)
+      setRefresh(!refresh) // Trigger a refresh
+      setTimeout(() => setShowSuccessNotification(false), 5000)
+    }
+    setIsModalOpen(false)
   }
 
   const toggleDone = () => {
@@ -97,6 +126,7 @@ const LabTests = () => {
                   </div>
                 </span>
                 <div>
+                  <p className="text-sm">Patient: {results.patient_name}</p>
                   <p className="text-sm">Doctor: {results.doctor_name}</p>
                   <p className="text-xs">Test Type: {results.test_type || "N/A"}</p>
                 </div>
@@ -175,7 +205,13 @@ const LabTests = () => {
           renderResults((results) => results.status_note.toLowerCase() === "not approved")}
         {activeTab === "discarded" && renderResults((results) => results.status_note.toLowerCase() === "discarded")}
       </div>
-      {isModalOpen && clickedCard && <TestModal results={clickedCard} onClose={() => setIsModalOpen(false)} />}
+      {isModalOpen && clickedCard && <TestModal results={clickedCard} onClose={handleModalClose} />}
+      {showSuccessNotification && (
+        <div className="animation-fade-in absolute bottom-16 m-5  flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514] md:right-16">
+          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
+          <span className="clash-font text-sm  text-[#0F920F]">Result Submitted</span>
+        </div>
+      )}
     </>
   )
 }

@@ -16,7 +16,7 @@ interface RateIconProps {
   filled: boolean
   onClick: () => void
 }
-type Department = "Admin" | "Doctors" | "Pharmacy" | "Laboratory" | "Nurse" | "Patients"
+type Department = "Admin" | "Doctors" | "Pharmacy" | "Laboratory" | "Nurses" | "Patients"
 
 const RateIcon: React.FC<RateIconProps> = ({ filled, onClick }) => {
   return (
@@ -45,7 +45,7 @@ const Page: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const [showErrorNotification, setShowErrorNotification] = useState(false)
-  const departments: Department[] = ["Admin", "Doctors", "Pharmacy", "Laboratory", "Nurse", "Patients"]
+  const departments: Department[] = ["Admin", "Doctors", "Pharmacy", "Laboratory", "Nurses", "Patients"]
   const router = useRouter()
 
   useEffect(() => {
