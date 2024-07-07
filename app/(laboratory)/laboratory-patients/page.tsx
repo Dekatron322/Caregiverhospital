@@ -70,7 +70,7 @@ export default function Patients() {
   }
 
   const handlePatientClick = (patientId: string) => {
-    router.push(`/patients/patient/${patientId}`)
+    router.push(`/laboratory-patients/patient/${patientId}`)
   }
 
   useEffect(() => {
@@ -183,10 +183,6 @@ export default function Patients() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-              <Link href="/patients/add" className="add-button">
-                <p className="text-[12px]">Add Patient</p>
-                <GoPlus />
-              </Link>
             </div>
 
             <div className="mb-4 flex h-full flex-col gap-2 px-16 max-sm:px-4">
@@ -267,8 +263,6 @@ export default function Patients() {
                     </div>
                     <div className="flex gap-2">
                       <RemoveRedEyeIcon className="text-[#46FFA6]" onClick={() => handlePatientClick(patient.id)} />
-                      <BorderColorOutlinedIcon />
-                      <DeleteForeverIcon className="text-[#F2B8B5]" onClick={() => openModal(patient)} />
                     </div>
                   </div>
                 ))

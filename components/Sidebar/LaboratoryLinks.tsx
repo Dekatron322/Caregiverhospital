@@ -12,10 +12,14 @@ const links = [
     href: "/reports",
     icon: Departments,
   },
-  // { name: "Patients", href: "/pharmacy-patients", icon: Patients },
+  { name: "Patients", href: "/laboratory-patients", icon: Patients },
 ]
 
-export function LaboratoryLinks() {
+interface LinksProps {
+  isCollapsed: boolean
+}
+
+export function LaboratoryLinks({ isCollapsed }: LinksProps) {
   const [loading, setLoading] = useState(true)
   setTimeout(() => setLoading(false), 5000)
   const pathname = usePathname()
@@ -35,8 +39,9 @@ export function LaboratoryLinks() {
               <div className="flex items-center gap-2 pl-5">
                 <LinkIcon />
                 <p
-                  className={clsx("hidden text-sm font-semibold lg:block", {
-                    "font-extrabold": pathname.startsWith(link.href),
+                  className={clsx("text-sm font-semibold transition-opacity duration-500", {
+                    hidden: isCollapsed,
+                    "font-extrabold transition-opacity duration-500": pathname.startsWith(link.href),
                   })}
                 >
                   {link.name}

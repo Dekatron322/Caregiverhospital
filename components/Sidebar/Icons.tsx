@@ -19,6 +19,17 @@ export const LogoIcon = () => (
   </>
 )
 
+export const CollapsedLogoIcon = () => (
+  <>
+    <Link href="/" className="icon-style content-center">
+      <Image src="/alternate.svg" width={115} height={43} alt="dekalo" />
+    </Link>
+    <Link href="/" className="dark-icon-style content-center">
+      <Image src="/alternate.svg" width={20} height={43} alt="dekalo" />
+    </Link>
+  </>
+)
+
 export const DashboardIcon = () => <DashboardOutlinedIcon className="text-lg" />
 
 export const Departments = () => <HomeWorkOutlinedIcon className="text-lg" />

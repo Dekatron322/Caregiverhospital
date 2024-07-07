@@ -22,11 +22,24 @@ body {
 }
 
 .sidebar {
-  @apply border-r bg-[#EBF0F0] lg:w-[220px];
+  transition: width 0.3s;
+  background-color: #ebf0f0;
+}
+
+.dashboard-style {
+  transition:
+    background-color 0.3s,
+    color 0.3s;
+}
+
+.active-dashboard {
+  background-color: #f0f0f0;
+  color: #000;
 }
 
 [data-theme="dark"] .sidebar {
-  @apply bg-[#171818];
+  transition: width 0.3s;
+  background-color: #171818;
 }
 
 .active-tab {

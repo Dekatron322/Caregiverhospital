@@ -27,6 +27,9 @@ const LabTests = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const [refresh, setRefresh] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [searchQuery, setSearchQuery] = useState("")
+  const resultsPerPage = 7
 
   useEffect(() => {
     AOS.init({
@@ -110,10 +113,31 @@ const LabTests = () => {
     return new Date(dateString).toLocaleDateString(undefined, options)
   }
 
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+  }
+
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(event.target.value)
+  }
+
+  const filteredResults = labTestResults.filter(
+    (result) =>
+      result.patient_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      result.doctor_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      result.test_type.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
+  const indexOfLastResult = currentPage * resultsPerPage
+  const indexOfFirstResult = indexOfLastResult - resultsPerPage
+  const currentResults = filteredResults.slice(indexOfFirstResult, indexOfLastResult)
+
+  const totalPages = Math.ceil(filteredResults.length / resultsPerPage)
+
   const renderResults = (filter: (results: LabTestResult) => boolean) => {
     return (
       <div className="flex flex-col gap-2">
-        {labTestResults.filter(filter).map((results) => (
+        {currentResults.filter(filter).map((results) => (
           <div
             key={results.id}
             className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
@@ -149,6 +173,21 @@ const LabTests = () => {
             </div>
           </div>
         ))}
+        <div className="mb-4 flex items-center justify-end  max-sm:px-3 md:mt-4">
+          {Array.from({ length: totalPages }, (_, index) => (
+            <button
+              key={index + 1}
+              onClick={() => handlePageChange(index + 1)}
+              className={`pagination-button ${
+                currentPage === index + 1
+                  ? "active h-6 w-6 rounded-full bg-[#131414] text-sm text-[#ffffff] shadow"
+                  : "h-6 w-6 rounded-full bg-[#F1FFF0] text-sm text-[#1E1E1E]"
+              }`}
+            >
+              {index + 1}
+            </button>
+          ))}
+        </div>
       </div>
     )
   }
@@ -165,38 +204,51 @@ const LabTests = () => {
             ))}
           </div>
         ) : (
-          <div className="tab-bg mb-8 flex items-center gap-3 rounded-lg p-1 md:w-[358px] md:border">
-            <button
-              className={`${activeTab === "all" ? "active-tab" : "inactive-tab"}`}
-              onClick={() => setActiveTab("all")}
-            >
-              All
-            </button>
-            <button
-              className={`${activeTab === "approved" ? "active-tab" : "inactive-tab"}`}
-              onClick={() => setActiveTab("approved")}
-            >
-              Approved
-            </button>
+          <>
+            <div className="tab-bg mb-4 flex items-center gap-3 rounded-lg p-1 md:w-[358px] md:border">
+              <button
+                className={`${activeTab === "all" ? "active-tab" : "inactive-tab"}`}
+                onClick={() => setActiveTab("all")}
+              >
+                All
+              </button>
+              <button
+                className={`${activeTab === "approved" ? "active-tab" : "inactive-tab"}`}
+                onClick={() => setActiveTab("approved")}
+              >
+                Approved
+              </button>
 
-            <button
-              className={`${
-                activeTab === "not approved" ? "active-tab whitespace-nowrap" : "inactive-tab whitespace-nowrap"
-              }`}
-              onClick={() => setActiveTab("not approved")}
-            >
-              Not Approved
-            </button>
+              <button
+                className={`${
+                  activeTab === "not approved" ? "active-tab whitespace-nowrap" : "inactive-tab whitespace-nowrap"
+                }`}
+                onClick={() => setActiveTab("not approved")}
+              >
+                Not Approved
+              </button>
 
-            <button
-              className={`${
-                activeTab === "discarded" ? "active-tab whitespace-nowrap" : "inactive-tab whitespace-nowrap"
-              }`}
-              onClick={() => setActiveTab("discarded")}
-            >
-              Discarded
-            </button>
-          </div>
+              <button
+                className={`${
+                  activeTab === "discarded" ? "active-tab whitespace-nowrap" : "inactive-tab whitespace-nowrap"
+                }`}
+                onClick={() => setActiveTab("discarded")}
+              >
+                Discarded
+              </button>
+            </div>
+            <div className="search-bg mb-4 flex h-10 items-center justify-between gap-2 rounded border border-[#CFDBD5] px-3 py-1 max-md:w-[180px] lg:w-[300px]">
+              <Image className="icon-style" src="/icons.svg" width={16} height={16} alt="dekalo" />
+              <Image className="dark-icon-style" src="/search-dark.svg" width={16} height={16} alt="dekalo" />
+              <input
+                type="text"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={handleSearchChange}
+                className="w-full bg-transparent text-xs outline-none focus:outline-none"
+              />
+            </div>
+          </>
         )}
 
         {activeTab === "all" && renderResults(() => true)}
@@ -205,6 +257,7 @@ const LabTests = () => {
           renderResults((results) => results.status_note.toLowerCase() === "not approved")}
         {activeTab === "discarded" && renderResults((results) => results.status_note.toLowerCase() === "discarded")}
       </div>
+
       {isModalOpen && clickedCard && <TestModal results={clickedCard} onClose={handleModalClose} />}
       {showSuccessNotification && (
         <div className="animation-fade-in absolute bottom-16 m-5  flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514] md:right-16">

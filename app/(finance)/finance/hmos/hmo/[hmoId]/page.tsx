@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
-import { IoMdArrowBack, IoMdSearch } from "react-icons/io"
+import { IoMdArrowBack } from "react-icons/io"
 import { HiOutlineTrash } from "react-icons/hi2"
 import { FaRegEdit } from "react-icons/fa"
 import { GoPlus } from "react-icons/go"
@@ -14,6 +14,16 @@ import EditModal from "components/Modals/EditModal"
 import { IoAddCircleSharp, IoReceipt } from "react-icons/io5"
 import AOS from "aos"
 import "aos/dist/aos.css"
+import UpdateHmoStatusModal from "components/Modals/UpdateHmoStatusModal"
+
+interface Hmo {
+  id: string
+  name: string
+  category: string
+  description: string
+  status: boolean
+  pub_date: string
+}
 
 interface HmoDetail {
   id: string
@@ -21,14 +31,7 @@ interface HmoDetail {
   detail: string
   status: boolean
   pub_date: string
-  hmos: {
-    id: string
-    name: string
-    category: string
-    description: string
-    status: boolean
-    pub_date: string
-  }[]
+  hmos: Hmo[]
 }
 
 interface HmoDetailPageProps {
@@ -40,19 +43,14 @@ export default function HmoDetailPage({ params }: HmoDetailPageProps) {
   const [isAddHmoOpen, setIsAddHmoOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [isEditOpen, setIsEditOpen] = useState(false)
+  const [isUpdateOpen, setIsUpdateOpen] = useState(false)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const [searchQuery, setSearchQuery] = useState<string>("")
-  const [refreshKey, setRefreshKey] = useState(0) // State to trigger refresh
-  const [hmoToDelete, setHmoToDelete] = useState<string | null>(null) // State to store HMO ID to delete
+  const [refreshKey, setRefreshKey] = useState(0)
+  const [hmoToDelete, setHmoToDelete] = useState<string | null>(null)
+  const [hmoToUpdate, setHmoToUpdate] = useState<Hmo | null>(null) // Updated to Hmo
   const router = useRouter()
   const { hmoId } = params
-
-  useEffect(() => {
-    AOS.init({
-      duration: 1000,
-      once: true,
-    })
-  }, [])
 
   useEffect(() => {
     const fetchHmoDetails = async () => {
@@ -106,6 +104,15 @@ export default function HmoDetailPage({ params }: HmoDetailPageProps) {
     setIsEditOpen(true)
   }
 
+  const openUpdateModal = (hmo: Hmo) => {
+    setHmoToUpdate(hmo)
+    setIsUpdateOpen(true)
+  }
+
+  const closeUpdateModal = () => {
+    setIsUpdateOpen(false)
+  }
+
   const closeEditModal = () => {
     setIsEditOpen(false)
   }
@@ -113,8 +120,15 @@ export default function HmoDetailPage({ params }: HmoDetailPageProps) {
   const handleHmoSubmissionSuccess = () => {
     setShowSuccessNotification(true)
     setTimeout(() => setShowSuccessNotification(false), 5000)
-    setRefreshKey((prevKey) => prevKey + 1) // Trigger refresh
+    setRefreshKey((prevKey) => prevKey + 1)
   }
+
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+    })
+  }, [])
 
   return (
     <>
@@ -141,14 +155,8 @@ export default function HmoDetailPage({ params }: HmoDetailPageProps) {
               </>
             ) : (
               <>
-                {" "}
                 {hmoDetail && (
-                  <div
-                    className="px-16 py-3 max-md:px-3"
-                    data-aos="fade-in"
-                    data-aos-duration="1000"
-                    data-aos-delay="500"
-                  >
+                  <div className="px-16 py-3 max-md:px-3">
                     <div className="flex justify-between pt-4">
                       <button onClick={handleGoBack} className="redirect">
                         <IoMdArrowBack />
@@ -184,8 +192,28 @@ export default function HmoDetailPage({ params }: HmoDetailPageProps) {
                       <div className="grid grid-cols-2 gap-2 pt-4 md:grid-cols-3">
                         {filteredList.map((item) => (
                           <div key={item.id} className="rounded-md border p-6 max-md:p-3">
-                            <h3 className="font-semibold max-md:text-sm">{item.name}</h3>
-                            <p className="max-md:text-xs">{item.description}</p>
+                            <div className="flex justify-between">
+                              <div>
+                                <h3 className="font-semibold max-md:text-sm">{item.name}</h3>
+                                <p className="max-md:text-xs">{item.description}</p>
+                              </div>
+                              {item.status ? (
+                                <p
+                                  onClick={() => openUpdateModal(item)}
+                                  className="h-6 justify-center rounded bg-[#46FFA6] p-1 text-xs text-[#000000]"
+                                >
+                                  Active
+                                </p>
+                              ) : (
+                                <p
+                                  onClick={() => openUpdateModal(item)}
+                                  className="h-6 justify-center rounded bg-[#F20089] p-1 text-xs text-[#ffffff]"
+                                >
+                                  Inactive
+                                </p>
+                              )}
+                            </div>
+
                             <div>
                               <div className="flex items-center justify-between pt-6">
                                 <div className="max-md:hidden">
@@ -236,6 +264,12 @@ export default function HmoDetailPage({ params }: HmoDetailPageProps) {
           onClose={closeHmoModal}
           onSubmitSuccess={handleHmoSubmissionSuccess}
           hmoCategoryId={hmoId}
+        />
+        <UpdateHmoStatusModal
+          isOpen={isUpdateOpen}
+          onClose={closeUpdateModal}
+          onSubmitSuccess={handleHmoSubmissionSuccess}
+          hmo={hmoToUpdate}
         />
         <EditModal isOpen={isEditOpen} onClose={closeEditModal} onSubmitSuccess={handleHmoSubmissionSuccess} />
       </section>

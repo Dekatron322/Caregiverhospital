@@ -1,163 +1,167 @@
 "use client"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Request } from "utils"
 import Image from "next/image"
 import { PiDotsThree } from "react-icons/pi"
 import { useRouter } from "next/navigation"
+import AOS from "aos"
+import "aos/dist/aos.css"
+
+interface Prescription {
+  id: string
+  doctor_name: string
+  category: string
+  name: string
+  complain: string
+  code: string
+  unit: string
+  dosage: string
+  rate: string
+  usage: string
+  status: string
+  pub_date: string
+}
+
+interface Patient {
+  id: string
+  name: string
+  gender: string
+  dob: string
+  membership_no: string
+  policy_id: string
+  email_address: string
+  phone_no: string
+  address: string
+  nok_name: string
+  nok_phone_no: string
+  nok_address: string
+  allergies: string
+  heart_rate: string
+  body_temperature: string
+  glucose_level: string
+  blood_pressure: string
+  image: string
+  status: boolean
+  prescriptions: Prescription[]
+}
+
+type ApiResponse = Patient[]
 
 const IssueRequest = () => {
   const router = useRouter()
   const [isDone, setIsDone] = useState<boolean>(false)
   const [activeTab, setActiveTab] = useState("pending")
+  const [patients, setPatients] = useState<Patient[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   const toggleDone = () => {
     setIsDone(!isDone)
   }
 
-  const renderPendingRequests = () => {
-    const pendingrequests = Request.filter((request) => request.status === "pending")
+  useEffect(() => {
+    AOS.init({
+      duration: 1000,
+      once: true,
+    })
+  }, [])
 
+  const fetchPatients = async () => {
+    try {
+      const response = await fetch("https://api.caregiverhospital.com/patient/patient/")
+      const data = (await response.json()) as ApiResponse
+      const patientsWithAppointments = data.filter((patient) => patient.prescriptions.length > 0)
+      setPatients(patientsWithAppointments)
+    } catch (error) {
+      console.error("Error fetching patients:", error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchPatients()
+  }, [])
+
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }
+    return new Date(dateString).toLocaleDateString(undefined, options)
+  }
+
+  const renderPrescriptionDetails = (patient: Patient, prescription: Prescription) => {
     return (
-      <>
-        <div className="flex flex-col gap-2  ">
-          {pendingrequests.map((request) => (
-            <div
-              key={request.id}
-              className="flex w-full cursor-pointer  items-center justify-between rounded-lg border p-2 "
-            >
-              <div className="w-full">
-                <p className="text-sm font-bold">{request.name}</p>
-                <small className="text-xs">Medicine Name</small>
-              </div>
-              <div className="w-full max-sm:hidden">
-                <p className="text-sm font-bold">{request.medicine_id}</p>
-                <small className="text-xs">Medicine ID</small>
-              </div>
-              <div className="w-full max-sm:hidden">
-                <div className="flex gap-1 text-sm font-bold">{request.category_name}</div>
-                <small className="text-xs">Category Name</small>
-              </div>
-              <div className="w-full max-sm:hidden">
-                <p className="text-sm font-bold">{request.time}</p>
-                <small className="text-xs">Time</small>
-              </div>
-              <div className="w-full">
-                <p className="rounded  py-[2px] text-xs">{request.patient_name}</p>
-                <small className="text-xs">Patient Name</small>
-              </div>
-              <div className="w-full max-sm:hidden">
-                <p className="rounded  py-[2px] text-xs">{request.patient_id}</p>
-                <small className="text-xs">patient ID</small>
-              </div>
-              <div className="w-full max-sm:hidden">
-                <p className="rounded  py-[2px] text-xs">{request.requested}</p>
-                <small className="text-xs">Request by</small>
-              </div>
-              <div className="">
-                <PiDotsThree />
-              </div>
-            </div>
-          ))}
+      <div key={prescription.id} className="mb-2 flex w-full items-center justify-between rounded-lg border p-2">
+        <div className="flex w-full items-center gap-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46ffa6] max-md:hidden">
+            <p className="capitalize text-[#000000]">{patient.name.charAt(0)}</p>
+          </div>
+          <div>
+            <p className="text-sm font-bold">{patient.name}</p>
+            <p className="text-xs">Patient Name</p>
+          </div>
         </div>
-      </>
+        <div className="w-full">
+          <p className="text-sm font-bold">{prescription.name}</p>
+          <small className="text-xs">Medicine Name</small>
+        </div>
+        <div className="w-full max-sm:hidden">
+          <p className="text-sm font-bold">{prescription.id}</p>
+          <small className="text-xs">Medicine ID</small>
+        </div>
+        <div className="w-full max-sm:hidden">
+          <div className="flex gap-1 text-sm font-bold">{prescription.category}</div>
+          <small className="text-xs">Category Name</small>
+        </div>
+        <div className="w-full max-sm:hidden">
+          <p className="text-sm font-bold">{formatDate(prescription.pub_date)}</p>
+          <small className="text-xs">Date and Time</small>
+        </div>
+        <div className="w-full max-sm:hidden">
+          <p className="rounded py-[2px] text-xs">{prescription.doctor_name}</p>
+          <small className="text-xs">Request by</small>
+        </div>
+        <div className="max-md:hidden">
+          <PiDotsThree />
+        </div>
+      </div>
     )
   }
 
-  const renderIssuedRequests = () => {
-    const issuedRequests = Request.filter((request) => request.status === "issued")
-    return (
-      <>
-        <div className="flex flex-col gap-2  ">
-          {issuedRequests.map((request) => (
-            <div
-              key={request.id}
-              className="flex w-full cursor-pointer  items-center justify-between rounded-lg border p-2 "
-            >
-              <div className="w-full">
-                <p className="text-sm font-bold">{request.name}</p>
-                <small className="text-xs">Medicine Name</small>
-              </div>
-              <div className="w-full max-sm:hidden">
-                <p className="text-sm font-bold">{request.medicine_id}</p>
-                <small className="text-xs">Medicine ID</small>
-              </div>
-              <div className="w-full max-sm:hidden">
-                <div className="flex gap-1 text-sm font-bold">{request.category_name}</div>
-                <small className="text-xs">Category Name</small>
-              </div>
-              <div className="w-full max-sm:hidden">
-                <p className="text-sm font-bold">{request.time}</p>
-                <small className="text-xs">Time</small>
-              </div>
-              <div className="w-full">
-                <p className="rounded  py-[2px] text-xs">{request.patient_name}</p>
-                <small className="text-xs">Patient Name</small>
-              </div>
-              <div className="w-full max-sm:hidden">
-                <p className="rounded  py-[2px] text-xs">{request.patient_id}</p>
-                <small className="text-xs">patient ID</small>
-              </div>
-              <div className="w-full max-sm:hidden">
-                <p className="rounded  py-[2px] text-xs">{request.requested}</p>
-                <small className="text-xs">Request by</small>
-              </div>
-              <div className="">
-                <PiDotsThree />
-              </div>
-            </div>
-          ))}
-        </div>
-      </>
-    )
-  }
+  const renderPendingRequests = () => (
+    <div className="flex flex-col gap-2">
+      {patients.map((patient) =>
+        patient.prescriptions.map((prescription) => renderPrescriptionDetails(patient, prescription))
+      )}
+    </div>
+  )
 
-  const renderCancelledRquests = () => {
-    const cancelledRequests = Request.filter((request) => request.status === "cancelled")
-    return (
-      <>
-        <div className="flex flex-col gap-2">
-          {cancelledRequests.map((request) => (
-            <div
-              key={request.id}
-              className="flex w-full cursor-pointer  items-center justify-between rounded-lg border p-2 "
-            >
-              <div className="w-full">
-                <p className="text-sm font-bold">{request.name}</p>
-                <small className="text-xs">Medicine Name</small>
-              </div>
-              <div className="w-full max-sm:hidden">
-                <p className="text-sm font-bold">{request.medicine_id}</p>
-                <small className="text-xs">Medicine ID</small>
-              </div>
-              <div className="w-full max-sm:hidden">
-                <div className="flex gap-1 text-sm font-bold">{request.category_name}</div>
-                <small className="text-xs">Category Name</small>
-              </div>
-              <div className="w-full max-sm:hidden">
-                <p className="text-sm font-bold">{request.time}</p>
-                <small className="text-xs">Time</small>
-              </div>
-              <div className="w-full">
-                <p className="rounded  py-[2px] text-xs">{request.patient_name}</p>
-                <small className="text-xs">Patient Name</small>
-              </div>
-              <div className="w-full max-sm:hidden">
-                <p className="rounded  py-[2px] text-xs">{request.patient_id}</p>
-                <small className="text-xs">patient ID</small>
-              </div>
-              <div className="w-full max-sm:hidden">
-                <p className="rounded  py-[2px] text-xs">{request.requested}</p>
-                <small className="text-xs">Request by</small>
-              </div>
-              <div className="">
-                <PiDotsThree />
-              </div>
-            </div>
-          ))}
-        </div>
-      </>
-    )
-  }
+  const renderIssuedRequests = () => (
+    <div className="flex flex-col gap-2">
+      {patients
+        .filter((patient) => patient.prescriptions.some((prescription) => prescription.status !== "done"))
+        .map((patient) =>
+          patient.prescriptions
+            .filter((prescription) => prescription.status !== "done")
+            .map((prescription) => renderPrescriptionDetails(patient, prescription))
+        )}
+    </div>
+  )
+
+  const renderCancelledRequests = () => (
+    <div className="flex flex-col gap-2">
+      {patients
+        .filter((patient) => patient.prescriptions.every((prescription) => prescription.status === "done"))
+        .map((patient) =>
+          patient.prescriptions.map((prescription) => renderPrescriptionDetails(patient, prescription))
+        )}
+    </div>
+  )
 
   return (
     <div className="flex w-full flex-col">
@@ -185,7 +189,7 @@ const IssueRequest = () => {
 
       {activeTab === "pending" ? renderPendingRequests() : null}
       {activeTab === "issued" ? renderIssuedRequests() : null}
-      {activeTab === "cancelled" ? renderCancelledRquests() : null}
+      {activeTab === "cancelled" ? renderCancelledRequests() : null}
     </div>
   )
 }

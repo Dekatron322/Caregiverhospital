@@ -39,7 +39,7 @@ const EditModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitSucces
       <div className={styles.modalContent}>
         <div className="px-6 py-6">
           <div className="flex items-center justify-between">
-            <h6 className="text-lg font-medium">Add Hmo</h6>
+            <h6 className="text-lg font-medium">Edit Hmo</h6>
             <LiaTimesSolid className="cursor-pointer" onClick={onClose} />
           </div>
 

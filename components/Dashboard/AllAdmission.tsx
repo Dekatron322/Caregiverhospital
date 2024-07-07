@@ -146,7 +146,7 @@ const AllAdmission: React.FC = () => {
               <small className="text-xs">Reason for check in</small>
             </div>
             <div className="w-full max-md:hidden">
-              <p className="rounded py-[2px] text-xs font-semibold text-[#000000]">{appointment.check_out_date}</p>
+              <p className="rounded py-[2px] text-xs font-semibold">{formatDate(appointment.check_out_date)}</p>
               <small className="text-xs">Check-out date</small>
             </div>
             <div>

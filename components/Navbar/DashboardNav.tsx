@@ -108,6 +108,7 @@ const DashboardNav: React.FC = () => {
 
   const handleLogoutClick = () => {
     setIsLogoutModalOpen(true)
+    closeDropdown() // Close the dropdown when the logout is clicked
   }
 
   const handleLogoutConfirm = () => {
@@ -169,7 +170,10 @@ const DashboardNav: React.FC = () => {
         </div>
       </nav>
       {isDropdownOpen && (
-        <div ref={dropdownRef} className="auth absolute right-16 top-14 z-10 w-64 rounded border shadow-md">
+        <div
+          ref={dropdownRef}
+          className="auth absolute right-16 top-14 z-10 w-64 rounded border shadow-md transition-opacity duration-300"
+        >
           <div className="border-b px-4 py-2">
             <div className="flex items-center gap-2">
               <MdAccountCircle />
@@ -193,7 +197,7 @@ const DashboardNav: React.FC = () => {
             <RiLogoutCircleRLine />
             <p className="cursor-pointer text-sm font-semibold">Logout</p>
           </div>
-          <div className="flex items-center gap-2 border-b px-4 py-2">
+          <div className="flex items-center gap-2 border-b px-4 py-2" onClick={closeDropdown}>
             <IoMdLock />
             <p className="text-sm font-semibold">Security</p>
           </div>

@@ -3,19 +3,18 @@
 import clsx from "clsx"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Admissions, Appointments, DashboardIcon, Departments, Finance, Patients, Staff } from "./Icons"
+import { Admissions, DashboardIcon } from "./Icons"
 
 const links = [
   { name: "Dashboard", href: "/nurses-dashboard", icon: DashboardIcon },
-
-  //   { name: "Appointments", href: "/appointments", icon: Appointments },
-  //   { name: "Staff", href: "/staff", icon: Staff },
-  //   { name: "Patients", href: "/all-patients", icon: Patients },
-  //   { name: "Finance", href: "/finance", icon: Finance },
   { name: "Admissions", href: "/all-admissions", icon: Admissions },
 ]
 
-export function NursesLink() {
+interface LinksProps {
+  isCollapsed: boolean
+}
+
+export function NursesLink({ isCollapsed }: LinksProps) {
   const pathname = usePathname()
   return (
     <div className="flex h-full flex-row   border-black  lg:h-80 lg:flex-col">
@@ -33,8 +32,9 @@ export function NursesLink() {
               <div className="flex items-center gap-2 pl-5">
                 <LinkIcon />
                 <p
-                  className={clsx("hidden text-sm font-semibold lg:block", {
-                    "font-extrabold": pathname.startsWith(link.href),
+                  className={clsx("text-sm font-semibold transition-opacity duration-500", {
+                    hidden: isCollapsed,
+                    "font-extrabold transition-opacity duration-500": pathname.startsWith(link.href),
                   })}
                 >
                   {link.name}
