@@ -16,7 +16,7 @@ import html2pdf from "html2pdf.js"
 type ModalProps = {
   show: boolean
   onClose: () => void
-  record: any // Define the type based on your data structure
+  record: any
 }
 
 const formatDateTime = (dateString: string) => {
