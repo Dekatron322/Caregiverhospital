@@ -30,6 +30,31 @@
   justify-content: end;
 }
 
+.modalContainers {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* background: rgba(208, 208, 208, 0.8); */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modalBodys {
+  background: #fff;
+  color: #1e1e1e;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  max-width: 650px;
+  width: 100%;
+  flex-grow: 1;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  height: 100vh;
+  margin-left: 16px;
+}
+
 .modalBody {
   background: #fff;
   color: #1e1e1e;

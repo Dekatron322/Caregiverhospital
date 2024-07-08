@@ -121,7 +121,8 @@ export default function PatientDetailsForDoctor({ params }: { params: { patientI
   }
 
   const handleViewClick = (record: MedicalRecord) => {
-    setSelectedRecord(record)
+    const recordWithPatientName = { ...record, patient_name: patientDetail?.name }
+    setSelectedRecord(recordWithPatientName)
     setModalVisible(true)
   }
 
@@ -165,31 +166,30 @@ export default function PatientDetailsForDoctor({ params }: { params: { patientI
           key={prescription.id}
           className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
         >
-          <div className="">
+          <div className="w-full">
             <p className="text-sm font-bold">{prescription.doctor_name}</p>
             <small className="text-xm ">doctor</small>
           </div>
-          <div className="">
+          <div className="w-full">
             <p className="text-sm font-bold">{prescription.name}</p>
             <small className="text-xm ">Medication name</small>
           </div>
-          <div className="max-md:hidden">
+          <div className="w-full max-md:hidden">
             <p className="text-sm font-bold">{prescription.category}</p>
             <small className="text-xm ">Category</small>
           </div>
-          <div className="max-md:hidden">
+          <div className="w-full max-md:hidden">
             <p className="text-sm font-bold">{prescription.unit}</p>
             <small className="text-xm ">Quantity</small>
           </div>
-          <div className="max-md:hidden">
+          <div className="w-full max-md:hidden">
             <p className="text-sm font-bold">{prescription.dosage}</p>
             <small className="text-xm ">Dosage</small>
           </div>
-          <div className="max-md:hidden">
+          <div className="w-full max-md:hidden">
             <p className="text-sm font-bold">{prescription.usage}</p>
             <small className="text-xm ">Usage</small>
           </div>
-          <PiDotsThree />
         </div>
       ))}
     </div>

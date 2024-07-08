@@ -17,7 +17,7 @@ export default function PharmacyDashboard() {
 
             <div className="mt-10 px-16 pb-4">
               <h4 className="font-semibold">Doctor&apos;s Dashboard</h4>
-              <p className="text-xs">A Quick overview of your pharmacy</p>
+              <p className="text-xs">A Quick overview of your dashboard</p>
             </div>
             <div className="mb-3 grid w-full grid-cols-3 gap-2 px-16 max-sm:grid-cols-1 max-sm:px-3">
               {Pharmacy.map((pharmacy) => (

@@ -183,7 +183,7 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
                         </div>
                         <h1 className="mt-3 text-center font-bold capitalize">{patientDetail.name}</h1>
                         <p className="text-center text-base font-bold">
-                          Patient ID: <span className="font-normal">{patientDetail.id}</span>
+                          Patient ID: <span className="font-normal">{patientDetail.policy_id}</span>
                         </p>
                         <div className="flex items-center justify-center gap-2">
                           <MdLocationPin />
@@ -261,31 +261,28 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
                               key={drug.id}
                               className="mb-2 flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
                             >
-                              <div className="flex items-center gap-2">
-                                <div></div>
+                              <div className="flex w-full items-center gap-2">
                                 <div>
                                   <p className="text-sm font-bold">Nurse Name</p>
                                   <small className="text-xm">nurse</small>
                                 </div>
                               </div>
-                              <div>
+                              <div className="w-full">
                                 <p className="text-sm font-bold">{drug.name}</p>
                                 <small className="text-xm">Medication name</small>
                               </div>
-                              <div>
+                              <div className="w-full">
                                 <p className="text-sm font-bold">{drug.category}</p>
                                 <small className="text-xm">Category</small>
                               </div>
-                              <div>
+                              <div className="w-full">
                                 <p className="text-sm font-bold">{drug.unit}</p>
                                 <small className="text-xm">Units</small>
                               </div>
-                              <div>
+                              <div className="w-full">
                                 <p className="text-sm font-bold">{formatDate(drug.pub_date)}</p>
                                 <small className="text-xm">Time and Date Administered</small>
                               </div>
-
-                              <PiDotsThree />
                             </div>
                           ))}
                         </div>

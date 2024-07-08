@@ -42,7 +42,7 @@ interface PatientDetail {
   name: string
   appointments: Appointment[]
   prescriptions: Prescription[]
-  medical_records: MedicalRecord[]
+  lab_tests: MedicalRecord[]
 }
 
 const formatDateTime = (dateString: string) => {
@@ -111,7 +111,7 @@ export default function PatientDetails({ params }: { params: { patientId: string
     prescription.name.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  const filteredMedicalRecords = patientDetail.medical_records.filter((medical) =>
+  const filteredMedicalRecords = patientDetail.lab_tests.filter((medical) =>
     medical.name.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
@@ -120,7 +120,8 @@ export default function PatientDetails({ params }: { params: { patientId: string
   }
 
   const handleViewClick = (record: MedicalRecord) => {
-    setSelectedRecord(record)
+    const recordWithPatientName = { ...record, patient_name: patientDetail?.name }
+    setSelectedRecord(recordWithPatientName)
     setModalVisible(true)
   }
 

@@ -12,6 +12,10 @@ import { IoMdArrowBack } from "react-icons/io"
 import { MdLocationPin } from "react-icons/md"
 import AOS from "aos"
 import "aos/dist/aos.css"
+import { GoPlus } from "react-icons/go"
+import UpdateVitalsModal from "components/Modals/UpdateVitalsModal"
+import EditNoteIcon from "@mui/icons-material/EditNote"
+import UpdateAllergiesModal from "components/Modals/UpdateAllergiesModal"
 
 interface PatientDetail {
   id: string
@@ -68,6 +72,8 @@ interface PatientDetailPageProps {
 export default function PatientDetailPage({ params }: PatientDetailPageProps) {
   const [patientDetail, setPatientDetail] = useState<PatientDetail | null>(null)
   const [isAdmissionOpen, setIsAdmissionOpen] = useState(false)
+  const [isUpdateVitalsOpen, setIsUpdateVitalsOpen] = useState(false)
+  const [isUpdateAllergiesOpen, setIsUpdateAllergiesOpen] = useState(false)
   const [isAppointmentOpen, setIsAppointmentOpen] = useState(false)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const [showDeleteNotification, setShowDeleteNotification] = useState(false)
@@ -112,6 +118,22 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
 
   const closeAdmissionModal = () => {
     setIsAdmissionOpen(false)
+  }
+
+  const openUpdateVitalsModal = () => {
+    setIsUpdateVitalsOpen(true)
+  }
+
+  const closeUpdateVitalsModal = () => {
+    setIsUpdateVitalsOpen(false)
+  }
+
+  const openUpdateAllergiesModal = () => {
+    setIsUpdateAllergiesOpen(true)
+  }
+
+  const closeUpdateAllergiesModal = () => {
+    setIsUpdateAllergiesOpen(false)
   }
 
   const closeAppointmentModal = () => {
@@ -176,16 +198,22 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
 
             {patientDetail && (
               <div className="px-16 max-md:px-3 sm:py-10">
-                <button onClick={handleGoBack} className="redirect">
-                  <IoMdArrowBack />
-                  <p className="capitalize">Go back</p>
-                </button>
+                <div className="flex justify-between">
+                  <button onClick={handleGoBack} className="redirect">
+                    <IoMdArrowBack />
+                    <p className="capitalize">Go back</p>
+                  </button>
+                  <button className="add-button" onClick={openUpdateVitalsModal}>
+                    <p className="text-xs">Update Vitals</p>
+                    <GoPlus />
+                  </button>
+                </div>
                 <div className="pt-10" data-aos="fade-in" data-aos-duration="1000" data-aos-delay="500">
                   <div className="mb-3 grid w-full grid-cols-4 gap-2 max-sm:grid-cols-2">
                     <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
                       <Image src="/pt-dashboard-01.svg" height={40} width={40} alt="" />
                       <h3 className="py-2 font-bold">Heart Rate</h3>
-                      <p>{patientDetail.heart_rate || "N/A"}</p>
+                      <p>{patientDetail.heart_rate || "N/A"} bpm</p>
                     </div>
                     <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
                       <Image src="/pt-dashboard-02.svg" height={40} width={40} alt="" />
@@ -262,7 +290,10 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
                       </div>
 
                       <div className="py-2">
-                        <h3 className="mb-1 font-bold">Allergies</h3>
+                        <div className="flex justify-between">
+                          <h3 className="mb-1 font-bold">Allergies</h3>
+                          <EditNoteIcon onClick={openUpdateAllergiesModal} />
+                        </div>
                         <div className="flex flex-wrap">
                           {patientDetail.allergies
                             ? patientDetail.allergies.split(",").map((allergy, index) => (
@@ -301,6 +332,19 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
           </div>
         </div>
       </section>
+      <UpdateAllergiesModal
+        isOpen={isUpdateAllergiesOpen}
+        onClose={closeUpdateAllergiesModal}
+        onSubmitSuccess={handleHmoSubmissionSuccess}
+        patientId={patientId}
+      />
+      <UpdateVitalsModal
+        isOpen={isUpdateVitalsOpen}
+        onClose={closeUpdateVitalsModal}
+        onSubmitSuccess={handleHmoSubmissionSuccess}
+        patientId={patientId}
+      />
+
       <AdmissionModal
         isOpen={isAdmissionOpen}
         onClose={closeAdmissionModal}

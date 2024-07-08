@@ -348,6 +348,10 @@ body {
   background-color: #f5f5f5;
 }
 
+.result_area {
+  @apply rounded-md bg-[#EBF0F0] p-2;
+}
+
 .nok_area {
   @apply rounded-md bg-[#EBF0F0] p-2;
 }
