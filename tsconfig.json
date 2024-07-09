@@ -17,8 +17,8 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    "typeRoots": ["node_modules/@types", "types"],
     "baseUrl": ".",
-    "types": ["node", "jest", "@testing-library/jest-dom"],
     "plugins": [
       {
         "name": "next"
@@ -33,7 +33,8 @@
     "jest.config.js",
     ".next/types/**/*.ts",
     "components/ProvidersComponents/ThemeProviders.jsx",
-    "app/(dashboard)/settings"
+    "app/(dashboard)/settings",
+    "types/html2pdf.d.ts"
   ],
   "exclude": ["node_modules"]
 }
