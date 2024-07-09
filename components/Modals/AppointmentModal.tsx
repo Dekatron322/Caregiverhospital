@@ -90,7 +90,7 @@ const AppointmentModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmi
         setShowSuccessNotification(true)
         setTimeout(() => setShowSuccessNotification(false), 5000)
       } else {
-        console.error("Failed to submit form")
+        console.error("Failed to submit form", await response.text())
         setShowErrorNotification(true)
         setTimeout(() => setShowErrorNotification(false), 5000)
       }
