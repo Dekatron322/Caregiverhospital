@@ -14,7 +14,17 @@ interface LabTestResult {
   status_note: string
   pub_date: string
   patient_name: string
+  diagnosis_code: string
   name: string
+}
+
+interface Diagnosis {
+  id: string
+  name: string
+  code: string
+  price: string
+  status: boolean
+  pub_date: string
 }
 
 const LabTests = () => {
@@ -24,6 +34,7 @@ const LabTests = () => {
   const [clickedCard, setClickedCard] = useState<LabTestResult | null>(null)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
   const [labTestResults, setLabTestResults] = useState<LabTestResult[]>([])
+  const [diagnosisData, setDiagnosisData] = useState<Diagnosis[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const [refresh, setRefresh] = useState(false)
@@ -39,13 +50,12 @@ const LabTests = () => {
   }, [])
 
   useEffect(() => {
-    const fetchLabTestResults = async () => {
+    const fetchData = async () => {
       setIsLoading(true)
       try {
-        const response = await axios.get("https://api.caregiverhospital.com/patient/patient/")
-        console.log(response.data) // Check the complete data
-
-        const patientData = response.data
+        // Fetch lab test results
+        const labTestResponse = await axios.get("https://api.caregiverhospital.com/patient/patient/")
+        const patientData = labTestResponse.data
 
         if (Array.isArray(patientData)) {
           const tests = patientData.flatMap((patient: any) => {
@@ -55,19 +65,22 @@ const LabTests = () => {
             }))
           })
 
-          console.log(tests) // Check the extracted tests
           setLabTestResults(tests)
         } else {
-          console.error("Unexpected response format")
+          console.error("Unexpected response format for lab test results")
         }
+
+        // Fetch diagnosis data
+        const diagnosisResponse = await axios.get("https://api.caregiverhospital.com/diagnosis/diagnosis/")
+        setDiagnosisData(diagnosisResponse.data)
       } catch (error) {
-        console.error("Error fetching lab test results:", error)
+        console.error("Error fetching data:", error)
       } finally {
         setIsLoading(false)
       }
     }
 
-    fetchLabTestResults()
+    fetchData()
   }, [refresh])
 
   const handleCardClick = (results: LabTestResult) => {
@@ -137,42 +150,55 @@ const LabTests = () => {
   const renderResults = (filter: (results: LabTestResult) => boolean) => {
     return (
       <div className="flex flex-col gap-2">
-        {currentResults.filter(filter).map((results) => (
-          <div
-            key={results.id}
-            className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
-          >
-            <div className="w-full">
-              <div className="flex items-center gap-2 text-sm font-bold">
-                <span className="max-sm:hidden">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#46ffa6]">
-                    <p className="capitalize text-[#000000]">{results.doctor_name.charAt(0)}</p>
+        {currentResults.filter(filter).map((results) => {
+          const diagnosis = diagnosisData.find((diag) => diag.name === results.diagnosis_code)
+          return (
+            <div
+              key={results.id}
+              className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
+            >
+              <div className="w-full">
+                <div className="flex items-center gap-2 text-sm font-bold">
+                  <span className="max-sm:hidden">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#46ffa6]">
+                      <p className="capitalize text-[#000000]">{results.doctor_name.charAt(0)}</p>
+                    </div>
+                  </span>
+                  <div>
+                    <p className="text-sm">Patient: {results.patient_name}</p>
+                    <p className="text-sm">Doctor: {results.doctor_name}</p>
+                    <p className="text-xs">Test Type: {results.test_type || "N/A"}</p>
                   </div>
-                </span>
-                <div>
-                  <p className="text-sm">Patient: {results.patient_name}</p>
-                  <p className="text-sm">Doctor: {results.doctor_name}</p>
-                  <p className="text-xs">Test Type: {results.test_type || "N/A"}</p>
                 </div>
               </div>
+              <div className="w-full max-sm:hidden">
+                <p className="text-sm">{diagnosis?.name || "N/A"}</p>
+                <p className="text-xs font-bold">Code: {diagnosis?.code || "N/A"}</p>
+              </div>
+
+              <div className="w-full max-sm:hidden">
+                <p className="text-sm">₦ {diagnosis?.price || "N/A"}</p>
+                <p className="text-xs font-bold">Diagnosis Price</p>
+              </div>
+              <div className="w-full">
+                <p
+                  className={`w-32 rounded ${getStatusColor(
+                    results.status_note
+                  )} px-2 py-[6px] text-center text-xs text-[#000000]`}
+                >
+                  {results.status_note}
+                </p>
+              </div>
+              <div className="w-full max-sm:hidden">
+                <p className="text-sm font-bold">{formatDate(results.pub_date)}</p>
+                <p className="text-xs font-bold">Date Requested</p>
+              </div>
+              <div>
+                <PiDotsThree onClick={() => handleCardClick(results)} />
+              </div>
             </div>
-            <div className="w-full">
-              <p
-                className={`w-32 rounded ${getStatusColor(
-                  results.status_note
-                )} px-2 py-[6px] text-center text-xs text-[#000000]`}
-              >
-                {results.status_note}
-              </p>
-            </div>
-            <div className="w-full max-sm:hidden">
-              <p className="text-sm font-bold">{formatDate(results.pub_date)}</p>
-            </div>
-            <div>
-              <PiDotsThree onClick={() => handleCardClick(results)} />
-            </div>
-          </div>
-        ))}
+          )
+        })}
         <div className="mb-4 flex items-center justify-end  max-sm:px-3 md:mt-4">
           {Array.from({ length: totalPages }, (_, index) => (
             <button

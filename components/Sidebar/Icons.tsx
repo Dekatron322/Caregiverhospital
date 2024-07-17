@@ -7,6 +7,8 @@ import VaccinesOutlinedIcon from "@mui/icons-material/VaccinesOutlined"
 import AirlineSeatIndividualSuiteOutlinedIcon from "@mui/icons-material/AirlineSeatIndividualSuiteOutlined"
 import CardTravelIcon from "@mui/icons-material/CardTravel"
 import Link from "next/link"
+import BiotechIcon from "@mui/icons-material/Biotech"
+import MonitorHeartIcon from "@mui/icons-material/MonitorHeart"
 
 export const LogoIcon = () => (
   <>
@@ -35,6 +37,9 @@ export const DashboardIcon = () => <DashboardOutlinedIcon className="text-lg" />
 export const Departments = () => <HomeWorkOutlinedIcon className="text-lg" />
 
 export const Appointments = () => <MedicationLiquidOutlinedIcon className="text-lg" />
+
+export const Diagnosis = () => <BiotechIcon className="text-lg" />
+export const ProcedureIcon = () => <MonitorHeartIcon className="text-lg" />
 
 export const Staff = () => <GiNurseMale />
 

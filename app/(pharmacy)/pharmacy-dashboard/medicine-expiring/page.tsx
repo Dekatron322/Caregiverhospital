@@ -3,33 +3,52 @@ import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
 import { IoIosArrowBack, IoIosArrowForward, IoMdArrowBack, IoMdSearch } from "react-icons/io"
 import { usePathname, useRouter } from "next/navigation"
-import { Shortage } from "utils"
-import { SetStateAction, useState } from "react"
+import { useEffect, useState } from "react"
 
 import Image from "next/image"
 import Link from "next/link"
-import { PiDotsThree } from "react-icons/pi"
 import { GoPlus } from "react-icons/go"
 import { IoAddCircleSharp } from "react-icons/io5"
 import { HiOutlineTrash } from "react-icons/hi2"
 import TrashDrugModal from "components/Modals/TrashDrugModal"
 
-export default function MedicineExpiring({ params }: { params: { medicineId: string } }) {
+interface Medicine {
+  id: string
+  name: string
+  quantity: string
+  category: string
+  expiry_date: string
+  price: string
+  procedure_code: string
+  how_to_use: string
+  side_effect: string
+  status: boolean
+  pub_date: string
+}
+
+interface MedicineExpiringProps {
+  params: {
+    medicineId: string
+  }
+}
+
+export default function MedicineExpiring({ params }: MedicineExpiringProps) {
   const pathname = usePathname()
   const [searchQuery, setSearchQuery] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const router = useRouter()
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
+  const [medicines, setMedicines] = useState<Medicine[]>([])
   const { medicineId } = params
 
   const patientsPerPage = 7
   const indexOfLastPatient = currentPage * patientsPerPage
   const indexOfFirstPatient = indexOfLastPatient - patientsPerPage
-  const currentPatients = Shortage.slice(indexOfFirstPatient, indexOfLastPatient)
+  const currentPatients = medicines.slice(indexOfFirstPatient, indexOfLastPatient)
 
-  const pageNumbers = []
-  for (let i = 1; i <= Math.ceil(Shortage.length / patientsPerPage); i++) {
+  const pageNumbers: number[] = []
+  for (let i = 1; i <= Math.ceil(medicines.length / patientsPerPage); i++) {
     pageNumbers.push(i)
   }
 
@@ -41,7 +60,7 @@ export default function MedicineExpiring({ params }: { params: { medicineId: str
     setCurrentPage(currentPage - 1)
   }
 
-  const handlePageChange = (pageNumber: SetStateAction<number>) => {
+  const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber)
   }
 
@@ -65,6 +84,25 @@ export default function MedicineExpiring({ params }: { params: { medicineId: str
     setShowSuccessNotification(true)
     setTimeout(() => setShowSuccessNotification(false), 5000)
   }
+
+  const fetchMedicines = async () => {
+    try {
+      const response = await fetch("https://api.caregiverhospital.com/medicine/medicine")
+      const data = (await response.json()) as Medicine[]
+      const today = new Date()
+      const filteredData = data.filter((medicine) => {
+        const expiryDate = new Date(medicine.expiry_date)
+        return expiryDate <= today
+      })
+      setMedicines(filteredData)
+    } catch (error) {
+      console.error("Error fetching medicines:", error)
+    }
+  }
+
+  useEffect(() => {
+    fetchMedicines()
+  }, [])
 
   return (
     <>
@@ -117,7 +155,7 @@ export default function MedicineExpiring({ params }: { params: { medicineId: str
                   </div>
                 </>
               ) : (
-                filteredPatients.map((shortage, index) => (
+                filteredPatients.map((shortage) => (
                   <div
                     key={shortage.id}
                     className="flex w-full cursor-pointer  items-center justify-between rounded-lg border p-2 "
@@ -127,11 +165,11 @@ export default function MedicineExpiring({ params }: { params: { medicineId: str
                       <small className="text-xs ">Medicine Name</small>
                     </div>
                     <div className="w-full max-sm:hidden">
-                      <p className="text-sm font-bold">{shortage.medicine_id}</p>
+                      <p className="text-sm font-bold">{shortage.id}</p>
                       <small className="text-xs ">Medicine ID</small>
                     </div>
                     <div className="w-full max-sm:hidden">
-                      <div className="flex gap-1 text-sm font-bold">{shortage.category_name}</div>
+                      <div className="flex gap-1 text-sm font-bold">{shortage.category}</div>
                       <small className="text-xs ">Category Name</small>
                     </div>
                     <div className="w-full max-sm:hidden">
@@ -182,7 +220,7 @@ export default function MedicineExpiring({ params }: { params: { medicineId: str
                   <li>
                     <button
                       onClick={handleNextPage}
-                      disabled={currentPage === Math.ceil(Shortage.length / patientsPerPage)}
+                      disabled={currentPage === Math.ceil(medicines.length / patientsPerPage)}
                     >
                       <IoIosArrowForward />
                     </button>

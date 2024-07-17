@@ -64,7 +64,7 @@ export default function PharmacyDashboard() {
   }, [])
 
   const calculateMetrics = (data: Category[]) => {
-    const today = new Date().toISOString().split("T")[0]
+    const today: any = new Date().toISOString().split("T")[0]
     let totalMedicines = 0
     let medicinesAvailable = 0
     let medicineShortage = 0
@@ -79,7 +79,11 @@ export default function PharmacyDashboard() {
         if (parseInt(medicine.quantity, 10) === 0) {
           medicineShortage += 1
         }
-        if (medicine.expiry_date === today) {
+        if (
+          medicine.expiry_date &&
+          typeof medicine.expiry_date === "string" &&
+          new Date(medicine.expiry_date) <= new Date(today)
+        ) {
           medicinesExpiring += 1
         }
         totalMedicinePrice += parseFloat(medicine.price)
@@ -95,6 +99,7 @@ export default function PharmacyDashboard() {
       totalMedicinePrice,
     })
   }
+
   if (loading) {
     return (
       <section className="h-full">

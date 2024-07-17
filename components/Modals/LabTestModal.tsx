@@ -28,6 +28,11 @@ interface UserDetails {
   account_type: string
 }
 
+interface Diagnosis {
+  id: string
+  name: string
+}
+
 const testOptions = [
   { id: "1", name: "Postrate Specific Antigen (PSA)" },
   { id: "2", name: "Estradiol" },
@@ -61,10 +66,11 @@ const LabTestModal: React.FC<ModalProps> = ({ results, onClose, userId }) => {
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null)
   const [test, setTest] = useState<string>("")
   const [note, setNote] = useState<string>("")
-  const [diagnosis, SetDiagnosis] = useState<string>("")
-  const [status, SetStatus] = useState<string>("Not Approved")
+  const [diagnosis, setDiagnosis] = useState<string>("")
+  const [status, setStatus] = useState<string>("Not Approved")
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const [showErrorNotification, setShowErrorNotification] = useState(false)
+  const [diagnosisData, setDiagnosisData] = useState<Diagnosis[]>([])
 
   useEffect(() => {
     AOS.init({
@@ -76,6 +82,7 @@ const LabTestModal: React.FC<ModalProps> = ({ results, onClose, userId }) => {
   useEffect(() => {
     setMounted(true)
     fetchUserDetails()
+    fetchDiagnosis()
   }, [])
 
   const fetchUserDetails = async () => {
@@ -101,6 +108,19 @@ const LabTestModal: React.FC<ModalProps> = ({ results, onClose, userId }) => {
     }
   }
 
+  const fetchDiagnosis = async () => {
+    try {
+      const response = await fetch(`https://api.caregiverhospital.com/diagnosis/diagnosis/`)
+      if (!response.ok) {
+        throw new Error("Failed to fetch diagnosis")
+      }
+      const data = (await response.json()) as Diagnosis[]
+      setDiagnosisData(data)
+    } catch (error) {
+      console.error("Error fetching diagnosis:", error)
+    }
+  }
+
   const handleAddPrescription = async () => {
     if (userDetails) {
       setDoctorName(userDetails.username)
@@ -109,10 +129,13 @@ const LabTestModal: React.FC<ModalProps> = ({ results, onClose, userId }) => {
     const selectedTestOption = testOptions.find((option) => option.id === test)
     const testName = selectedTestOption ? selectedTestOption.name : ""
 
+    const selectedDiagnosis = diagnosisData.find((dia) => dia.id === diagnosis)
+    const diagnosisName = selectedDiagnosis ? selectedDiagnosis.name : ""
+
     const prescriptionData = {
       doctor_name: doctorName,
       test_type: testName,
-      diagnosis_code: diagnosis,
+      diagnosis_code: diagnosisName,
       note,
       status_note: status,
       pub_date: new Date().toISOString(),
@@ -169,15 +192,12 @@ const LabTestModal: React.FC<ModalProps> = ({ results, onClose, userId }) => {
               </div>
             </div>
             <div className="my-2 w-full">
-              <div className="search-bg mt-1 flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
-                <input
-                  type="text"
-                  id="diagnosis"
-                  placeholder="diagnosis"
-                  className="h-[45px] w-full bg-transparent text-xs outline-none focus:outline-none"
-                  style={{ width: "100%", height: "45px" }}
-                  value={diagnosis}
-                  onChange={(e) => SetDiagnosis(e.target.value)}
+              <div className="search-bg mt-1 flex h-[50px] w-[100%] items-center justify-between gap-3 rounded  py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+                <CustomDropdown
+                  options={diagnosisData.map((dia) => ({ id: dia.id, name: dia.name }))}
+                  selectedOption={diagnosis}
+                  onChange={setDiagnosis}
+                  placeholder="Select Diagnosis"
                 />
               </div>
             </div>

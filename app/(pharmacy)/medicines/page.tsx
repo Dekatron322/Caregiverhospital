@@ -20,6 +20,7 @@ interface Medicine {
   price: string
   how_to_use: string
   side_effect: string
+  medicine_id: string
   status: boolean
   pub_date: string
 }
@@ -177,7 +178,7 @@ export default function Medicines() {
                       <small className="text-xs">Medicine Name</small>
                     </div>
                     <div className="w-full max-sm:hidden">
-                      <p className="text-sm font-bold">{medicine.id}</p>
+                      <p className="text-sm font-bold">{medicine.medicine_id}</p>
                       <small className="text-xs">Medicine Id</small>
                     </div>
                     <div className="w-full max-sm:hidden">

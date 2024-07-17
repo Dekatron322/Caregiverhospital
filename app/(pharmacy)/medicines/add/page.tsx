@@ -38,6 +38,7 @@ const Page: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>("")
   const [name, setName] = useState<string>("")
   const [quantity, setQuantity] = useState<string>("")
+  const [medicine_id, setMedicine_id] = useState<string>("")
   const [expiryDate, setExpiryDate] = useState<string>("")
   const [price, setPrice] = useState<string>("")
   const [howToUse, setHowToUse] = useState<string>("")
@@ -80,6 +81,7 @@ const Page: React.FC = () => {
     const newMedicine = {
       name,
       quantity,
+      medicine_id,
       category: selectedCategory,
       expiry_date: expiryDate,
       price,
@@ -181,7 +183,7 @@ const Page: React.FC = () => {
                         <RxCalendar />
                       </div>
                     </div>
-                    <div className="mb-3 grid grid-cols-2 gap-3 max-sm:grid-cols-2">
+                    <div className="mb-3 grid grid-cols-3 gap-3 max-sm:grid-cols-1">
                       <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                         <input
                           type="number"
@@ -200,6 +202,18 @@ const Page: React.FC = () => {
                           placeholder="Quantity"
                           value={quantity}
                           onChange={(e) => setQuantity(e.target.value)}
+                          className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
+                          style={{ width: "100%", height: "50px" }}
+                        />
+                      </div>
+
+                      <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+                        <input
+                          type="text"
+                          id="medicine_id"
+                          placeholder="Medicine ID"
+                          value={medicine_id}
+                          onChange={(e) => setMedicine_id(e.target.value)}
                           className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
                           style={{ width: "100%", height: "50px" }}
                         />

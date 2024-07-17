@@ -29,7 +29,7 @@ const Page = () => {
   const [formData, setFormData] = useState({
     name: "",
     gender: "",
-    dob: null,
+    dob: "",
     membership_no: "",
     policy_id: "",
     email_address: "",
@@ -40,6 +40,7 @@ const Page = () => {
     nok_address: "",
     allergies: "",
     hmo: "",
+    password: "",
   })
   const [hmos, setHmos] = useState<Hmo[]>([])
   const departments = ["Medical Consultants", "Pharmacy", "Medical Laboratory", "Finance", "Nurse", "Patients"]
@@ -55,10 +56,6 @@ const Page = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
-  }
-
-  const handleDateChange = (date: any) => {
-    setFormData((prev) => ({ ...prev, dob: date }))
   }
 
   const handleGenderChange = (selectedGender: string) => {
@@ -248,14 +245,14 @@ const Page = () => {
                       </div>
 
                       <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
-                        <DatePicker
-                          selected={formData.dob}
-                          onChange={handleDateChange}
-                          placeholderText="Date of Birth"
+                        <input
+                          type="datetime-local"
+                          id="dob"
+                          name="dob"
+                          value={formData.dob}
+                          onChange={handleChange}
                           className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
-                          dateFormat="yyyy/MM/dd"
                         />
-                        <RxCalendar />
                       </div>
                       <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                         <input
@@ -361,19 +358,33 @@ const Page = () => {
                         />
                       </div>
                     </div>
-                    <div className="mb-3 gap-3">
-                      <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
-                        <input
-                          type="text"
-                          name="allergies"
-                          placeholder="Allergies"
-                          className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
-                          style={{ width: "100%", height: "50px" }}
-                          value={formData.allergies}
-                          onChange={handleChange}
-                        />
+                    <div className="mb-3 ">
+                      <div className="mb-3 grid grid-cols-2 gap-3 ">
+                        <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+                          <input
+                            type="text"
+                            name="allergies"
+                            placeholder="Allergies"
+                            className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
+                            style={{ width: "100%", height: "50px" }}
+                            value={formData.allergies}
+                            onChange={handleChange}
+                          />
+                        </div>
+                        <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+                          <input
+                            type="text"
+                            name="password"
+                            placeholder="Enter Password"
+                            className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
+                            style={{ width: "100%", height: "50px" }}
+                            value={formData.password}
+                            onChange={handleChange}
+                          />
+                        </div>
+
+                        <p className="my-2 text-xs text-[#0F920F]">Separate allergies with &rdquo;,&rdquo;</p>
                       </div>
-                      <p className="my-2 text-xs">Separate allergies with &rdquo;,&rdquo;</p>
                     </div>
                     <h6 className="text-lg font-medium">Next of Kin Information</h6>
                     <div className="mt-3">

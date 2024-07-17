@@ -3,11 +3,13 @@
 import clsx from "clsx"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Admissions, DashboardIcon } from "./Icons"
+import { Admissions, DashboardIcon, Diagnosis, ProcedureIcon } from "./Icons"
 
 const links = [
   { name: "Dashboard", href: "/nurses-dashboard", icon: DashboardIcon },
   { name: "Admissions", href: "/all-admissions", icon: Admissions },
+  { name: "Diagnosis", href: "/all-diagnosis", icon: Diagnosis },
+  { name: "Proceduces", href: "/all-procedure", icon: ProcedureIcon },
 ]
 
 interface LinksProps {
