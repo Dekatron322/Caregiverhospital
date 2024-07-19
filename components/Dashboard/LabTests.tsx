@@ -6,6 +6,18 @@ import TestModal from "components/Modals/TestModal"
 import AOS from "aos"
 import "aos/dist/aos.css"
 import Image from "next/image"
+import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye"
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet"
+import PaymentModal from "components/Modals/PaymentModal"
+
+interface HMO {
+  id: string
+  name: string
+  category: string
+  description: string
+  status: boolean
+  pub_date: string
+}
 
 interface LabTestResult {
   id: string
@@ -14,8 +26,11 @@ interface LabTestResult {
   status_note: string
   pub_date: string
   patient_name: string
+  patient_id: string // Added field for patient ID
+  policy_id: string
   diagnosis_code: string
   name: string
+  hmo?: HMO
 }
 
 interface Diagnosis {
@@ -24,7 +39,13 @@ interface Diagnosis {
   code: string
   price: string
   status: boolean
-  pub_date: string
+  pub_date: any
+}
+
+interface ModalProps {
+  results: LabTestResult
+  onClose: (isSuccess: boolean) => void
+  diagnosis?: Diagnosis
 }
 
 const LabTests = () => {
@@ -32,11 +53,14 @@ const LabTests = () => {
   const [isDone, setIsDone] = useState<boolean>(false)
   const [activeTab, setActiveTab] = useState("all")
   const [clickedCard, setClickedCard] = useState<LabTestResult | null>(null)
+  const [paymentCard, setPaymentCard] = useState<LabTestResult | null>(null)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
+  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState<boolean>(false)
   const [labTestResults, setLabTestResults] = useState<LabTestResult[]>([])
   const [diagnosisData, setDiagnosisData] = useState<Diagnosis[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
+  const [showPaymentSuccessNotification, setShowPaymentSuccessNotification] = useState(false)
   const [refresh, setRefresh] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [searchQuery, setSearchQuery] = useState("")
@@ -57,22 +81,30 @@ const LabTests = () => {
         const labTestResponse = await axios.get("https://api.caregiverhospital.com/patient/patient/")
         const patientData = labTestResponse.data
 
+        // Fetch diagnosis data
+        const diagnosisResponse = await axios.get("https://api.caregiverhospital.com/diagnosis/diagnosis/")
+        const fetchedDiagnosisData = diagnosisResponse.data
+        setDiagnosisData(fetchedDiagnosisData)
+
         if (Array.isArray(patientData)) {
           const tests = patientData.flatMap((patient: any) => {
-            return patient.lab_tests.map((test: any) => ({
-              ...test,
-              patient_name: patient.name,
-            }))
+            return patient.lab_tests.map((test: any) => {
+              const diagnosis = fetchedDiagnosisData.find((diag: any) => diag.code === test.diagnosis_code)
+              return {
+                ...test,
+                patient_name: patient.name,
+                patient_id: patient.id, // Include patient ID here
+                policy_id: patient.policy_id,
+                diagnosis,
+                hmo: patient.hmo, // Include HMO details here
+              }
+            })
           })
 
           setLabTestResults(tests)
         } else {
           console.error("Unexpected response format for lab test results")
         }
-
-        // Fetch diagnosis data
-        const diagnosisResponse = await axios.get("https://api.caregiverhospital.com/diagnosis/diagnosis/")
-        setDiagnosisData(diagnosisResponse.data)
       } catch (error) {
         console.error("Error fetching data:", error)
       } finally {
@@ -88,6 +120,13 @@ const LabTests = () => {
     setIsModalOpen(true)
   }
 
+  const handlePaymentClick = (results: LabTestResult) => {
+    const diagnosis = diagnosisData.find((diag) => diag.code === results.diagnosis_code)
+    const resultWithDiagnosis = { ...results, diagnosis }
+    setPaymentCard(resultWithDiagnosis)
+    setIsPaymentModalOpen(true)
+  }
+
   const handleModalClose = (isSuccess: boolean) => {
     if (isSuccess) {
       setShowSuccessNotification(true)
@@ -95,6 +134,15 @@ const LabTests = () => {
       setTimeout(() => setShowSuccessNotification(false), 5000)
     }
     setIsModalOpen(false)
+  }
+
+  const handlePaymentModalClose = (isSuccess: boolean) => {
+    if (isSuccess) {
+      setShowPaymentSuccessNotification(true)
+      setRefresh(!refresh) // Trigger a refresh
+      setTimeout(() => setShowPaymentSuccessNotification(false), 5000)
+    }
+    setIsPaymentModalOpen(false)
   }
 
   const toggleDone = () => {
@@ -190,11 +238,12 @@ const LabTests = () => {
                 </p>
               </div>
               <div className="w-full max-sm:hidden">
-                <p className="text-sm font-bold">{formatDate(results.pub_date)}</p>
+                <p className="text-sm font-bold">{formatDate(diagnosis?.pub_date)}</p>
                 <p className="text-xs font-bold">Date Requested</p>
               </div>
-              <div>
-                <PiDotsThree onClick={() => handleCardClick(results)} />
+              <div className="flex gap-2">
+                <RemoveRedEyeIcon className="text-[#46FFA6]" onClick={() => handleCardClick(results)} />
+                <AccountBalanceWalletIcon onClick={() => handlePaymentClick(results)} />
               </div>
             </div>
           )
@@ -285,10 +334,18 @@ const LabTests = () => {
       </div>
 
       {isModalOpen && clickedCard && <TestModal results={clickedCard} onClose={handleModalClose} />}
+      {isPaymentModalOpen && paymentCard && <PaymentModal results={paymentCard} onClose={handlePaymentModalClose} />}
+
       {showSuccessNotification && (
         <div className="animation-fade-in absolute bottom-16 m-5  flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514] md:right-16">
           <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
           <span className="clash-font text-sm  text-[#0F920F]">Result Submitted</span>
+        </div>
+      )}
+      {showPaymentSuccessNotification && (
+        <div className="animation-fade-in absolute bottom-16 m-5  flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514] md:right-16">
+          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
+          <span className="clash-font text-sm  text-[#0F920F]">Invoice Sent</span>
         </div>
       )}
     </>
