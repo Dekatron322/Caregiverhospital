@@ -192,7 +192,12 @@ export default function InvoicesPage({ params }: HmoDetailPageProps) {
               </div>
               <div className="pt-4">
                 <label htmlFor="month-select">Select Month: </label>
-                <select id="month-select" value={selectedMonth} onChange={handleMonthChange}>
+                <select
+                  className="search-bg w-60 rounded border p-2"
+                  id="month-select"
+                  value={selectedMonth}
+                  onChange={handleMonthChange}
+                >
                   {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
                     <option key={month} value={month}>
                       {new Date(0, month - 1).toLocaleString("default", { month: "long" })}

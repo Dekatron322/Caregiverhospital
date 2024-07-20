@@ -137,7 +137,7 @@ const Page: React.FC = () => {
                   type="text"
                   id="email"
                   placeholder="Email Address"
-                  className="w-ful h-[45px] bg-transparent text-xs outline-none focus:outline-none"
+                  className="h-[45px] w-full bg-transparent text-xs outline-none focus:outline-none"
                   style={{ width: "100%", height: "45px" }}
                   value={email}
                   onChange={handleEmailChange}

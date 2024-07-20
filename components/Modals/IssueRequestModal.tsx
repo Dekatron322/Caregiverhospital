@@ -91,13 +91,13 @@ const IssueRequestModal: React.FC<PrescriptionModalProps> = ({
   prescription,
   procedureDetails,
 }) => {
-  if (!isOpen || !patient || !prescription) {
-    return null
-  }
   const [openSection, setOpenSection] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
+  if (!isOpen || !patient || !prescription) {
+    return null
+  }
   const toggleOpen = (index: number) => {
     setOpenSection(openSection === index ? -1 : index)
   }
