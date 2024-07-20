@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useState, SetStateAction } from "react"
+import React, { SetStateAction, useEffect, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
