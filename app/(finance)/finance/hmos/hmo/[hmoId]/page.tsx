@@ -73,6 +73,10 @@ export default function HmoDetailPage({ params }: HmoDetailPageProps) {
     router.back()
   }
 
+  const handleNavigateToInvoices = (hmoId: string) => {
+    router.push(`/invoices/${hmoId}`)
+  }
+
   let filteredList = hmoDetail?.hmos || []
 
   if (searchQuery) {
@@ -217,12 +221,18 @@ export default function HmoDetailPage({ params }: HmoDetailPageProps) {
                             <div>
                               <div className="flex items-center justify-between pt-6">
                                 <div className="max-md:hidden">
-                                  <button className="button-primary h-[50px] rounded-sm max-md:h-[40px]">
-                                    View invoice
+                                  <button
+                                    className="button-primary h-[50px] rounded-sm max-md:h-[40px]"
+                                    onClick={() => handleNavigateToInvoices(item.id)}
+                                  >
+                                    View invoices
                                   </button>
                                 </div>
                                 <div className="md:hidden">
-                                  <button className="rounded border p-2">
+                                  <button
+                                    className="rounded border p-2"
+                                    onClick={() => handleNavigateToInvoices(item.id)}
+                                  >
                                     <IoReceipt />
                                   </button>
                                 </div>

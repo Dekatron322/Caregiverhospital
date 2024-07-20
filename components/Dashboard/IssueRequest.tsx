@@ -1,19 +1,19 @@
-"use client"
+// components/IssueRequest.tsx
 import React, { useEffect, useState } from "react"
-import { Request } from "utils"
-import Image from "next/image"
-import { PiDotsThree } from "react-icons/pi"
-import { useRouter } from "next/navigation"
 import AOS from "aos"
 import "aos/dist/aos.css"
+import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet"
+import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye"
+import IssueRequestModal from "components/Modals/IssueRequestModal"
 
 interface Prescription {
   id: string
   doctor_name: string
+  medicine_id: string
   category: string
+  code: string
   name: string
   complain: string
-  code: string
   unit: string
   dosage: string
   rate: string
@@ -45,18 +45,28 @@ interface Patient {
   prescriptions: Prescription[]
 }
 
+interface Procedure {
+  id: string
+  name: string
+  code: string
+  price: string
+  status: boolean
+  pub_date: string
+}
+
 type ApiResponse = Patient[]
+type ProcedureResponse = Procedure[]
 
 const IssueRequest = () => {
-  const router = useRouter()
   const [isDone, setIsDone] = useState<boolean>(false)
   const [activeTab, setActiveTab] = useState("pending")
   const [patients, setPatients] = useState<Patient[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [proceduresMap, setProceduresMap] = useState<Map<string, Procedure>>(new Map())
 
-  const toggleDone = () => {
-    setIsDone(!isDone)
-  }
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null)
+  const [selectedPrescription, setSelectedPrescription] = useState<Prescription | null>(null)
 
   useEffect(() => {
     AOS.init({
@@ -78,8 +88,20 @@ const IssueRequest = () => {
     }
   }
 
+  const fetchProcedures = async () => {
+    try {
+      const response = await fetch("https://api.caregiverhospital.com/procedure/procedure/")
+      const data = (await response.json()) as ProcedureResponse
+      const proceduresMap = new Map(data.map((procedure) => [procedure.name, procedure]))
+      setProceduresMap(proceduresMap)
+    } catch (error) {
+      console.error("Error fetching procedures:", error)
+    }
+  }
+
   useEffect(() => {
     fetchPatients()
+    fetchProcedures()
   }, [])
 
   const formatDate = (dateString: string) => {
@@ -94,7 +116,18 @@ const IssueRequest = () => {
     return new Date(dateString).toLocaleDateString(undefined, options)
   }
 
+  const getProcedureDetails = (procedureName: string) => {
+    return proceduresMap.get(procedureName)
+  }
+
+  const handleIconClick = (patient: Patient, prescription: Prescription) => {
+    setSelectedPatient(patient)
+    setSelectedPrescription(prescription)
+    setIsModalOpen(true)
+  }
+
   const renderPrescriptionDetails = (patient: Patient, prescription: Prescription) => {
+    const procedureDetails = getProcedureDetails(prescription.code)
     return (
       <div key={prescription.id} className="mb-2 flex w-full items-center justify-between rounded-lg border p-2">
         <div className="flex w-full items-center gap-2">
@@ -103,31 +136,37 @@ const IssueRequest = () => {
           </div>
           <div>
             <p className="text-sm font-bold">{patient.name}</p>
-            <p className="text-xs">Patient Name</p>
+            <p className="text-xs">Doctor: {prescription.doctor_name}</p>
+            <p className="text-xs">HMO ID: {patient.policy_id}</p>
           </div>
+        </div>
+        <div className="w-full max-sm:hidden">
+          <p className="text-sm font-bold">Procedure: {procedureDetails?.name}</p>
+          <p className="text-xs font-medium">Price: ₦{procedureDetails?.price}</p>
+          <p className="text-xs font-medium">Code: {procedureDetails?.code}</p>
         </div>
         <div className="w-full">
           <p className="text-sm font-bold">{prescription.name}</p>
           <small className="text-xs">Medicine Name</small>
         </div>
-        <div className="w-full max-sm:hidden">
-          <p className="text-sm font-bold">{prescription.id}</p>
-          <small className="text-xs">Medicine ID</small>
-        </div>
+
         <div className="w-full max-sm:hidden">
           <div className="flex gap-1 text-sm font-bold">{prescription.category}</div>
           <small className="text-xs">Category Name</small>
         </div>
+
         <div className="w-full max-sm:hidden">
-          <p className="text-sm font-bold">{formatDate(prescription.pub_date)}</p>
+          <div className="flex gap-1 text-sm font-bold">{prescription.unit}</div>
+          <small className="text-xs">Unit</small>
+        </div>
+        <div className="w-full max-sm:hidden">
+          <p className="text-sm font-bold">{formatDate(procedureDetails?.pub_date || "")}</p>
           <small className="text-xs">Date and Time</small>
         </div>
-        <div className="w-full max-sm:hidden">
-          <p className="rounded py-[2px] text-xs">{prescription.doctor_name}</p>
-          <small className="text-xs">Request by</small>
-        </div>
-        <div className="max-md:hidden">
-          <PiDotsThree />
+
+        <div className="flex gap-2">
+          <AccountBalanceWalletIcon onClick={() => handleIconClick(patient, prescription)} />
+          <RemoveRedEyeIcon className="text-[#46FFA6]" />
         </div>
       </div>
     )
@@ -190,6 +229,14 @@ const IssueRequest = () => {
       {activeTab === "pending" ? renderPendingRequests() : null}
       {activeTab === "issued" ? renderIssuedRequests() : null}
       {activeTab === "cancelled" ? renderCancelledRequests() : null}
+
+      <IssueRequestModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        patient={selectedPatient}
+        prescription={selectedPrescription}
+        procedureDetails={getProcedureDetails(selectedPrescription?.code || "")}
+      />
     </div>
   )
 }

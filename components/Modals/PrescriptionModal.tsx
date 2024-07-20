@@ -48,6 +48,11 @@ interface UserDetails {
   account_type: string
 }
 
+interface Procedure {
+  id: string
+  name: string
+}
+
 const PrescriptionModal: React.FC<ModalProps> = ({ results, onClose, userId }) => {
   const [category, setCategory] = useState<string>("")
   const [name, setName] = useState<string>("")
@@ -68,6 +73,8 @@ const PrescriptionModal: React.FC<ModalProps> = ({ results, onClose, userId }) =
   const [loading, setLoading] = useState(true)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const [showErrorNotification, setShowErrorNotification] = useState(false)
+  const [procedureData, setProcedureData] = useState<Procedure[]>([])
+  const [procedure, setProcedure] = useState<string>("")
 
   useEffect(() => {
     AOS.init({
@@ -79,6 +86,7 @@ const PrescriptionModal: React.FC<ModalProps> = ({ results, onClose, userId }) =
   useEffect(() => {
     setMounted(true)
     fetchUserDetails()
+    fetchProcedure()
   }, [])
 
   const fetchUserDetails = async () => {
@@ -101,6 +109,19 @@ const PrescriptionModal: React.FC<ModalProps> = ({ results, onClose, userId }) =
       console.error("Error fetching user details:", error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchProcedure = async () => {
+    try {
+      const response = await fetch(`https://api.caregiverhospital.com/procedure/procedure/`)
+      if (!response.ok) {
+        throw new Error("Failed to fetch procedure")
+      }
+      const data = (await response.json()) as Procedure[]
+      setProcedureData(data)
+    } catch (error) {
+      console.error("Error fetching procedure:", error)
     }
   }
 
@@ -139,13 +160,15 @@ const PrescriptionModal: React.FC<ModalProps> = ({ results, onClose, userId }) =
     const selectedCategory = categories.find((cat) => cat.id === category)
     const selectedMedicine = medicines.find((med) => med.id === name)
     const selectedComplain = complaintsOptions.find((comp) => comp.id === complain)
+    const selectedProceduce = procedureData.find((pro) => pro.id === procedure)
+    const procedureName = selectedProceduce ? selectedProceduce.name : ""
 
     const prescriptionData = {
       doctor_name: doctorName,
       category: selectedCategory ? selectedCategory.name : "",
       name: selectedMedicine ? selectedMedicine.name : "",
       complain: selectedComplain ? selectedComplain.name : "",
-      code,
+      code: procedureName,
       unit,
       dosage,
       rate,
@@ -205,12 +228,22 @@ const PrescriptionModal: React.FC<ModalProps> = ({ results, onClose, userId }) =
   return (
     <div className={styles.modalOverlay} data-aos="fade-up" data-aos-duration="1000" data-aos-delay="500">
       <div className={styles.modalContent}>
+        <div className="my-2 w-full"></div>
         <div className="px-6 py-6">
           <div className="mb-4 flex items-center justify-between">
             <p className="text-lg font-semibold">Add Prescription for {results.name}</p>
             <div className="hover:rounded-md hover:border">
               <LiaTimesSolid className="m-1 cursor-pointer" onClick={onClose} />
             </div>
+          </div>
+
+          <div className="search-bg mt-1 flex h-[50px] w-[100%] items-center justify-between gap-3 rounded  py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+            <CustomDropdown
+              options={procedureData.map((pro) => ({ id: pro.id, name: pro.name }))}
+              selectedOption={procedure}
+              onChange={setProcedure}
+              placeholder="Select Procedure"
+            />
           </div>
 
           <div className="my-2 flex w-full gap-2">
@@ -232,19 +265,6 @@ const PrescriptionModal: React.FC<ModalProps> = ({ results, onClose, userId }) =
             </div>
           </div>
           <div className="my-2 flex w-full gap-2">
-            <div className="w-full">
-              <div className="search-bg last: mt-1 flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
-                <input
-                  type="text"
-                  id="code"
-                  placeholder="Code"
-                  className="-xs h-[45px] w-full bg-transparent text-xs outline-none focus:outline-none"
-                  style={{ width: "100%", height: "45px" }}
-                  value={code}
-                  onChange={(e) => setCode(e.target.value)}
-                />
-              </div>
-            </div>
             <div className="w-full">
               <div className="search-bg mt-1 flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                 <input

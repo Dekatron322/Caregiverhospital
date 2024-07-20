@@ -131,6 +131,18 @@ export default function PatientDetailPage() {
     setClickedRequestCard(results)
     setIsRequestModalOpen(true)
   }
+
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }
+    return new Date(dateString).toLocaleDateString(undefined, options)
+  }
   return (
     <>
       <section className="h-full">
@@ -193,8 +205,8 @@ export default function PatientDetailPage() {
                             <p className="xl:text-sm">{patient.phone_no}</p>
                           </div>
                           <div className="flex justify-between pb-2">
-                            <p className="xl:text-sm">Age</p>
-                            <p className="xl:text-sm">{patient.dob}</p>
+                            <p className="xl:text-sm">DOB</p>
+                            <p className="xl:text-sm">{formatDate(patient.dob)}</p>
                           </div>
                           <div className="flex justify-between pb-2">
                             <p className="xl:text-sm">Blood Group</p>
