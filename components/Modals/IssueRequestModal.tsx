@@ -44,6 +44,7 @@ interface Prescription {
   usage: string
   status: string
   pub_date: string
+  issue_status: boolean
 }
 
 interface Procedure {
@@ -135,6 +136,12 @@ const IssueRequestModal: React.FC<PrescriptionModalProps> = ({
         payload
       )
       console.log("Response data:", response.data)
+
+      // Update the issue_status of the prescription
+      await axios.put(`https://api.caregiverhospital.com/prescription/prescription/${prescription.id}/`, {
+        issue_status: true,
+      })
+
       onClose()
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {

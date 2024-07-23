@@ -23,6 +23,7 @@ interface Medicine {
   price: string
   how_to_use: string
   side_effect: string
+  medicine_id: string
   status: boolean
   pub_date: string
 }
@@ -103,13 +104,20 @@ export default function MedicineDetailPage({ params }: { params: { medicineId: s
 
   if (!medicineDetail) {
     return (
-      <div className="loading-text flex h-full items-center justify-center">
-        {"loading...".split("").map((letter, index) => (
-          <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>
-            {letter}
-          </span>
-        ))}
-      </div>
+      <section className="h-full">
+        <div className="flex min-h-screen">
+          <div className="flex w-screen flex-col">
+            <PharmacyNav />
+            <div className="loading-text flex h-full items-center justify-center">
+              {"loading...".split("").map((letter, index) => (
+                <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>
+                  {letter}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
     )
   }
 
@@ -134,7 +142,7 @@ export default function MedicineDetailPage({ params }: { params: { medicineId: s
                       <div className="border"></div>
                       <div className="flex justify-between">
                         <div className="px-4 py-2 ">
-                          <p className="text-sn pb-4 font-bold">{medicineDetail.id}</p>
+                          <p className="text-sn pb-4 font-bold">{medicineDetail.medicine_id}</p>
                           <p className="text-xs">Medicine ID</p>
                         </div>
                         <div className="px-4 py-2">

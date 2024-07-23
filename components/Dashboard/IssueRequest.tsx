@@ -1,9 +1,9 @@
-// components/IssueRequest.tsx
 import React, { useEffect, useState } from "react"
 import AOS from "aos"
 import "aos/dist/aos.css"
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet"
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye"
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline"
 import IssueRequestModal from "components/Modals/IssueRequestModal"
 
 interface Prescription {
@@ -19,6 +19,7 @@ interface Prescription {
   rate: string
   usage: string
   status: string
+  issue_status: boolean // changed from string to boolean
   pub_date: string
 }
 
@@ -121,9 +122,33 @@ const IssueRequest = () => {
   }
 
   const handleIconClick = (patient: Patient, prescription: Prescription) => {
-    setSelectedPatient(patient)
-    setSelectedPrescription(prescription)
-    setIsModalOpen(true)
+    if (!prescription.issue_status) {
+      setSelectedPatient(patient)
+      setSelectedPrescription(prescription)
+      setIsModalOpen(true)
+    }
+  }
+
+  const updateIssueStatus = async (prescriptionId: string) => {
+    try {
+      const response = await fetch(`https://api.caregiverhospital.com/prescription/prescription/${prescriptionId}/`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ issue_status: true }),
+      })
+      if (!response.ok) {
+        throw new Error("Failed to update issue status")
+      }
+      fetchPatients() // Re-fetch patients to get the updated data
+    } catch (error) {
+      console.error("Error updating issue status:", error)
+    }
+  }
+
+  const handleRemoveRedEyeClick = (prescription: Prescription) => {
+    updateIssueStatus(prescription.id)
   }
 
   const renderPrescriptionDetails = (patient: Patient, prescription: Prescription) => {
@@ -165,8 +190,14 @@ const IssueRequest = () => {
         </div>
 
         <div className="flex gap-2">
-          <AccountBalanceWalletIcon onClick={() => handleIconClick(patient, prescription)} />
-          <RemoveRedEyeIcon className="text-[#46FFA6]" />
+          {prescription.issue_status ? (
+            <CheckCircleOutlineIcon className="text-gray-400" />
+          ) : (
+            <>
+              <AccountBalanceWalletIcon onClick={() => handleIconClick(patient, prescription)} />
+              <RemoveRedEyeIcon className="text-[#46FFA6]" onClick={() => handleRemoveRedEyeClick(prescription)} />
+            </>
+          )}
         </div>
       </div>
     )
