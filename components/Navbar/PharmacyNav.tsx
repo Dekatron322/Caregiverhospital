@@ -182,13 +182,16 @@ const PharmacyNav: React.FC = () => {
           </div>
         </div>
       </nav>
-      <nav className="block border-b bg-[#F2F6FD] px-16 py-4 max-md:px-3 md:hidden">
+      <nav className="block border-b px-16 py-4 max-md:px-3 md:hidden">
         <div className="flex items-center justify-between">
           <FormatAlignLeftIcon onClick={toggleNav} style={{ cursor: "pointer" }} />
-          <Link href="/" className="content-center">
+          <Link href="/" className="icon-style content-center">
             <Image src="/ic_logo.svg" width={150} height={43} alt="dekalo" />
           </Link>
-          <div className="flex h-[50px] items-center justify-center gap-1 rounded-full bg-[#EDF2F7] px-1">
+          <Link href="/" className="dark-icon-style content-center">
+            <Image src="/dark_logo.svg" width={150} height={43} alt="dekalo" />
+          </Link>
+          <div className="redirect flex h-[50px] items-center justify-center gap-1 rounded-full px-1">
             <div
               className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46ffa6]"
               onClick={handleProfileClick}
