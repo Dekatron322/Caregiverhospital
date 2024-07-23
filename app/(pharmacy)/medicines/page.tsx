@@ -10,6 +10,7 @@ import { GoPlus } from "react-icons/go"
 import { IoAddCircleSharp } from "react-icons/io5"
 import AOS from "aos"
 import "aos/dist/aos.css"
+import PharmacyNav from "components/Navbar/PharmacyNav"
 
 interface Medicine {
   id: string
@@ -106,7 +107,7 @@ export default function Medicines() {
       <section className="h-full ">
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
-            <DashboardNav />
+            <PharmacyNav />
 
             <div className="flex items-center gap-2 px-16 pt-4 max-md:px-3">
               <p className="font-bold">Pharmacy</p>

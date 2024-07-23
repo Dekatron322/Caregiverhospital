@@ -11,6 +11,7 @@ import DeleteMedicineModal from "components/Modals/DeleteMedicineModal"
 import Image from "next/image"
 import AOS from "aos"
 import "aos/dist/aos.css"
+import PharmacyNav from "components/Navbar/PharmacyNav"
 
 // Define types
 interface Medicine {
@@ -117,7 +118,7 @@ export default function MedicineDetailPage({ params }: { params: { medicineId: s
       <section className="h-full">
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
-            <DashboardNav />
+            <PharmacyNav />
 
             {medicineDetail && (
               <div className="px-16 py-6 max-sm:px-3" data-aos="fade-in" data-aos-duration="1000" data-aos-delay="500">

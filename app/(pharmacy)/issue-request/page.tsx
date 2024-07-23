@@ -5,6 +5,7 @@ import Footer from "components/Footer/Footer"
 import IssueRequest from "components/Dashboard/IssueRequest"
 import { IoIosArrowForward } from "react-icons/io"
 import { usePathname, useRouter } from "next/navigation"
+import PharmacyNav from "components/Navbar/PharmacyNav"
 
 export default function Dashboard() {
   const pathname = usePathname()
@@ -13,7 +14,7 @@ export default function Dashboard() {
       <section className="h-full ">
         <div className=" flex min-h-screen ">
           <div className="flex  w-screen flex-col ">
-            <DashboardNav />
+            <PharmacyNav />
 
             <div className="flex items-center gap-2 px-16 max-sm:px-3  md:py-6">
               <p className="font-bold">Pharmacy</p>

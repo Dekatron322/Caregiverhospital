@@ -13,6 +13,7 @@ import AdministerDrugModal from "components/Modals/AdministerDrugModal"
 import AOS from "aos"
 import "aos/dist/aos.css"
 import PrescribeMedicationModal from "components/Modals/PrescribeMedicationModal"
+import DoctorNav from "components/Navbar/DoctorNav"
 
 interface PatientDetail {
   id: string
@@ -157,7 +158,7 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
       <section className="h-full">
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
-            <DashboardNav />
+            <DoctorNav />
 
             {patientDetail && (
               <div className="px-16 py-6" data-aos="fade-in" data-aos-duration="1000" data-aos-delay="500">

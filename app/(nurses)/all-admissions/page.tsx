@@ -8,6 +8,7 @@ import AOS from "aos"
 import "aos/dist/aos.css"
 import { useEffect } from "react"
 import NursesAdmission from "components/Dashboard/NursesAdmission"
+import NursesNav from "components/Navbar/NursesNav"
 
 export default function Admission() {
   const router = useRouter()
@@ -28,7 +29,7 @@ export default function Admission() {
       <section className="h-full ">
         <div className=" flex min-h-screen ">
           <div className="flex  w-screen flex-col ">
-            <DashboardNav />
+            <NursesNav />
             <div
               className="flex justify-between px-16 py-6 max-md:px-3"
               data-aos="fade-in"

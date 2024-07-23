@@ -12,6 +12,7 @@ import "aos/dist/aos.css"
 import PatientDetailsForDoctor from "components/Patient/PatientDetailsForDoctor"
 import LabTestModal from "components/Modals/LabTestModal"
 import PrescriptionModal from "components/Modals/PrescriptionModal"
+import DoctorNav from "components/Navbar/DoctorNav"
 
 interface Patient {
   id: string
@@ -148,7 +149,7 @@ export default function PatientDetailPage() {
       <section className="h-full">
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
-            <DashboardNav />
+            <DoctorNav />
 
             {patient && (
               <div className="px-16 max-md:px-3 sm:py-10">

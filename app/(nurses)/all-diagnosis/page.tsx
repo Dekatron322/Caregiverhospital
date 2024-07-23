@@ -15,6 +15,7 @@ import DeletePatientModal from "components/Modals/DeletePatientModal"
 import EditDiagnosisModal from "components/Modals/EditDiagnosisModal"
 import AOS from "aos"
 import "aos/dist/aos.css"
+import NursesNav from "components/Navbar/NursesNav"
 
 interface Diagnosis {
   id: string
@@ -155,7 +156,7 @@ export default function Patients() {
       <section className="h-full">
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
-            <DashboardNav />
+            <NursesNav />
 
             <div className="flex items-center gap-2 px-16 pt-4 max-md:px-3">
               <p className="font-bold">Admin Dashboard</p>

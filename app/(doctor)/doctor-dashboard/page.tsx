@@ -8,6 +8,7 @@ import Link from "next/link"
 import DoctorsAppointments from "components/Dashboard/DoctorsAppointments"
 import { MdKeyboardDoubleArrowRight } from "react-icons/md"
 import axios from "axios"
+import DoctorNav from "components/Navbar/DoctorNav"
 
 export default function PharmacyDashboard() {
   const [doctorCount, setDoctorCount] = useState(0)
@@ -50,7 +51,7 @@ export default function PharmacyDashboard() {
       <section className="h-full ">
         <div className="flex min-h-screen ">
           <div className="flex w-screen flex-col ">
-            <DashboardNav />
+            <DoctorNav />
 
             <div className="mt-10 px-16 pb-4">
               <h4 className="font-semibold">Doctor&apos;s Dashboard</h4>

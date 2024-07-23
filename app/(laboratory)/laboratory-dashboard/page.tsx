@@ -6,6 +6,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { MdKeyboardDoubleArrowRight } from "react-icons/md"
 import LabTests from "components/Dashboard/LabTests"
+import LaboratoryNav from "components/Navbar/LaboratoryNav"
 
 interface LabTest {
   id: string
@@ -48,7 +49,7 @@ export default function PharmacyDashboard() {
       <section className="h-full">
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
-            <DashboardNav />
+            <LaboratoryNav />
 
             <div className="px-16 pb-4 max-sm:px-3 md:mt-10">
               <h4 className="font-semibold">Laboratory Dashboard</h4>

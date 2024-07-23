@@ -2,12 +2,12 @@
 import Link from "next/link"
 import React, { useState } from "react"
 import { CollapsedLogoIcon, LogoIcon } from "./Icons"
-import { LaboratoryLinks } from "./LaboratoryLinks"
+import { NursesLink } from "./NursesLink"
 import clsx from "clsx"
+import { PatientLinks } from "./PatientLinks."
 
-const LaboratorySideBar = () => {
+const PatientSidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(true)
-
   return (
     <div
       onMouseEnter={() => setIsCollapsed(false)}
@@ -25,11 +25,11 @@ const LaboratorySideBar = () => {
         <div className="h-full border-0 border-primary-700 lg:h-auto lg:space-y-1">
           {/* <p className="hidden px-7 text-xs lg:block">Navigation</p> */}
 
-          <LaboratoryLinks isCollapsed={isCollapsed} />
+          <PatientLinks isCollapsed={isCollapsed} />
         </div>
       </div>
     </div>
   )
 }
 
-export default LaboratorySideBar
+export default PatientSidebar

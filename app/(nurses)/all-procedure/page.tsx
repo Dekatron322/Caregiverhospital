@@ -15,6 +15,7 @@ import "aos/dist/aos.css"
 import BorderColorOutlinedIcon from "@mui/icons-material/BorderColorOutlined"
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
 import EditProcedureModal from "components/Modals/EditProcedureModal"
+import NursesNav from "components/Navbar/NursesNav"
 
 interface Procedure {
   id: string
@@ -158,7 +159,7 @@ export default function Patients() {
       <section className="h-full ">
         <div className="flex min-h-screen ">
           <div className="flex w-screen flex-col ">
-            <DashboardNav />
+            <NursesNav />
 
             <div className="flex items-center gap-2 px-16 pt-4 max-md:px-3">
               <p className="font-bold">Admin Dashboard</p>

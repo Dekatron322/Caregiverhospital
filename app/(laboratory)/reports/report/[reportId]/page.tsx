@@ -14,6 +14,7 @@ import AOS from "aos"
 import "aos/dist/aos.css"
 import ReportDetails from "components/ReportDetails/ReportDetails"
 import { IoEyeSharp, IoPrintOutline } from "react-icons/io5"
+import LaboratoryNav from "components/Navbar/LaboratoryNav"
 
 interface Patient {
   id: string
@@ -123,7 +124,7 @@ export default function PatientDetailPage() {
       <section className="h-full">
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
-            <DashboardNav />
+            <LaboratoryNav />
 
             {patient && (
               <div className="px-16 max-md:px-3 sm:py-10">

@@ -8,6 +8,7 @@ import { IoMdArrowBack } from "react-icons/io"
 import { useRouter } from "next/navigation"
 import AOS from "aos"
 import "aos/dist/aos.css"
+import NursesNav from "components/Navbar/NursesNav"
 
 type Hmo = {
   id: string
@@ -138,7 +139,7 @@ const Page = () => {
       <section className="h-full ">
         <div className="flex min-h-screen ">
           <div className="flex w-screen flex-col ">
-            <DashboardNav />
+            <NursesNav />
             <div
               className="flex justify-between px-16 py-4 max-md:px-3"
               data-aos="fade-in"

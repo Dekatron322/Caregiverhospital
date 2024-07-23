@@ -1,4 +1,5 @@
 import NursesSideBar from "components/Sidebar/NursesSidebar"
+import PatientSidebar from "components/Sidebar/PatientSidebar"
 import PharmacySideBar from "components/Sidebar/PharmacySidebar"
 import SideBar from "components/Sidebar/Sidebar"
 import { Metadata } from "next"
@@ -25,7 +26,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <div className="flex h-screen w-screen flex-col-reverse border-0 border-blue-700 lg:flex-row">
       <div className="">
-        <NursesSideBar />
+        <PatientSidebar />
       </div>
       <div className="grow overflow-y-auto border-0 border-black ">{children}</div>
     </div>

@@ -10,6 +10,7 @@ import { IoMdArrowBack } from "react-icons/io"
 import AOS from "aos"
 import "aos/dist/aos.css"
 import CustomDropdown from "components/Patient/CustomDropdown"
+import PharmacyNav from "components/Navbar/PharmacyNav"
 
 interface RateIconProps {
   filled: boolean
@@ -132,7 +133,7 @@ const Page: React.FC = () => {
       <section className="h-full">
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
-            <DashboardNav />
+            <PharmacyNav />
             <div className="flex justify-between px-16 py-6 max-sm:px-3">
               <button onClick={handleGoBack} className="redirect">
                 <IoMdArrowBack />

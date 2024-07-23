@@ -1,4 +1,5 @@
-import { Tooltip } from "@mui/material"
+"use client"
+import { Skeleton, Tooltip } from "@mui/material"
 import React, { useEffect, useRef, useState } from "react"
 import axios from "axios"
 import Image from "next/image"
@@ -24,7 +25,7 @@ interface UserDetails {
   account_type: string
 }
 
-const DashboardNav: React.FC = () => {
+const PharmacyNav: React.FC = () => {
   const pathname = usePathname()
   const router = useRouter()
   const [isMoonIcon, setIsMoonIcon] = useState(true)
@@ -41,7 +42,6 @@ const DashboardNav: React.FC = () => {
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false)
 
   const dropdownRef = useRef<HTMLDivElement>(null)
-  const navRef = useRef<HTMLDivElement>(null)
 
   const toggleIcon = () => {
     setIsMoonIcon(!isMoonIcon)
@@ -83,16 +83,18 @@ const DashboardNav: React.FC = () => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false)
       }
-      if (navRef.current && !navRef.current.contains(event.target as Node)) {
-        setIsNavOpen(false)
-      }
     }
 
-    document.addEventListener("mousedown", handleClickOutside)
+    if (isDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside)
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside)
     }
-  }, [isDropdownOpen, isNavOpen])
+  }, [isDropdownOpen])
 
   if (!mounted) {
     return null
@@ -122,6 +124,7 @@ const DashboardNav: React.FC = () => {
   const handleLogoutConfirm = () => {
     localStorage.removeItem("id")
     localStorage.removeItem("token")
+
     router.push("/signin")
   }
 
@@ -197,7 +200,6 @@ const DashboardNav: React.FC = () => {
         </div>
 
         <div
-          ref={navRef}
           className={`fixed left-0 top-0 z-50 h-full w-[250px] bg-[#044982] transition-transform duration-300 ${
             isNavOpen ? "translate-x-0" : "-translate-x-full"
           }`}
@@ -207,9 +209,12 @@ const DashboardNav: React.FC = () => {
             <RxCross2 className="text-white" onClick={toggleNav} style={{ cursor: "pointer" }} />
           </div>
           <div className="mt-4 flex flex-col items-start space-y-2 p-4">
-            <Link href="/dashboard" className={`flex items-center gap-2 pb-4 ${getNavLinkClass("/dashboard")}`}>
+            <Link
+              href="/pharmacy-dashboard"
+              className={`flex items-center gap-2 pb-4 ${getNavLinkClass("/pharmacy-dashboard")}`}
+            >
               <Image
-                src={getNavImageSrc("/dashboard", "/Graph.svg", "/Graph-active.svg")}
+                src={getNavImageSrc("/pharmacy-dashboard", "/Graph.svg", "/Graph-active.svg")}
                 width={20}
                 height={20}
                 alt="avatar"
@@ -217,63 +222,49 @@ const DashboardNav: React.FC = () => {
               <p className="mt-1">Dashboard</p>
             </Link>
 
-            <Link href="/departments" className={`flex items-center gap-2 pb-4 ${getNavLinkClass("/departments")}`}>
+            <Link href="/medicines" className={`flex items-center gap-2 pb-4 ${getNavLinkClass("/medicines")}`}>
               <Image
-                src={getNavImageSrc("/departments", "/departments.svg", "/departments-active.svg")}
+                src={getNavImageSrc("/medicines", "/departments.svg", "/departments-active.svg")}
                 width={20}
                 height={20}
                 alt="avatar"
               />
-              <p className="mt-1">Departments</p>
+              <p className="mt-1">List of Medicines</p>
             </Link>
-            <Link href="/appointments" className={`flex items-center gap-2 pb-4 ${getNavLinkClass("/appointments")}`}>
+            <Link
+              href="/medicine-categories"
+              className={`flex items-center gap-2 pb-4 ${getNavLinkClass("/medicine-categories")}`}
+            >
               <Image
-                src={getNavImageSrc("/appointments", "/appointments.svg", "/appointments-active.svg")}
+                src={getNavImageSrc("/medicine-categories", "/appointments.svg", "/appointments-active.svg")}
                 width={20}
                 height={20}
                 alt="avatar"
               />
-              <p className="mt-1">Appointments</p>
-            </Link>
-
-            <Link href="/staff" className={`flex items-center gap-2 pb-4 ${getNavLinkClass("/staff")}`}>
-              <Image
-                src={getNavImageSrc("/staff", "/admin.svg", "/admin-active.svg")}
-                width={20}
-                height={20}
-                alt="avatar"
-              />
-              <p className="mt-1">Staff</p>
+              <p className="mt-1">Medicine Categories</p>
             </Link>
 
-            <Link href="/patients" className={`flex items-center gap-2 pb-4 ${getNavLinkClass("/patients")}`}>
+            <Link href="/issue-request" className={`flex items-center gap-2 pb-4 ${getNavLinkClass("/issue-request")}`}>
               <Image
-                src={getNavImageSrc("/patients", "/appointments.svg", "/appointments-active.svg")}
+                src={getNavImageSrc("/issue-request", "/admin.svg", "/admin-active.svg")}
+                width={20}
+                height={20}
+                alt="avatar"
+              />
+              <p className="mt-1">Issue Request</p>
+            </Link>
+
+            <Link
+              href="/pharmacy-patients"
+              className={`flex items-center gap-2 pb-4 ${getNavLinkClass("/pharmacy-patients")}`}
+            >
+              <Image
+                src={getNavImageSrc("/pharmacy-patients", "/appointments.svg", "/appointments-active.svg")}
                 width={20}
                 height={20}
                 alt="avatar"
               />
               <p className="mt-1">Patients</p>
-            </Link>
-
-            <Link href="/finance" className={`flex items-center gap-2 pb-4 ${getNavLinkClass("/finance")}`}>
-              <Image
-                src={getNavImageSrc("/finance", "/finance.svg", "/finance-active.svg")}
-                width={20}
-                height={20}
-                alt="avatar"
-              />
-              <p className="mt-1">Finance</p>
-            </Link>
-
-            <Link href="/admissions" className={`flex items-center gap-2 pb-4 ${getNavLinkClass("/admissions")}`}>
-              <Image
-                src={getNavImageSrc("/admissions", "/departments.svg", "/departments-active.svg")}
-                width={20}
-                height={20}
-                alt="avatar"
-              />
-              <p className="mt-1">Admissions</p>
             </Link>
 
             <button
@@ -289,32 +280,40 @@ const DashboardNav: React.FC = () => {
       {isDropdownOpen && (
         <div
           ref={dropdownRef}
-          className="fixed right-0 top-16 z-50 w-[200px] rounded-lg border bg-white py-2 shadow-md"
+          className="auth absolute right-16 top-14 z-10 w-64 rounded border shadow-md transition-opacity duration-300"
         >
-          <div className="flex flex-col px-4 py-2">
-            <Link href="/profile" className="flex items-center gap-2 py-1 text-gray-600 hover:text-gray-800">
+          <div className="border-b px-4 py-2">
+            <div className="flex items-center gap-2">
               <MdAccountCircle />
-              Profile
-            </Link>
-            <Link href="/change-password" className="flex items-center gap-2 py-1 text-gray-600 hover:text-gray-800">
-              <IoMdLock />
-              Change Password
-            </Link>
-            <button
-              onClick={handleLogoutClick}
-              className="flex items-center gap-2 py-1 text-gray-600 hover:text-gray-800"
-            >
-              <RiLogoutCircleRLine />
-              Logout
-            </button>
+              <p className="text-sm font-semibold">Account Information</p>
+            </div>
+            {loading ? (
+              <Skeleton variant="text" width={120} />
+            ) : error ? (
+              <small className="text-red-500">{error}</small>
+            ) : userDetails ? (
+              <>
+                <p className="text-xs">{userDetails.username}</p>
+                <p className="text-xs">{userDetails.email}</p>
+                <p className="text-xs">{userDetails.phone_number}</p>
+              </>
+            ) : (
+              <small className="text-red-500">No user details found.</small>
+            )}
+          </div>
+          <div className="flex items-center gap-2 border-b px-4 py-2" onClick={handleLogoutClick}>
+            <RiLogoutCircleRLine />
+            <p className="cursor-pointer text-sm font-semibold">Logout</p>
+          </div>
+          <div className="flex items-center gap-2 border-b px-4 py-2" onClick={closeDropdown}>
+            <IoMdLock />
+            <p className="text-sm font-semibold">Security</p>
           </div>
         </div>
       )}
-      {isLogoutModalOpen && (
-        <LogoutModal open={isLogoutModalOpen} handleClose={handleLogoutCancel} handleConfirm={handleLogoutConfirm} />
-      )}
+      <LogoutModal open={isLogoutModalOpen} handleClose={handleLogoutCancel} handleConfirm={handleLogoutConfirm} />
     </>
   )
 }
 
-export default DashboardNav
+export default PharmacyNav

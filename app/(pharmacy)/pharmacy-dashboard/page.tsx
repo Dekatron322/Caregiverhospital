@@ -6,6 +6,7 @@ import Footer from "components/Footer/Footer"
 import Image from "next/image"
 import Link from "next/link"
 import { MdKeyboardDoubleArrowRight } from "react-icons/md"
+import PharmacyNav from "components/Navbar/PharmacyNav"
 
 interface Medicine {
   id: string
@@ -105,7 +106,7 @@ export default function PharmacyDashboard() {
       <section className="h-full">
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
-            <DashboardNav />
+            <PharmacyNav />
             <div className="loading-text flex h-full items-center justify-center">
               {"loading...".split("").map((letter, index) => (
                 <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>
@@ -124,7 +125,7 @@ export default function PharmacyDashboard() {
       <section className="h-full">
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
-            <DashboardNav />
+            <PharmacyNav />
 
             <div className="px-16 pb-4 max-md:px-3 md:mt-10">
               <h4 className="font-semibold">Pharmacy Dashboard</h4>

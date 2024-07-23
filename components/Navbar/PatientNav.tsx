@@ -11,6 +11,10 @@ import { BiMessageDetail } from "react-icons/bi"
 import { IoIosArrowDown, IoIosNotificationsOutline, IoMdAddCircleOutline, IoMdLock, IoMdSearch } from "react-icons/io"
 import LogoutModal from "components/Modals/LogoutModal"
 import Search from "components/Search/Search"
+import Link from "next/link"
+import { RxCross2 } from "react-icons/rx"
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"
+import FormatAlignLeftIcon from "@mui/icons-material/FormatAlignLeft"
 
 interface UserDetails {
   id: number
@@ -32,10 +36,11 @@ const PatientNav: React.FC = () => {
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-
+  const [isNavOpen, setIsNavOpen] = useState(false)
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false)
 
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const navRef = useRef<HTMLDivElement>(null)
 
   const toggleIcon = () => {
     setIsMoonIcon(!isMoonIcon)
@@ -75,22 +80,42 @@ const PatientNav: React.FC = () => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false)
       }
+      if (navRef.current && !navRef.current.contains(event.target as Node)) {
+        setIsNavOpen(false)
+      }
     }
 
-    if (isDropdownOpen) {
-      document.addEventListener("mousedown", handleClickOutside)
-    } else {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
-
+    document.addEventListener("mousedown", handleClickOutside)
     return () => {
       document.removeEventListener("mousedown", handleClickOutside)
     }
-  }, [isDropdownOpen])
+  }, [isDropdownOpen, isNavOpen])
 
   if (!mounted) {
     return null
   }
+
+  // useEffect(() => {
+  //   const handleClickOutside = (event: MouseEvent) => {
+  //     if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+  //       setIsDropdownOpen(false)
+  //     }
+  //   }
+
+  //   if (isDropdownOpen) {
+  //     document.addEventListener("mousedown", handleClickOutside)
+  //   } else {
+  //     document.removeEventListener("mousedown", handleClickOutside)
+  //   }
+
+  //   return () => {
+  //     document.removeEventListener("mousedown", handleClickOutside)
+  //   }
+  // }, [isDropdownOpen])
+
+  // if (!mounted) {
+  //   return null
+  // }
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen)
@@ -116,8 +141,20 @@ const PatientNav: React.FC = () => {
     router.push("/signin")
   }
 
+  const toggleNav = () => {
+    setIsNavOpen(!isNavOpen)
+  }
+
   const handleLogoutCancel = () => {
     setIsLogoutModalOpen(false)
+  }
+
+  const getNavLinkClass = (path: string) => {
+    return pathname === path ? "text-[#46ffa6]" : "text-white"
+  }
+
+  const getNavImageSrc = (path: string, defaultSrc: string, activeSrc: string) => {
+    return pathname === path ? activeSrc : defaultSrc
   }
 
   const isDashboardPage = pathname.includes("/dashboard")
@@ -158,13 +195,55 @@ const PatientNav: React.FC = () => {
           </div>
         </div>
       </nav>
-      <nav className="mb-4 block border-b px-16 py-4 max-md:px-3 md:hidden">
+      <nav className="block border-b bg-[#F2F6FD] px-16 py-4 max-md:px-3 md:hidden">
         <div className="flex items-center justify-between">
-          <div className="cursor-pointer p-1 transition duration-300">
-            {isDashboardPage ? <IoMdSearch /> : <IoMdAddCircleOutline />}
+          <FormatAlignLeftIcon onClick={toggleNav} style={{ cursor: "pointer" }} />
+          <Link href="/" className="content-center">
+            <Image src="/ic_logo.svg" width={150} height={43} alt="dekalo" />
+          </Link>
+          <div className="flex h-[50px] items-center justify-center gap-1 rounded-full bg-[#EDF2F7] px-1">
+            <div
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46ffa6]"
+              onClick={handleProfileClick}
+            >
+              <p className="text-[#000000]">{firstLetter}</p>
+            </div>
+            <KeyboardArrowDownIcon />
           </div>
-          <h5 className="font-bold capitalize">{pathname.split("/").pop()}</h5>
-          <Image src="/profile.png" width={35} height={35} alt="profile" />
+        </div>
+
+        <div
+          ref={navRef}
+          className={`fixed left-0 top-0 z-50 h-full w-[250px] bg-[#044982] transition-transform duration-300 ${
+            isNavOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+        >
+          <div className="flex items-center justify-between p-4 pt-6">
+            <Image className="" src="/alternate.svg" height={80} width={80} alt="" />
+            <RxCross2 className="text-white" onClick={toggleNav} style={{ cursor: "pointer" }} />
+          </div>
+          <div className="mt-4 flex flex-col items-start space-y-2 p-4">
+            <Link
+              href="/patient-dashboard"
+              className={`flex items-center gap-2 pb-4 ${getNavLinkClass("/patient-dashboard")}`}
+            >
+              <Image
+                src={getNavImageSrc("/patient-dashboard", "/Graph.svg", "/Graph-active.svg")}
+                width={20}
+                height={20}
+                alt="avatar"
+              />
+              <p className="mt-1">Dashboard</p>
+            </Link>
+
+            <button
+              onClick={handleLogoutClick}
+              className="fixed bottom-2 mt-10 flex items-center gap-2 pb-4 text-white"
+            >
+              <Image src="/logout.svg" width={20} height={20} alt="logout" />
+              <p className="mt-1">Logout</p>
+            </button>
+          </div>
         </div>
       </nav>
       {isDropdownOpen && (

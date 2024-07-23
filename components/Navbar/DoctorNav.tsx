@@ -24,7 +24,7 @@ interface UserDetails {
   account_type: string
 }
 
-const DashboardNav: React.FC = () => {
+const DoctorNav: React.FC = () => {
   const pathname = usePathname()
   const router = useRouter()
   const [isMoonIcon, setIsMoonIcon] = useState(true)
@@ -207,9 +207,12 @@ const DashboardNav: React.FC = () => {
             <RxCross2 className="text-white" onClick={toggleNav} style={{ cursor: "pointer" }} />
           </div>
           <div className="mt-4 flex flex-col items-start space-y-2 p-4">
-            <Link href="/dashboard" className={`flex items-center gap-2 pb-4 ${getNavLinkClass("/dashboard")}`}>
+            <Link
+              href="/doctor-dashboard"
+              className={`flex items-center gap-2 pb-4 ${getNavLinkClass("/doctor-dashboard")}`}
+            >
               <Image
-                src={getNavImageSrc("/dashboard", "/Graph.svg", "/Graph-active.svg")}
+                src={getNavImageSrc("/doctor-dashboard", "/Graph.svg", "/Graph-active.svg")}
                 width={20}
                 height={20}
                 alt="avatar"
@@ -217,63 +220,30 @@ const DashboardNav: React.FC = () => {
               <p className="mt-1">Dashboard</p>
             </Link>
 
-            <Link href="/departments" className={`flex items-center gap-2 pb-4 ${getNavLinkClass("/departments")}`}>
+            <Link
+              href="/doctor-admission"
+              className={`flex items-center gap-2 pb-4 ${getNavLinkClass("/doctor-admission")}`}
+            >
               <Image
-                src={getNavImageSrc("/departments", "/departments.svg", "/departments-active.svg")}
-                width={20}
-                height={20}
-                alt="avatar"
-              />
-              <p className="mt-1">Departments</p>
-            </Link>
-            <Link href="/appointments" className={`flex items-center gap-2 pb-4 ${getNavLinkClass("/appointments")}`}>
-              <Image
-                src={getNavImageSrc("/appointments", "/appointments.svg", "/appointments-active.svg")}
-                width={20}
-                height={20}
-                alt="avatar"
-              />
-              <p className="mt-1">Appointments</p>
-            </Link>
-
-            <Link href="/staff" className={`flex items-center gap-2 pb-4 ${getNavLinkClass("/staff")}`}>
-              <Image
-                src={getNavImageSrc("/staff", "/admin.svg", "/admin-active.svg")}
-                width={20}
-                height={20}
-                alt="avatar"
-              />
-              <p className="mt-1">Staff</p>
-            </Link>
-
-            <Link href="/patients" className={`flex items-center gap-2 pb-4 ${getNavLinkClass("/patients")}`}>
-              <Image
-                src={getNavImageSrc("/patients", "/appointments.svg", "/appointments-active.svg")}
-                width={20}
-                height={20}
-                alt="avatar"
-              />
-              <p className="mt-1">Patients</p>
-            </Link>
-
-            <Link href="/finance" className={`flex items-center gap-2 pb-4 ${getNavLinkClass("/finance")}`}>
-              <Image
-                src={getNavImageSrc("/finance", "/finance.svg", "/finance-active.svg")}
-                width={20}
-                height={20}
-                alt="avatar"
-              />
-              <p className="mt-1">Finance</p>
-            </Link>
-
-            <Link href="/admissions" className={`flex items-center gap-2 pb-4 ${getNavLinkClass("/admissions")}`}>
-              <Image
-                src={getNavImageSrc("/admissions", "/departments.svg", "/departments-active.svg")}
+                src={getNavImageSrc("/doctor-admission", "/departments.svg", "/departments-active.svg")}
                 width={20}
                 height={20}
                 alt="avatar"
               />
               <p className="mt-1">Admissions</p>
+            </Link>
+
+            <Link
+              href="/doctor-patients"
+              className={`flex items-center gap-2 pb-4 ${getNavLinkClass("/doctor-patients")}`}
+            >
+              <Image
+                src={getNavImageSrc("/doctor-patients", "/appointments.svg", "/appointments-active.svg")}
+                width={20}
+                height={20}
+                alt="avatar"
+              />
+              <p className="mt-1">Patients</p>
             </Link>
 
             <button
@@ -317,4 +287,4 @@ const DashboardNav: React.FC = () => {
   )
 }
 
-export default DashboardNav
+export default DoctorNav
