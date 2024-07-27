@@ -158,7 +158,7 @@ export default function Dashboard() {
                     <div className="mt-4 flex w-full gap-2 lowercase">
                       <Link
                         href={`departments/${getDepartmentUrl(department.name)}`}
-                        className="button-primary h-[50px] w-full rounded-sm lowercase max-sm:h-[45px]"
+                        className="button-primary h-[50px] w-full rounded-sm capitalize max-sm:h-[45px]"
                       >
                         View
                       </Link>

@@ -199,7 +199,7 @@ export default function HmoDetailPage({ params }: HmoDetailPageProps) {
                             <div className="flex justify-between">
                               <div>
                                 <h3 className="font-semibold max-md:text-sm">{item.name}</h3>
-                                <p className="max-md:text-xs">{item.description}</p>
+                                <p className="max-md:text-xs max-sm:hidden">{item.description}</p>
                               </div>
                               {item.status ? (
                                 <p

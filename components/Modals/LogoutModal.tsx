@@ -34,7 +34,7 @@ const LogoutModal: React.FC<LogoutModalProps> = ({ open, handleClose, handleConf
         </div>
 
         <Typography sx={{ mt: 2 }}>Are you sure you want to logout?</Typography>
-        <Box sx={{ mt: 3, display: "flex max-sm:flex-col", justifyContent: "flex-end", gap: 2 }}>
+        <Box sx={{ mt: 3, display: "flex ", justifyContent: "flex-end", gap: 2 }}>
           <button className="button-danger h-[50px] w-full rounded-sm max-sm:h-[45px]" onClick={handleClose}>
             CANCEL
           </button>

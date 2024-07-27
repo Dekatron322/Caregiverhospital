@@ -11,6 +11,7 @@ import Link from "next/link"
 import { PiDotsThree } from "react-icons/pi"
 import { GoPlus } from "react-icons/go"
 import { IoAddCircleSharp } from "react-icons/io5"
+import PharmacyNav from "components/Navbar/PharmacyNav"
 
 export default function MedicineShortage() {
   const pathname = usePathname()
@@ -56,7 +57,7 @@ export default function MedicineShortage() {
       <section className="h-full ">
         <div className=" flex min-h-screen ">
           <div className="flex  w-screen flex-col ">
-            <DashboardNav />
+            <PharmacyNav />
 
             <div className="flex items-center gap-2 px-16  pt-6 max-sm:px-3">
               <button onClick={handleGoBack} className="redirect">

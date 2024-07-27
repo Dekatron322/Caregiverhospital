@@ -1,22 +1,22 @@
 "use client"
+import { useEffect, useState } from "react"
 import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
 import { IoIosArrowBack, IoIosArrowForward, IoMdArrowBack, IoMdSearch } from "react-icons/io"
 import { usePathname, useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
-
 import Image from "next/image"
 import Link from "next/link"
 import { GoPlus } from "react-icons/go"
 import { IoAddCircleSharp } from "react-icons/io5"
 import { HiOutlineTrash } from "react-icons/hi2"
 import TrashDrugModal from "components/Modals/TrashDrugModal"
+import PharmacyNav from "components/Navbar/PharmacyNav"
 
 interface Medicine {
   id: string
   name: string
   quantity: string
-  category: string
+  category: string // This is the category ID
   expiry_date: string
   price: string
   procedure_code: string
@@ -24,22 +24,32 @@ interface Medicine {
   side_effect: string
   status: boolean
   pub_date: string
+  medicine_id: string
+}
+
+interface Category {
+  id: string
+  name: string
+  status: boolean
+  pub_date: string
 }
 
 interface MedicineExpiringProps {
   params: {
-    medicineId: string
+    medicineId: any
   }
 }
 
 export default function MedicineExpiring({ params }: MedicineExpiringProps) {
   const pathname = usePathname()
+  const router = useRouter()
   const [searchQuery, setSearchQuery] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
-  const router = useRouter()
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const [medicines, setMedicines] = useState<Medicine[]>([])
+  const [categories, setCategories] = useState<Category[]>([]) // Add state for categories
+  const [selectedMedicineId, setSelectedMedicineId] = useState<string | null>(null)
   const { medicineId } = params
 
   const patientsPerPage = 7
@@ -76,6 +86,11 @@ export default function MedicineExpiring({ params }: MedicineExpiringProps) {
     setIsDeleteOpen(true)
   }
 
+  const handleDeleteClick = (id: string) => {
+    setSelectedMedicineId(id)
+    setIsDeleteOpen(true)
+  }
+
   const closeDeleteModal = () => {
     setIsDeleteOpen(false)
   }
@@ -100,16 +115,34 @@ export default function MedicineExpiring({ params }: MedicineExpiringProps) {
     }
   }
 
+  // Fetch categories from the API
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch("https://api.caregiverhospital.com/medicine-category/medicine-category/")
+      const data = (await response.json()) as Category[]
+      setCategories(data)
+    } catch (error) {
+      console.error("Error fetching categories:", error)
+    }
+  }
+
   useEffect(() => {
     fetchMedicines()
+    fetchCategories() // Fetch categories when component mounts
   }, [])
+
+  // Function to get category name by ID
+  const getCategoryNameById = (categoryId: string) => {
+    const category = categories.find((cat) => cat.id === categoryId)
+    return category ? category.name : "Unknown"
+  }
 
   return (
     <>
-      <section className="h-full ">
-        <div className=" flex min-h-screen ">
-          <div className="flex  w-screen flex-col ">
-            <DashboardNav />
+      <section className="h-full">
+        <div className="flex min-h-screen">
+          <div className="flex w-screen flex-col">
+            <PharmacyNav />
 
             <div className="flex items-center gap-2 px-16 pt-6 max-sm:px-3">
               <button onClick={handleGoBack} className="redirect">
@@ -128,7 +161,7 @@ export default function MedicineExpiring({ params }: MedicineExpiringProps) {
                     type="text"
                     id="search"
                     placeholder="Search"
-                    className="w-full bg-transparent  outline-none focus:outline-none"
+                    className="w-full bg-transparent outline-none focus:outline-none"
                     style={{ width: "100%" }}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -137,18 +170,14 @@ export default function MedicineExpiring({ params }: MedicineExpiringProps) {
               </div>
             )}
 
-            <div className=" flex flex-col gap-2 px-16  max-sm:px-3 ">
+            <div className="flex flex-col gap-2 px-16 max-sm:px-3">
               {filteredPatients.length === 0 ? (
                 <>
                   <div className="mt-auto flex h-full w-full items-center justify-center">
                     <div>
                       <Image src="/undraw_medical_care_movn.svg" height={237} width={341} alt="pharmacy" />
                       <div className="mt-16 items-center justify-center">
-                        <h1 className="text-center text-5xl font-bold">No Patient Yet</h1>
-                        <Link className="flex cursor-pointer items-center justify-center" href="/patients/add">
-                          <p className="text-center">Add a new Patient</p>
-                          <IoAddCircleSharp />
-                        </Link>
+                        <h1 className="text-center text-5xl font-bold">No Expired drugs</h1>
                       </div>
                     </div>
                     <div></div>
@@ -158,26 +187,26 @@ export default function MedicineExpiring({ params }: MedicineExpiringProps) {
                 filteredPatients.map((shortage) => (
                   <div
                     key={shortage.id}
-                    className="flex w-full cursor-pointer  items-center justify-between rounded-lg border p-2 "
+                    className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
                   >
                     <div className="w-full">
                       <p className="text-sm font-bold">{shortage.name}</p>
-                      <small className="text-xs ">Medicine Name</small>
+                      <small className="text-xs">Medicine Name</small>
                     </div>
                     <div className="w-full max-sm:hidden">
-                      <p className="text-sm font-bold">{shortage.id}</p>
-                      <small className="text-xs ">Medicine ID</small>
+                      <p className="text-sm font-bold">{shortage.medicine_id}</p>
+                      <small className="text-xs">Medicine ID</small>
                     </div>
                     <div className="w-full max-sm:hidden">
-                      <div className="flex gap-1 text-sm font-bold">{shortage.category}</div>
-                      <small className="text-xs ">Category Name</small>
+                      <div className="flex gap-1 text-sm font-bold">{getCategoryNameById(shortage.category)}</div>
+                      <small className="text-xs">Category Name</small>
                     </div>
                     <div className="w-full max-sm:hidden">
                       <p className="text-sm font-bold">{shortage.expiry_date}</p>
-                      <small className="text-xs ">Expiry date</small>
+                      <small className="text-xs">Expiry date</small>
                     </div>
 
-                    <div className="" onClick={openDeleteModal}>
+                    <div className="" onClick={() => handleDeleteClick(shortage.id)}>
                       <button className="flex content-center items-center gap-1 whitespace-nowrap rounded-md bg-[#F2B8B5] px-2 py-2 text-[#601410]">
                         <p className="text-[12px]">Trash Medicine</p>
                         <HiOutlineTrash />
@@ -186,12 +215,6 @@ export default function MedicineExpiring({ params }: MedicineExpiringProps) {
                   </div>
                 ))
               )}
-              <div className="" onClick={openDeleteModal}>
-                <button className="flex content-center items-center gap-1 whitespace-nowrap rounded-md bg-[#F2B8B5] px-2 py-2 text-[#601410]">
-                  <p className="text-[12px]">Trash All</p>
-                  <HiOutlineTrash />
-                </button>
-              </div>
             </div>
             {filteredPatients.length === 0 ? (
               <></>
@@ -237,7 +260,7 @@ export default function MedicineExpiring({ params }: MedicineExpiringProps) {
         isOpen={isDeleteOpen}
         onClose={closeDeleteModal}
         onSubmitSuccess={handleHmoSubmissionSuccess}
-        medicineId={medicineId}
+        medicineId={selectedMedicineId}
       />
     </>
   )

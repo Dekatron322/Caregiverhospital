@@ -65,61 +65,62 @@ const PrintRecordModal: React.FC<ModalProps> = ({ show, onClose, record }) => {
           </div>
 
           <div className="mb-4 flex items-center justify-center">
-            <p className=" text-lg font-bold">Medical Record Details</p>
+            <p className=" text-lg font-bold text-black">Medical Record Details</p>
           </div>
 
           <div className="mb-3 flex items-center gap-2">
-            <CalendarMonthOutlinedIcon />
-            <p className="flex items-center gap-1 text-sm">Time: {formatDateTime(record.pub_date)}</p>
+            <CalendarMonthOutlinedIcon className="text-black" />
+            <p className="flex items-center gap-1 text-sm text-black">Time: {formatDateTime(record.pub_date)}</p>
           </div>
 
           <div className="mb-3 flex items-center gap-2">
-            <ReceiptLongOutlinedIcon />
-            <p className="flex items-center gap-1 text-sm">Issuer: {record.doctor_name}</p>
+            <ReceiptLongOutlinedIcon className="text-black" />
+            <p className="flex items-center gap-1 text-sm text-black">Issuer: {record.doctor_name}</p>
           </div>
 
           <div className="mb-3 flex items-center gap-2">
-            <AssignmentIndOutlinedIcon />
-            <p className="flex items-center gap-1 text-sm">Issued to: {record.patient_name}</p>
+            <AssignmentIndOutlinedIcon className="text-black" />
+            <p className="flex items-center gap-1 text-sm text-black">Issued to: {record.patient_name}</p>
           </div>
 
-          <h2 className="mb-3 text-lg font-bold">Test Result</h2>
+          <h2 className="mb-3 text-lg font-bold text-black">Test Result</h2>
           <div className="result_area  h-full w-full rounded-lg p-4">
             <div className=" w-full items-center justify-between">
-              <p className="mb-2 text-sm font-bold">Test type: {record.test_type}</p>
+              <p className="mb-2 text-sm font-bold text-black">Test type: {record.test_type}</p>
               <div className="flex items-center gap-2">
-                <InboxOutlinedIcon className="text-lg font-bold" /> <p className="text-sm font-bold">Result: 10</p>
+                <InboxOutlinedIcon className="text-lg font-bold text-black" />{" "}
+                <p className="text-sm font-bold">Result: 10</p>
               </div>
             </div>
             <div className="mt-3">
-              <p className="mb-3 font-bold">Reference Range</p>
+              <p className="mb-3 font-bold text-black">Reference Range</p>
               <div className="mb-3 flex items-center gap-2">
                 <p className="text-sm font-bold">
                   Men{" "}
                   <span>
-                    <KeyboardArrowLeftOutlinedIcon />
+                    <KeyboardArrowLeftOutlinedIcon className="text-black" />
                   </span>{" "}
-                  <span className="font-regular">62 pg/mL</span>
+                  <span className="font-regular text-black">62 pg/mL</span>
                 </p>
               </div>
-              <p className="text-sm font-bold">Female</p>
+              <p className="text-sm font-bold text-black">Female</p>
               <div className="my-3 flex items-center gap-2">
-                <p className="text-sm ">
-                  Folicular phase <span className="font-regular"> 18 - 147 pg/mL</span>
+                <p className="text-sm text-black">
+                  Folicular phase <span className="font-regular text-black"> 18 - 147 pg/mL</span>
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <p className="text-sm ">
-                  Pre-ovulatory peak <span className="font-regular"> 93 - 575 pg/mL</span>
+                <p className="text-sm text-black">
+                  Pre-ovulatory peak <span className="font-regular text-black"> 93 - 575 pg/mL</span>
                 </p>
               </div>
               <div className="mt-3 flex items-center gap-2">
-                <p className="text-sm ">
+                <p className="text-sm text-black">
                   Menopause{" "}
                   <span>
-                    <KeyboardArrowLeftOutlinedIcon />
+                    <KeyboardArrowLeftOutlinedIcon className="text-black" />
                   </span>{" "}
-                  <span className="font-regular">58 pg/mL</span>
+                  <span className="font-regular text-black">58 pg/mL</span>
                 </p>
               </div>
             </div>
@@ -127,13 +128,13 @@ const PrintRecordModal: React.FC<ModalProps> = ({ show, onClose, record }) => {
 
           <div className="mt-4 flex items-end justify-between">
             <div className="flex cursor-pointer items-center gap-2" onClick={handlePrint}>
-              <LocalPrintshopOutlinedIcon />
-              <p className="text-sm">Print</p>
+              <LocalPrintshopOutlinedIcon className="text-black" />
+              <p className="text-sm text-black">Print</p>
             </div>
 
             <div className="flex cursor-pointer items-center gap-2" onClick={handleDownloadPDF}>
               <FileDownloadOutlinedIcon />
-              <p className="text-sm">Download PDF</p>
+              <p className="text-sm text-black">Download PDF</p>
             </div>
           </div>
         </div>

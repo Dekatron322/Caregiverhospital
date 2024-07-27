@@ -23,9 +23,9 @@ const RateIcon: React.FC<RateIconProps> = ({ filled, onClick }) => {
 
 interface ReviewModalProps {
   isOpen: boolean
-  onSubmitSuccess: any
+  onSubmitSuccess: () => void
   onClose: () => void
-  medicineId: string // Assuming patientId is of type string
+  medicineId: any
 }
 
 const TrashDrugModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitSuccess, medicineId }) => {
@@ -47,12 +47,29 @@ const TrashDrugModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitS
 
   if (!isOpen) return null
 
-  const submitForm = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
-    onSubmitSuccess()
-    onClose()
-  }
+  const submitForm = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): Promise<void> => {
+    if (!medicineId) {
+      console.error("Medicine ID is undefined. Cannot delete medicine.")
+      return
+    }
 
-  const isSubmitEnabled = comment.trim() !== "" || selectedAmenities.length > 0 || rating > 0
+    try {
+      const response = await fetch(`https://api.caregiverhospital.com/medicine/medicine/${medicineId}/`, {
+        method: "DELETE",
+      })
+
+      if (response.ok) {
+        onSubmitSuccess()
+        onClose()
+      } else {
+        const errorMessage = await response.text()
+        console.error("Failed to delete the medicine:", errorMessage)
+        alert("Error: " + errorMessage) // Add an alert or some user feedback
+      }
+    } catch (error) {
+      console.error("Error deleting the medicine:", error)
+    }
+  }
 
   return (
     <div className={styles.modalOverlay}>

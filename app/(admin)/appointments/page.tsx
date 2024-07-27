@@ -11,7 +11,7 @@ export default function Appointment() {
           <div className="flex  w-screen flex-col ">
             <DashboardNav />
 
-            <div className="px-16 pb-4 max-md:px-3 md:mt-10">
+            <div className="px-16 py-4 max-md:px-3 md:mt-10">
               <div className="w-full">
                 <p className="mb-8 font-semibold">Appointments</p>
                 <Appointments />

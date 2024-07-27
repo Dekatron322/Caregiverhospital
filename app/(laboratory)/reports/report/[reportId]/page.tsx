@@ -15,6 +15,7 @@ import "aos/dist/aos.css"
 import ReportDetails from "components/ReportDetails/ReportDetails"
 import { IoEyeSharp, IoPrintOutline } from "react-icons/io5"
 import LaboratoryNav from "components/Navbar/LaboratoryNav"
+import PrintRecordModal from "components/Modals/PrintRecordModal"
 
 interface Patient {
   id: string
@@ -79,6 +80,8 @@ export default function PatientDetailPage() {
   const [loading, setLoading] = useState(true)
   const [patient, setPatient] = useState<Patient | null>(null)
   const patientId = pathname.split("/").pop()
+  const [modalVisible, setModalVisible] = useState(false)
+  const [selectedRecord, setSelectedRecord] = useState<Patient | null>(null)
 
   useEffect(() => {
     AOS.init({
@@ -119,6 +122,13 @@ export default function PatientDetailPage() {
     }
     return new Date(dateString).toLocaleDateString(undefined, options)
   }
+
+  const handleViewClick = (record: any) => {
+    const recordWithPatientName = { ...record, patient_name: patient?.name }
+    setSelectedRecord(recordWithPatientName)
+    setModalVisible(true)
+  }
+
   return (
     <>
       <section className="h-full">
@@ -260,10 +270,13 @@ export default function PatientDetailPage() {
                               </div>
 
                               <div className="flex gap-2">
-                                <button className="flex w-28 items-center justify-center gap-1 rounded bg-[#46FFA6] px-2 py-[2px] text-xs text-[#000000]">
+                                <button className="flex w-28 items-center justify-center gap-1 rounded bg-[#46FFA6] px-2 py-2 text-xs text-[#000000]">
                                   <IoPrintOutline /> Print
                                 </button>
-                                <button className="flex w-28 items-center justify-center gap-1 rounded bg-[#349DFB] px-2 py-[2px] text-xs text-[#000000]">
+                                <button
+                                  onClick={() => handleViewClick(record)}
+                                  className="flex w-28 items-center justify-center gap-1 rounded bg-[#349DFB] px-2 py-2 text-xs text-[#000000]"
+                                >
                                   <IoEyeSharp /> View
                                 </button>
                               </div>
@@ -279,6 +292,7 @@ export default function PatientDetailPage() {
             <Footer />
           </div>
         </div>
+        <PrintRecordModal show={modalVisible} onClose={() => setModalVisible(false)} record={selectedRecord} />
       </section>
     </>
   )

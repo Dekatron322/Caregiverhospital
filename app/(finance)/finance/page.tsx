@@ -36,7 +36,7 @@ export default function Dashboard() {
         <div className=" flex min-h-screen ">
           <div className="flex  w-screen flex-col ">
             <DashboardNav />
-            <div className="px-16 max-md:px-3 md:pt-4" data-aos="fade-in" data-aos-duration="1000" data-aos-delay="500">
+            <div className="px-16 pt-4 max-md:px-3" data-aos="fade-in" data-aos-duration="1000" data-aos-delay="500">
               <button onClick={handleGoBack} className="redirect">
                 <IoMdArrowBack />
                 <p className="capitalize">Go back</p>

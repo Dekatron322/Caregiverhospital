@@ -173,7 +173,7 @@ const Page: React.FC = () => {
                       </div>
                       <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                         <input
-                          type="text"
+                          type="date"
                           id="expiry_date"
                           placeholder="Expiry Date"
                           value={expiryDate}
@@ -181,7 +181,6 @@ const Page: React.FC = () => {
                           className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
                           style={{ width: "100%", height: "50px" }}
                         />
-                        <RxCalendar />
                       </div>
                     </div>
                     <div className="mb-3 grid grid-cols-3 gap-3 max-sm:grid-cols-1">

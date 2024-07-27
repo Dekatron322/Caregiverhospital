@@ -66,7 +66,7 @@ const Dashboard: React.FC = () => {
           <div className="flex w-screen flex-col">
             <DashboardNav />
             <div
-              className="flex justify-between px-16 max-md:px-3 md:pt-4"
+              className="flex justify-between px-16 pt-4 max-md:px-3"
               data-aos="fade-in"
               data-aos-duration="1000"
               data-aos-delay="500"

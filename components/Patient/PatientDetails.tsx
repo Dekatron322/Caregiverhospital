@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import Image from "next/image"
 import { PiDotsThree } from "react-icons/pi"
-import { useRouter } from "next/navigation"
+import { useRouter } from "next/navigation" // Corrected import statement
 import { IoEyeSharp, IoPrintOutline } from "react-icons/io5"
 import PrintRecordModal from "components/Modals/PrintRecordModal"
 import { IoMdSearch } from "react-icons/io"
@@ -28,8 +28,8 @@ interface Prescription {
 
 interface MedicalRecord {
   id: string
-  name: string
-  doctor_assigned: string
+
+  doctor_name: string
   doctor_image: string
   test: string
   result: string
@@ -112,7 +112,7 @@ export default function PatientDetails({ params }: { params: { patientId: string
   )
 
   const filteredMedicalRecords = patientDetail.lab_tests.filter((medical) =>
-    medical.name.toLowerCase().includes(searchQuery.toLowerCase())
+    medical.test.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -200,11 +200,11 @@ export default function PatientDetails({ params }: { params: { patientId: string
       {filteredMedicalRecords.map((medical) => (
         <div key={medical.id} className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2">
           <div className="max-md:hidden">
-            <p className="text-sm font-bold">{medical.name}</p>
-            <small className="text-xm ">{formatDateTime(medical.pub_date)}</small>
+            <p className="text-sm font-bold">{formatDateTime(medical.pub_date)}</p>
+            <small className="text-xm ">Date and Time</small>
           </div>
           <div className="">
-            <p className="text-sm font-bold">{medical.name}</p>
+            <p className="text-sm font-bold">{medical.test}</p>
             <small className="text-xm ">Name</small>
           </div>
           <div className="flex items-center gap-1 text-sm font-bold max-md:hidden">
@@ -212,17 +212,17 @@ export default function PatientDetails({ params }: { params: { patientId: string
               <Image src={medical.doctor_image} height={40} width={40} alt="" />
             </span> */}
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46ffa6]">
-              <p className="capitalize text-[#000000]">{medical.doctor_assigned.charAt(0)}</p>
+              <p className="capitalize text-[#000000]">{medical.doctor_name.charAt(0)}</p>
             </div>
             <div>
-              <p>{medical.doctor_assigned}</p>
+              <p>{medical.doctor_name}</p>
               <p className="text-xs ">Doctor Assigned</p>
             </div>
           </div>
-          <div className="max-md:hidden">
+          {/* <div className="max-md:hidden">
             <p className="text-sm font-bold capitalize">{medical.test_type}</p>
             <small className="text-xm ">Test</small>
-          </div>
+          </div> */}
           <div className="flex gap-2">
             <button className="flex w-28 items-center justify-center gap-1 rounded bg-[#46FFA6] px-2 py-2 text-xs text-[#000000]">
               <IoPrintOutline /> Print

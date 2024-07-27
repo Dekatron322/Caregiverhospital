@@ -220,7 +220,7 @@ export default function Patients() {
                     data-aos-duration="1000"
                     data-aos-delay="500"
                   >
-                    <div className="flex w-[20%] items-center gap-1 text-sm font-bold">
+                    <div className="flex items-center gap-1 text-sm font-bold md:w-[20%]">
                       {/* {patient.image ? (
                         <img
                           src={`https://api.caregiverhospital.com${patient.image}`}
@@ -230,7 +230,7 @@ export default function Patients() {
                           className="rounded-full"
                         />
                       ) : ( */}
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46ffa6]">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46ffa6] max-sm:hidden">
                         <p className="capitalize text-[#000000]">{patient.name.charAt(0)}</p>
                       </div>
                       {/* )} */}

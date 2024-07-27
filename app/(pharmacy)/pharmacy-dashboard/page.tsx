@@ -127,7 +127,7 @@ export default function PharmacyDashboard() {
           <div className="flex w-screen flex-col">
             <PharmacyNav />
 
-            <div className="px-16 pb-4 max-md:px-3 md:mt-10">
+            <div className="px-16 py-4 max-md:px-3 md:mt-10">
               <h4 className="font-semibold">Pharmacy Dashboard</h4>
               <p className="text-xs">A Quick overview of your pharmacy</p>
             </div>
@@ -154,11 +154,11 @@ export default function PharmacyDashboard() {
                   <MdKeyboardDoubleArrowRight />
                 </Link>
               </div>
-              <div className="auth flex w-full flex-col items-center justify-center rounded border border-[#FED600] pt-2 ">
+              <div className="auth flex w-full flex-col items-center justify-center rounded border border-[#EEC202] pt-2 ">
                 <Image src="/revenue.svg" height={38} width={38} alt="" />
                 <h3 className="py-2  font-bold">#{metrics.totalMedicinePrice}</h3>
                 <p>Revenue Status</p>
-                <div className="mt-2 flex w-full items-center justify-center gap-2 overflow-hidden bg-[#F6EAAA] py-1 text-black">
+                <div className="mt-2 flex w-full items-center justify-center gap-2 overflow-hidden bg-[#EEC202] py-1 text-black">
                   <p className="text-xs">View Detailed report</p>
                   <MdKeyboardDoubleArrowRight />
                 </div>
@@ -177,13 +177,13 @@ export default function PharmacyDashboard() {
                   <MdKeyboardDoubleArrowRight />
                 </Link>
               </div>
-              <div className="auth flex w-full flex-col items-center justify-center rounded border border-[#C20505] pt-2">
+              <div className="auth flex w-full flex-col items-center justify-center rounded border border-[#FF6A5A] pt-2">
                 <Image src="/expiring.svg" height={34} width={34} alt="" />
                 <h3 className="py-2 font-bold">{metrics.medicinesExpiring}</h3>
                 <p>Medicines Expiring</p>
                 <Link
                   href="/pharmacy-dashboard/medicine-expiring"
-                  className="mt-2 flex w-full items-center justify-center gap-2 overflow-hidden bg-[#FF0909] py-1 text-black"
+                  className="mt-2 flex w-full items-center justify-center gap-2 overflow-hidden bg-[#FF6A5A] py-1 text-black"
                 >
                   <p className="text-xs">Resolve Expiry</p>
                   <MdKeyboardDoubleArrowRight />

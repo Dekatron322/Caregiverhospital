@@ -132,7 +132,7 @@ export default function Dashboard() {
           <div className="flex w-screen flex-col">
             <DashboardNav />
 
-            <div className="px-16 pb-4 max-md:px-3 md:mt-10">
+            <div className="px-16 py-4 max-md:px-3 md:mt-10">
               <h4 className="font-semibold">Statistics</h4>
             </div>
             <div
