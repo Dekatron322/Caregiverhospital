@@ -95,6 +95,18 @@ export default function Patients() {
     }
   }
 
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }
+    return new Date(dateString).toLocaleDateString(undefined, options)
+  }
+
   const fetchPatients = async () => {
     try {
       const response = await fetch("https://api.caregiverhospital.com/patient/patient/")
@@ -232,7 +244,7 @@ export default function Patients() {
                     </div>
 
                     <div className="w-full max-md:hidden">
-                      <p className="text-sm font-bold">{patient.dob}</p>
+                      <p className="text-sm font-bold">{formatDate(patient.dob)}</p>
                       <small className="text-xs">Date of Birth</small>
                     </div>
                     <div className="w-full max-md:hidden">
