@@ -89,13 +89,13 @@ const PrintRecordModal: React.FC<ModalProps> = ({ show, onClose, record }) => {
               <p className="mb-2 text-sm font-bold text-black">Test type: {record.test_type}</p>
               <div className="flex items-center gap-2">
                 <InboxOutlinedIcon className="text-lg font-bold text-black" />{" "}
-                <p className="text-sm font-bold">Result: 10</p>
+                <p className="text-sm font-bold text-black">Result: 10</p>
               </div>
             </div>
             <div className="mt-3">
               <p className="mb-3 font-bold text-black">Reference Range</p>
               <div className="mb-3 flex items-center gap-2">
-                <p className="text-sm font-bold">
+                <p className="text-sm font-bold text-black">
                   Men{" "}
                   <span>
                     <KeyboardArrowLeftOutlinedIcon className="text-black" />
@@ -133,7 +133,7 @@ const PrintRecordModal: React.FC<ModalProps> = ({ show, onClose, record }) => {
             </div>
 
             <div className="flex cursor-pointer items-center gap-2" onClick={handleDownloadPDF}>
-              <FileDownloadOutlinedIcon />
+              <FileDownloadOutlinedIcon className="text-black" />
               <p className="text-sm text-black">Download PDF</p>
             </div>
           </div>
