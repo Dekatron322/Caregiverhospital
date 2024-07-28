@@ -33,10 +33,10 @@ interface ReviewModalProps {
 }
 
 const AppointmentModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitSuccess, patientId }) => {
-  const [doctor, setDoctor] = useState<string>("")
+  const [doctor, setDoctor] = useState<string>("") // Store doctor's name
   const [detail, setDetail] = useState<string>("")
   const [loading, setLoading] = useState(false)
-  const [doctors, setDoctors] = useState<any[]>([])
+  const [doctors, setDoctors] = useState<{ id: string; name: string }[]>([])
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const [showErrorNotification, setShowErrorNotification] = useState(false)
 
@@ -57,7 +57,12 @@ const AppointmentModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmi
     try {
       const response = await fetch("https://api.caregiverhospital.com/app_user/all/")
       const data = (await response.json()) as any[]
-      const filteredDoctors = data.filter((user: any) => user.account_type === "Doctors")
+      const filteredDoctors = data
+        .filter((user: any) => user.account_type === "Doctors")
+        .map((doc) => ({
+          id: doc.id,
+          name: doc.username,
+        }))
       setDoctors(filteredDoctors)
     } catch (error) {
       console.error("Error fetching doctors", error)
@@ -78,7 +83,7 @@ const AppointmentModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmi
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            doctor,
+            doctor: doctors.find((doc) => doc.id === doctor)?.name || "", // Submitting the doctor's name
             detail,
           }),
         }
@@ -108,20 +113,20 @@ const AppointmentModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmi
       <div className={styles.modalContent}>
         <div className="px-6 py-6">
           <div className="flex items-center justify-between">
-            <h6 className="text-lg font-medium">Admission </h6>
+            <h6 className="text-lg font-medium">Appointment</h6>
             <div className="hover:rounded-md hover:border">
               <LiaTimesSolid className="m-1 cursor-pointer" onClick={onClose} />
             </div>
           </div>
-          <p>Check in {Patient.find((patient) => patient.id === patientId)?.name}</p>
+          <p>Books an appointment for {Patient.find((patient) => patient.id === patientId)?.name}</p>
 
           <div className="relative mt-6">
             <p className="mb-1 text-sm">Doctor</p>
-            <div className="search-bg mt-1 flex h-[50px] w-[100%] items-center justify-between gap-3 rounded  py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+            <div className="search-bg mt-1 flex h-[50px] w-[100%] items-center justify-between gap-3 rounded py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
               <CustomDropdown
-                options={doctors.map((doc) => ({ id: doc.id, name: doc.username }))}
+                options={doctors.map((doc) => ({ id: doc.id, name: doc.name }))}
                 selectedOption={doctor}
-                onChange={setDoctor}
+                onChange={(selectedDoctorName) => setDoctor(selectedDoctorName)} // Ensure name is set
                 placeholder="Select Doctor"
               />
             </div>
