@@ -13,6 +13,7 @@ import PatientDetailsForDoctor from "components/Patient/PatientDetailsForDoctor"
 import LabTestModal from "components/Modals/LabTestModal"
 import PrescriptionModal from "components/Modals/PrescriptionModal"
 import DoctorNav from "components/Navbar/DoctorNav"
+import NoteModal from "components/Modals/NoteModal"
 
 interface Patient {
   id: string
@@ -69,6 +70,15 @@ interface Patient {
     result: string
     pub_date: string
   }[]
+  notes: [
+    {
+      id: string
+      title: string
+      detail: string
+      status: string
+      pub_date: any
+    },
+  ]
 }
 
 interface AddPrescription {
@@ -81,6 +91,12 @@ interface RequestTest {
   name: string
 }
 
+interface Note {
+  id: string
+  detail: string
+  title: string
+}
+
 export default function PatientDetailPage() {
   const pathname = usePathname()
   const router = useRouter()
@@ -89,8 +105,10 @@ export default function PatientDetailPage() {
   const patientId = pathname.split("/").pop()
   const [clickedCard, setClickedCard] = useState<AddPrescription | null>(null)
   const [clickedRequestCard, setClickedRequestCard] = useState<RequestTest | null>(null)
+  const [clickedNoteCard, setClickedNoteCard] = useState<Note | null>(null)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
   const [isRequestModalOpen, setIsRequestModalOpen] = useState<boolean>(false)
+  const [isNoteModalOpen, setIsNoteModalOpen] = useState<boolean>(false)
 
   useEffect(() => {
     AOS.init({
@@ -131,6 +149,16 @@ export default function PatientDetailPage() {
   const handleTestClick = (results: RequestTest) => {
     setClickedRequestCard(results)
     setIsRequestModalOpen(true)
+  }
+
+  const handleNoteClick = (patient: Patient) => {
+    const note: Note = {
+      id: patient.id,
+      detail: "",
+      title: "note",
+    }
+    setClickedNoteCard(note)
+    setIsNoteModalOpen(true)
   }
 
   const formatDate = (dateString: string) => {
@@ -235,6 +263,12 @@ export default function PatientDetailPage() {
                           >
                             Request Lab Test
                           </button>
+                          <button
+                            onClick={() => handleNoteClick(patient)}
+                            className="button-primary h-[40px] w-full whitespace-nowrap rounded-md max-sm:h-[40px] xl:text-sm"
+                          >
+                            Add Note
+                          </button>
                         </div>
                       </div>
 
@@ -267,6 +301,22 @@ export default function PatientDetailPage() {
                     </div>
                     <div className="w-3/4">
                       <PatientDetailsForDoctor params={{ patientId }} />
+
+                      {/* Notes Section */}
+                      <div className="notes-section mb-4 mt-10 rounded border p-4">
+                        <h3 className="mb-4 text-xl font-bold">Patient Notes</h3>
+                        {patient.notes.length > 0 ? (
+                          patient.notes.map((note) => (
+                            <div key={note.id} className="">
+                              <p>{note.detail}</p>
+                              <p className="mb-2 text-sm text-gray-600">{formatDate(note.pub_date)}</p>
+                              <div className="my-5 h-[1px] w-full bg-slate-700"></div>
+                            </div>
+                          ))
+                        ) : (
+                          <p>No notes available for this patient.</p>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -281,6 +331,10 @@ export default function PatientDetailPage() {
       )}
       {isRequestModalOpen && clickedRequestCard && (
         <LabTestModal results={clickedRequestCard} onClose={() => setIsRequestModalOpen(false)} userId={""} />
+      )}
+
+      {isNoteModalOpen && clickedNoteCard && (
+        <NoteModal results={clickedNoteCard} onClose={() => setIsNoteModalOpen(false)} userId={""} />
       )}
     </>
   )
