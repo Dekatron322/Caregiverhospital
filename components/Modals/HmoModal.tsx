@@ -22,7 +22,7 @@ const HmoModal: React.FC<HmoModalProps> = ({ isOpen, onClose, onSubmitSuccess, h
   const [showDropdown, setShowDropdown] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  const departments = ["Medical Consultants", "Pharmacy", "Medical Laboratory", "Finance", "Nurse", "Patients"]
+  const departments = ["Health maintenance organization", "Out of Pocket finance"]
 
   useEffect(() => {
     AOS.init({

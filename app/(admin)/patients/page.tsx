@@ -165,7 +165,7 @@ export default function Patients() {
             </div>
 
             <div
-              className="mb-6 mt-10 flex items-center justify-between px-16 max-md:px-3"
+              className="mb-6 mt-1 flex items-center justify-between px-16 max-md:px-3"
               data-aos="fade-in"
               data-aos-duration="1000"
               data-aos-delay="500"
@@ -252,7 +252,9 @@ export default function Patients() {
                     </div>
                     <div className="w-full">
                       <p className="text-sm font-bold">{patient.hmo.name}</p>
-                      <small className="text-xs">Hmo name</small>
+                      <small className="text-xs">
+                        {patient.hmo.name === "Cargivers Finance" ? "Out of Pocket" : "Hmo name"}
+                      </small>
                     </div>
                     <div className="w-full max-md:hidden">
                       {patient.hmo.status ? (

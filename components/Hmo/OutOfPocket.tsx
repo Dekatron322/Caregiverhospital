@@ -28,12 +28,12 @@ interface HmoComponentProps {
   openDeleteModal: (hmoId: string) => void
 }
 
-const HmoComponent: React.FC<HmoComponentProps> = ({ refreshKey, openDeleteModal }) => {
+const OutOfPocketComponent: React.FC<HmoComponentProps> = ({ refreshKey, openDeleteModal }) => {
   const router = useRouter()
   const [hmoCategories, setHmoCategories] = useState<HmoDetail[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
-  const [hmoToDelete, setHmoToDelete] = useState<string | null>(null) // State to store HMO ID to delete
+  const [hmoToDelete, setHmoToDelete] = useState<string | null>(null)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
 
@@ -87,43 +87,43 @@ const HmoComponent: React.FC<HmoComponentProps> = ({ refreshKey, openDeleteModal
 
   const handleHmoSubmissionSuccess = () => {
     setShowSuccessNotification(true)
-    fetchHmoCategories() // Refresh the list of HMOs after successful deletion
+    fetchHmoCategories()
     setTimeout(() => setShowSuccessNotification(false), 5000)
   }
 
+  const filteredCategories = hmoCategories.filter((category) => category.name === "Out of Pocket")
+
   return (
     <>
-      {hmoCategories
-        .filter((category) => category.name !== "Out of Pocket") // Filter out "Out of Pocket"
-        .map((category) => (
-          <div
-            key={category.id}
-            className="mb-3 w-full rounded border p-4 shadow-md"
-            data-aos="fade-in"
-            data-aos-duration="1000"
-            data-aos-delay="500"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="flex items-center gap-2">
-                  <h6 className="font-bold">{category.name}</h6>
+      {filteredCategories.map((category) => (
+        <div
+          key={category.id}
+          className="mb-3 w-full rounded border p-4 shadow-md"
+          data-aos="fade-in"
+          data-aos-duration="1000"
+          data-aos-delay="500"
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-2">
+                <h6 className="font-bold">{category.name}</h6>
 
-                  <HiOutlineTrash
-                    onClick={() => openDeleteModal(category.id)}
-                    className="cursor-pointer text-[#F20089]  transition-colors duration-500 hover:text-[#F2B8B5]"
-                  />
-                </div>
-                <p className="text-sm">{category.detail}</p>
+                <HiOutlineTrash
+                  onClick={() => openDeleteModal(category.id)}
+                  className="cursor-pointer text-[#F20089]  transition-colors duration-500 hover:text-[#F2B8B5]"
+                />
               </div>
-              <div
-                className="search-bg cursor-pointer rounded-full border p-2 shadow"
-                onClick={() => handleHmoClick(category.id)}
-              >
-                <IoIosArrowForward />
-              </div>
+              <p className="text-sm">{category.detail}</p>
+            </div>
+            <div
+              className="search-bg cursor-pointer rounded-full border p-2 shadow"
+              onClick={() => handleHmoClick(category.id)}
+            >
+              <IoIosArrowForward />
             </div>
           </div>
-        ))}
+        </div>
+      ))}
 
       <DeleteHmoCategoryModal
         isOpen={isDeleteOpen}
@@ -142,4 +142,4 @@ const HmoComponent: React.FC<HmoComponentProps> = ({ refreshKey, openDeleteModal
   )
 }
 
-export default HmoComponent
+export default OutOfPocketComponent

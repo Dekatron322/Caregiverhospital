@@ -203,7 +203,7 @@ export default function Dashboard() {
                 data-aos="fade-in"
                 data-aos-duration="1000"
                 data-aos-delay="500"
-                className="grid w-full rounded-xl border-[0.5px] px-4 py-4 shadow md:w-[25%]"
+                className=" w-full rounded-xl border-[0.5px] px-4 py-4 shadow md:w-[25%]"
               >
                 <div className="mb-4 flex items-center justify-between">
                   <h3 className="font-bold">Admissions</h3>

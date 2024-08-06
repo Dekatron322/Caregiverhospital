@@ -386,7 +386,7 @@ export const Finance = [
     name: "Out of pocket",
     income: "88,234,000",
     status: "active",
-    url: "pocket",
+    url: "/finance/out-of-pocket",
   },
   {
     id: 2,
