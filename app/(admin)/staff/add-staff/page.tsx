@@ -16,7 +16,7 @@ interface RateIconProps {
   filled: boolean
   onClick: () => void
 }
-type Department = "Admin" | "Doctors" | "Pharmacy" | "Laboratory" | "Nurses" | "Patients"
+type Department = "Admin" | "Doctors" | "Pharmacy" | "Laboratory" | "Nurses" | "Patients" | "Cashier"
 
 const RateIcon: React.FC<RateIconProps> = ({ filled, onClick }) => {
   return (
@@ -45,7 +45,7 @@ const Page: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const [showErrorNotification, setShowErrorNotification] = useState(false)
-  const departments: Department[] = ["Admin", "Doctors", "Pharmacy", "Laboratory", "Nurses", "Patients"]
+  const departments: Department[] = ["Admin", "Doctors", "Pharmacy", "Laboratory", "Nurses", "Patients", "Cashier"]
   const router = useRouter()
 
   useEffect(() => {
@@ -259,7 +259,7 @@ const Page: React.FC = () => {
                           options={genderOptions.map((gend) => ({ id: gend.id, name: gend.name }))}
                           selectedOption={gender}
                           onChange={(selected) => setGender(selected)}
-                          placeholder="Select Complain"
+                          placeholder="Select Gender"
                         />
                       </div>
                       <div className="search-bg  flex h-[50px] w-[100%] items-center justify-between gap-3  rounded   px-3 py-1  hover:border-[#5378F6]  focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
