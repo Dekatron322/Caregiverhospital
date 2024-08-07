@@ -5,8 +5,6 @@ import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet"
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye"
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline"
 import IssueRequestModal from "components/Modals/IssueRequestModal"
-import PrescriptionModal from "components/Modals/PrescriptionModal" // Import the new modal component
-import ViewPrescriptionModal from "components/Modals/ViewPrescriptionModal"
 
 interface Prescription {
   id: string
@@ -23,7 +21,6 @@ interface Prescription {
   status: string
   issue_status: boolean // changed from string to boolean
   pub_date: string
-  quantity: string
 }
 
 interface Patient {
@@ -61,7 +58,7 @@ interface Procedure {
 type ApiResponse = Patient[]
 type ProcedureResponse = Procedure[]
 
-const IssueRequest = () => {
+const CashierIssueRequest = () => {
   const [isDone, setIsDone] = useState<boolean>(false)
   const [activeTab, setActiveTab] = useState("pending")
   const [patients, setPatients] = useState<Patient[]>([])
@@ -69,7 +66,6 @@ const IssueRequest = () => {
   const [proceduresMap, setProceduresMap] = useState<Map<string, Procedure>>(new Map())
 
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [isPreModalOpen, setIsPreModalOpen] = useState(false)
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null)
   const [selectedPrescription, setSelectedPrescription] = useState<Prescription | null>(null)
 
@@ -84,8 +80,8 @@ const IssueRequest = () => {
     try {
       const response = await fetch("https://api.caregiverhospital.com/patient/patient/")
       const data = (await response.json()) as ApiResponse
-      const patientsWithAppointments = data.filter((patient) => patient.prescriptions.length > 0)
-      setPatients(patientsWithAppointments)
+      const filteredPatients = data.filter((patient) => patient.policy_id === "nil" && patient.prescriptions.length > 0)
+      setPatients(filteredPatients)
     } catch (error) {
       console.error("Error fetching patients:", error)
     } finally {
@@ -126,9 +122,11 @@ const IssueRequest = () => {
   }
 
   const handleIconClick = (patient: Patient, prescription: Prescription) => {
-    setSelectedPatient(patient)
-    setSelectedPrescription(prescription)
-    setIsModalOpen(true)
+    if (!prescription.issue_status) {
+      setSelectedPatient(patient)
+      setSelectedPrescription(prescription)
+      setIsModalOpen(true)
+    }
   }
 
   const updateIssueStatus = async (prescriptionId: string) => {
@@ -149,10 +147,8 @@ const IssueRequest = () => {
     }
   }
 
-  const handleRemoveRedEyeClick = (patient: Patient, prescription: Prescription) => {
-    setSelectedPatient(patient)
-    setSelectedPrescription(prescription)
-    setIsPreModalOpen(true)
+  const handleRemoveRedEyeClick = (prescription: Prescription) => {
+    updateIssueStatus(prescription.id)
   }
 
   const renderPrescriptionDetails = (patient: Patient, prescription: Prescription) => {
@@ -199,11 +195,7 @@ const IssueRequest = () => {
           ) : (
             <>
               <AccountBalanceWalletIcon onClick={() => handleIconClick(patient, prescription)} />
-
-              <RemoveRedEyeIcon
-                className="text-[#46FFA6]"
-                onClick={() => handleRemoveRedEyeClick(patient, prescription)}
-              />
+              <RemoveRedEyeIcon className="text-[#46FFA6]" onClick={() => handleRemoveRedEyeClick(prescription)} />
             </>
           )}
         </div>
@@ -276,34 +268,8 @@ const IssueRequest = () => {
         prescription={selectedPrescription}
         procedureDetails={getProcedureDetails(selectedPrescription?.code || "")}
       />
-      {isPreModalOpen && (
-        <ViewPrescriptionModal
-          isOpen={isPreModalOpen}
-          onClose={() => setIsPreModalOpen(false)}
-          patient={selectedPatient}
-          prescription={selectedPrescription}
-          procedureDetails={getProcedureDetails(selectedPrescription?.code || "")}
-          // onUpdateStatus={updateIssueStatus}
-        />
-      )}
     </div>
   )
 }
 
-export default IssueRequest
-
-{
-  /* <div className="flex gap-2">
-          <AccountBalanceWalletIcon onClick={() => handleIconClick(patient, prescription)} />
-          {prescription.issue_status ? (
-            <CheckCircleOutlineIcon className="text-gray-400" />
-          ) : (
-            <>
-              <RemoveRedEyeIcon
-                className="text-[#46FFA6]"
-                onClick={() => handleRemoveRedEyeClick(patient, prescription)}
-              />
-            </>
-          )}
-        </div> */
-}
+export default CashierIssueRequest
