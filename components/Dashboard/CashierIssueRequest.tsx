@@ -5,6 +5,7 @@ import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet"
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye"
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline"
 import IssueRequestModal from "components/Modals/IssueRequestModal"
+import ViewPrescriptionModal from "components/Modals/ViewPrescriptionModal"
 
 interface Prescription {
   id: string
@@ -18,9 +19,11 @@ interface Prescription {
   dosage: string
   rate: string
   usage: string
+  discount_value: string
   status: string
   issue_status: boolean // changed from string to boolean
   pub_date: string
+  quantity: string
 }
 
 interface Patient {
@@ -64,7 +67,7 @@ const CashierIssueRequest = () => {
   const [patients, setPatients] = useState<Patient[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [proceduresMap, setProceduresMap] = useState<Map<string, Procedure>>(new Map())
-
+  const [isPreModalOpen, setIsPreModalOpen] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null)
   const [selectedPrescription, setSelectedPrescription] = useState<Prescription | null>(null)
@@ -147,8 +150,10 @@ const CashierIssueRequest = () => {
     }
   }
 
-  const handleRemoveRedEyeClick = (prescription: Prescription) => {
-    updateIssueStatus(prescription.id)
+  const handleRemoveRedEyeClick = (patient: Patient, prescription: Prescription) => {
+    setSelectedPatient(patient)
+    setSelectedPrescription(prescription)
+    setIsPreModalOpen(true)
   }
 
   const renderPrescriptionDetails = (patient: Patient, prescription: Prescription) => {
@@ -184,18 +189,26 @@ const CashierIssueRequest = () => {
           <div className="flex gap-1 text-sm font-bold">{prescription.unit}</div>
           <small className="text-xs">Unit</small>
         </div>
+
+        {/* <div className="w-full max-sm:hidden">
+          <div className="flex gap-1 text-sm font-bold">{prescription.discount_value}</div>
+          <small className="text-xs">Discount</small>
+        </div> */}
         <div className="w-full max-sm:hidden">
           <p className="text-sm font-bold">{formatDate(procedureDetails?.pub_date || "")}</p>
           <small className="text-xs">Date and Time</small>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex w-[40%] gap-2">
           {prescription.issue_status ? (
             <CheckCircleOutlineIcon className="text-gray-400" />
           ) : (
             <>
               <AccountBalanceWalletIcon onClick={() => handleIconClick(patient, prescription)} />
-              <RemoveRedEyeIcon className="text-[#46FFA6]" onClick={() => handleRemoveRedEyeClick(prescription)} />
+              <RemoveRedEyeIcon
+                className="text-[#46FFA6]"
+                onClick={() => handleRemoveRedEyeClick(patient, prescription)}
+              />
             </>
           )}
         </div>
@@ -268,6 +281,16 @@ const CashierIssueRequest = () => {
         prescription={selectedPrescription}
         procedureDetails={getProcedureDetails(selectedPrescription?.code || "")}
       />
+      {isPreModalOpen && (
+        <ViewPrescriptionModal
+          isOpen={isPreModalOpen}
+          onClose={() => setIsPreModalOpen(false)}
+          patient={selectedPatient}
+          prescription={selectedPrescription}
+          procedureDetails={getProcedureDetails(selectedPrescription?.code || "")}
+          // onUpdateStatus={updateIssueStatus}
+        />
+      )}
     </div>
   )
 }

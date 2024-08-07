@@ -42,6 +42,7 @@ type Prescription = {
   issue_status: boolean // changed from string to boolean
   pub_date: string
   quantity: string
+  discount_value: string
 }
 
 type Procedure = {
@@ -115,6 +116,9 @@ const ViewPrescriptionModal: React.FC<PrescriptionModalProps> = ({
             </p>
             <p>
               <strong>Patient Complain:</strong> {prescription.complain}
+            </p>
+            <p>
+              <strong>Discount Value:</strong> {prescription.discount_value}
             </p>
             <p>
               <strong>Date:</strong> {prescription.pub_date}

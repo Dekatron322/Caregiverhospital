@@ -20,6 +20,7 @@ interface Prescription {
   dosage: string
   rate: string
   usage: string
+  discount_value: string
   status: string
   issue_status: boolean // changed from string to boolean
   pub_date: string
@@ -188,6 +189,7 @@ const IssueRequest = () => {
           <div className="flex gap-1 text-sm font-bold">{prescription.unit}</div>
           <small className="text-xs">Unit</small>
         </div>
+
         <div className="w-full max-sm:hidden">
           <p className="text-sm font-bold">{formatDate(procedureDetails?.pub_date || "")}</p>
           <small className="text-xs">Date and Time</small>

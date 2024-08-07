@@ -45,6 +45,7 @@ interface Prescription {
   status: string
   pub_date: string
   issue_status: boolean
+  discount_value: string
 }
 
 interface Procedure {
@@ -105,7 +106,16 @@ const IssueRequestModal: React.FC<PrescriptionModalProps> = ({
 
   const calculateTotal = () => {
     if (procedureDetails?.price && prescription.unit) {
-      return (Number(procedureDetails.price) * Number(prescription.unit)).toLocaleString("en-US", {
+      const unitPrice = Number(procedureDetails.price)
+      const quantity = Number(prescription.unit)
+      const totalPrice = unitPrice * quantity
+
+      // Check if there is a discount value
+      const discountValue = prescription.discount_value ? parseFloat(prescription.discount_value) : 0
+      const discountAmount = totalPrice * (discountValue / 100)
+      const finalPrice = totalPrice - discountAmount
+
+      return finalPrice.toLocaleString("en-US", {
         minimumFractionDigits: 2,
       })
     }
@@ -116,13 +126,22 @@ const IssueRequestModal: React.FC<PrescriptionModalProps> = ({
     setIsLoading(true)
     setErrorMessage(null) // Clear previous error message
     try {
+      const unitPrice = procedureDetails?.price ? Number(procedureDetails.price) : 0
+      const quantity = prescription.unit ? Number(prescription.unit) : 0
+      const totalPrice = unitPrice * quantity
+
+      const discountValue = prescription.discount_value ? parseFloat(prescription.discount_value) : 0
+      const discountAmount = totalPrice * (discountValue / 100)
+      const finalPrice = totalPrice - discountAmount
+
       const payload = {
         enroll_number: patient.policy_id,
         enroll_from: procedureDetails?.pub_date,
         enroll_to: prescription.pub_date,
         procedure_code: procedureDetails?.code || "N/A",
         diagnosis_code: "null",
-        charge_amount: procedureDetails?.price,
+        charge_amount: finalPrice.toFixed(2),
+        discount_value: prescription.discount_value,
         units: prescription.unit,
         status: true,
         pub_date: new Date().toISOString(), // Or use the appropriate date if provided
@@ -214,6 +233,10 @@ const IssueRequestModal: React.FC<PrescriptionModalProps> = ({
                         : "N/A"}{" "}
                       * {prescription.unit}
                     </p>
+                  </div>
+                  <div className="flex items-center justify-between pb-2">
+                    <p className="text-sm">Discount %</p>
+                    <p className="text-sm">{prescription.discount_value || "N/A"}</p>
                   </div>
                   <div className="w-full border"></div>
                   <div className="flex items-center justify-between pt-4">

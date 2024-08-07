@@ -52,6 +52,7 @@ interface Patient {
     note: string
     status: boolean
     pub_date: string
+    discount_value: string
   }[]
   medicals: {
     id: string

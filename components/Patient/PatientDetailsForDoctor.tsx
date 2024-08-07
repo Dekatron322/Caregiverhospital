@@ -5,6 +5,9 @@ import { useRouter } from "next/navigation"
 import { IoEyeSharp, IoPrintOutline } from "react-icons/io5"
 import PrintRecordModal from "components/Modals/PrintRecordModal"
 import { IoMdSearch } from "react-icons/io"
+import { CiDiscount1 } from "react-icons/ci"
+import styles from "../Modals/modal.module.css"
+import AddDiscountModal from "components/Modals/AddDiscountModal"
 
 interface Appointment {
   id: number
@@ -24,6 +27,7 @@ interface Prescription {
   dosage: string
   rate: string
   usage: string
+  discount_value: string
 }
 
 interface MedicalRecord {
@@ -65,6 +69,8 @@ export default function PatientDetailsForDoctor({ params }: { params: { patientI
   const [modalVisible, setModalVisible] = useState(false)
   const [selectedRecord, setSelectedRecord] = useState<MedicalRecord | null>(null)
   const [patientDetail, setPatientDetail] = useState<PatientDetail | null>(null)
+  const [discountModalVisible, setDiscountModalVisible] = useState(false)
+  const [selectedPrescription, setSelectedPrescription] = useState<Prescription | null>(null)
 
   useEffect(() => {
     const fetchPatientDetails = async () => {
@@ -126,6 +132,46 @@ export default function PatientDetailsForDoctor({ params }: { params: { patientI
     setModalVisible(true)
   }
 
+  const handleAddDiscountClick = (prescription: Prescription) => {
+    setSelectedPrescription(prescription)
+    setDiscountModalVisible(true)
+  }
+
+  const handleSaveDiscount = async (discountValue: string) => {
+    if (!selectedPrescription) return
+
+    try {
+      const response = await fetch(
+        `https://api.caregiverhospital.com/prescription/add-discount-to/${selectedPrescription.id}/`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ discount_value: discountValue }),
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok")
+      }
+
+      setPatientDetail((prevDetail) => {
+        if (!prevDetail) return prevDetail
+
+        const updatedPrescriptions = prevDetail.prescriptions.map((p) =>
+          p.id === selectedPrescription.id ? { ...p, discount_value: discountValue } : p
+        )
+
+        return { ...prevDetail, prescriptions: updatedPrescriptions }
+      })
+
+      setDiscountModalVisible(false)
+    } catch (error) {
+      console.error("Error updating discount value:", error)
+    }
+  }
+
   const renderAllAppointments = () => (
     <div className="flex flex-col gap-2">
       {filteredList.map((appointment) => (
@@ -180,8 +226,9 @@ export default function PatientDetailsForDoctor({ params }: { params: { patientI
           </div>
           <div className="w-full max-md:hidden">
             <p className="text-sm font-bold">{prescription.unit}</p>
-            <small className="text-xm ">Quantity</small>
+            <small className="text-xm ">Unit</small>
           </div>
+
           <div className="w-full max-md:hidden">
             <p className="text-sm font-bold">{prescription.dosage}</p>
             <small className="text-xm ">Dosage</small>
@@ -189,6 +236,19 @@ export default function PatientDetailsForDoctor({ params }: { params: { patientI
           <div className="w-full max-md:hidden">
             <p className="text-sm font-bold">{prescription.usage}</p>
             <small className="text-xm ">Usage</small>
+          </div>
+          <div className="max-md:hidden">
+            {prescription.discount_value ? (
+              <>
+                <p className="text-sm font-bold">{prescription.discount_value}</p>
+                <small className="text-xm ">Discount</small>
+              </>
+            ) : (
+              <CiDiscount1
+                className="fon text-2xl text-[#197046]"
+                onClick={() => handleAddDiscountClick(prescription)}
+              />
+            )}
           </div>
         </div>
       ))}
@@ -282,6 +342,12 @@ export default function PatientDetailsForDoctor({ params }: { params: { patientI
       {activeTab === "medicals" && renderMedicalRecord()}
 
       <PrintRecordModal show={modalVisible} onClose={() => setModalVisible(false)} record={selectedRecord} />
+      <AddDiscountModal
+        show={discountModalVisible}
+        onClose={() => setDiscountModalVisible(false)}
+        onSave={handleSaveDiscount}
+        prescription={selectedPrescription}
+      />
     </div>
   )
 }
