@@ -8,6 +8,7 @@ import { IoMdSearch } from "react-icons/io"
 import { CiDiscount1 } from "react-icons/ci"
 import styles from "../Modals/modal.module.css"
 import AddDiscountModal from "components/Modals/AddDiscountModal"
+import AddTestDiscountModal from "components/Modals/AddTestDiscountModal"
 
 interface Appointment {
   id: number
@@ -39,6 +40,7 @@ interface MedicalRecord {
   result: string
   pub_date: string
   status_note: string
+  discount_value: string
 }
 
 interface PatientDetail {
@@ -70,6 +72,7 @@ export default function PatientDetailsForDoctor({ params }: { params: { patientI
   const [selectedRecord, setSelectedRecord] = useState<MedicalRecord | null>(null)
   const [patientDetail, setPatientDetail] = useState<PatientDetail | null>(null)
   const [discountModalVisible, setDiscountModalVisible] = useState(false)
+  const [newDiscountModalVisible, setNewDiscountModalVisible] = useState(false)
   const [selectedPrescription, setSelectedPrescription] = useState<Prescription | null>(null)
 
   useEffect(() => {
@@ -117,9 +120,8 @@ export default function PatientDetailsForDoctor({ params }: { params: { patientI
     prescription.name.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  const filteredMedicalRecords = patientDetail.lab_tests.filter(
-    (medical) =>
-      medical.test_type.toLowerCase().includes(searchQuery.toLowerCase()) && medical.status_note === "Approved"
+  const filteredMedicalRecords = patientDetail.lab_tests.filter((medical) =>
+    medical.test_type.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -135,6 +137,11 @@ export default function PatientDetailsForDoctor({ params }: { params: { patientI
   const handleAddDiscountClick = (prescription: Prescription) => {
     setSelectedPrescription(prescription)
     setDiscountModalVisible(true)
+  }
+
+  const handleAddMedicalDiscountClick = (medical: MedicalRecord) => {
+    setSelectedRecord(medical)
+    setNewDiscountModalVisible(true)
   }
 
   const handleSaveDiscount = async (discountValue: string) => {
@@ -167,6 +174,38 @@ export default function PatientDetailsForDoctor({ params }: { params: { patientI
       })
 
       setDiscountModalVisible(false)
+    } catch (error) {
+      console.error("Error updating discount value:", error)
+    }
+  }
+
+  const handleSaveRecordDiscount = async (discountValue: string) => {
+    if (!selectedRecord) return
+
+    try {
+      const response = await fetch(`https://api.caregiverhospital.com/lab-test/add-discount-to/${selectedRecord.id}/`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ discount_value: discountValue }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok")
+      }
+
+      setPatientDetail((prevDetail) => {
+        if (!prevDetail) return prevDetail
+
+        const updatedRecords = prevDetail.lab_tests.map((record) =>
+          record.id === selectedRecord.id ? { ...record, discount_value: discountValue } : record
+        )
+
+        return { ...prevDetail, lab_tests: updatedRecords }
+      })
+
+      setNewDiscountModalVisible(false)
     } catch (error) {
       console.error("Error updating discount value:", error)
     }
@@ -283,10 +322,18 @@ export default function PatientDetailsForDoctor({ params }: { params: { patientI
             <p className="text-sm font-bold">{medical.test_type}</p>
             <small className="text-xm ">Test</small>
           </div>
+
+          <div className="w-full max-md:hidden">
+            {medical.discount_value ? (
+              <>
+                <p className="text-sm font-bold">{medical.discount_value}</p>
+                <small className="text-xm ">Discount</small>
+              </>
+            ) : (
+              <CiDiscount1 className="text-2xl text-[#197046]" onClick={() => handleAddMedicalDiscountClick(medical)} />
+            )}
+          </div>
           <div className="flex gap-2">
-            <button className="flex w-28 items-center justify-center gap-1 rounded bg-[#46FFA6] px-2 py-2 text-xs text-[#000000]">
-              <IoPrintOutline /> Print
-            </button>
             <button
               className="flex w-28 items-center justify-center gap-1 rounded bg-[#349DFB] px-2 py-2 text-xs text-[#000000]"
               onClick={() => handleViewClick(medical)}
@@ -347,6 +394,12 @@ export default function PatientDetailsForDoctor({ params }: { params: { patientI
         onClose={() => setDiscountModalVisible(false)}
         onSave={handleSaveDiscount}
         prescription={selectedPrescription}
+      />
+      <AddTestDiscountModal
+        show={newDiscountModalVisible}
+        onClose={() => setNewDiscountModalVisible(false)}
+        onSave={handleSaveRecordDiscount}
+        record={selectedRecord}
       />
     </div>
   )

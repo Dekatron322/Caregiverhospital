@@ -29,6 +29,7 @@ interface LabTestResult {
   patient_id: string // Added field for patient ID
   policy_id: string
   diagnosis_code: string
+  discount_value: string
   name: string
   hmo?: HMO
 }
@@ -227,6 +228,11 @@ const LabTests = () => {
               <div className="w-full max-sm:hidden">
                 <p className="text-sm">₦ {diagnosis?.price || "N/A"}</p>
                 <p className="text-xs font-bold">Diagnosis Price</p>
+              </div>
+
+              <div className="w-full max-sm:hidden">
+                <p className="text-sm">{results.discount_value || "N/A"}</p>
+                <p className="text-xs font-bold">Discount</p>
               </div>
               <div className="w-full">
                 <p

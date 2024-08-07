@@ -19,6 +19,7 @@ interface LabTest {
   status_note: string
   status: boolean
   pub_date: string
+  discount_value: string
 }
 
 export default function PharmacyDashboard() {

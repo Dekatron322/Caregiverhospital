@@ -89,7 +89,7 @@ const PrintRecordModal: React.FC<ModalProps> = ({ show, onClose, record }) => {
               <p className="mb-2 text-sm font-bold text-black">Test type: {record.test_type}</p>
               <div className="flex items-center gap-2">
                 <InboxOutlinedIcon className="text-lg font-bold text-black" />{" "}
-                <p className="text-sm font-bold text-black">Result: 10</p>
+                <p className="text-sm font-bold text-black">Result: {record.result}</p>
               </div>
             </div>
             <div className="mt-3">

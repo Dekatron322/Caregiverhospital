@@ -25,6 +25,7 @@ interface LabTestResult {
   pub_date: string
   diagnosis_code: string
   patient_id: string
+  discount_value: string
   hmo?: HMO
 }
 
@@ -98,20 +99,39 @@ const PaymentModal: React.FC<ModalProps> = ({ results, onClose }) => {
     setOpenSection(openSection === index ? -1 : index)
   }
 
+  const calculateTotal = () => {
+    if (diagnosisInfo?.price) {
+      const unitPrice = Number(diagnosisInfo.price)
+      const discountValue = results.discount_value ? parseFloat(results.discount_value) : 0
+      const discountAmount = unitPrice * (discountValue / 100)
+      const finalPrice = unitPrice - discountAmount
+
+      return finalPrice.toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+      })
+    }
+    return "N/A"
+  }
+
   const handleSubmit = async () => {
     setIsLoading(true)
     setErrorMessage(null) // Clear previous error message
     try {
+      const unitPrice = diagnosisInfo?.price ? Number(diagnosisInfo.price) : 0
+      const discountValue = results.discount_value ? parseFloat(results.discount_value) : 0
+      const discountAmount = unitPrice * (discountValue / 100)
+      const finalPrice = unitPrice - discountAmount
+
       const payload = {
         enroll_number: results.policy_id,
         enroll_from: diagnosisInfo?.pub_date,
         enroll_to: results.pub_date,
         procedure_code: "null",
         diagnosis_code: diagnosisInfo?.code || "N/A",
-        charge_amount: diagnosisInfo?.price,
+        charge_amount: finalPrice.toFixed(2),
         units: "1",
         status: true,
-        pub_date: new Date().toISOString(), // Or use the appropriate date if provided
+        pub_date: new Date().toISOString(),
         hmo: results.hmo?.id || "N/A",
       }
 
@@ -200,18 +220,15 @@ const PaymentModal: React.FC<ModalProps> = ({ results, onClose }) => {
                     * 1
                   </p>
                 </div>
+                <div className="flex items-center justify-between pb-2">
+                  <p className="text-sm">Discount</p>
+                  <p className="text-sm">{results.discount_value || "N/A"}</p>
+                </div>
                 <div className="w-full border"></div>
                 <div className="flex items-center justify-between pt-4">
                   <p className="text-sm">Total</p>
-
-                  <p className="text-sm font-bold">
-                    ₦
-                    {diagnosisInfo?.price
-                      ? Number(diagnosisInfo.price).toLocaleString("en-US", { minimumFractionDigits: 2 })
-                      : "N/A"}
-                  </p>
+                  <p className="text-sm font-bold">₦{calculateTotal()}</p>
                 </div>
-                {/* <p className="text-xs">HMO ID: {results.hmo?.id || "N/A"}</p> */}
               </div>
             )}
           </div>
