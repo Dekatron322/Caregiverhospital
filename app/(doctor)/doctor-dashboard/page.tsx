@@ -1,8 +1,6 @@
 "use client"
 import { useEffect, useState } from "react"
-import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
-import { Pharmacy } from "utils"
 import Image from "next/image"
 import Link from "next/link"
 import DoctorsAppointments from "components/Dashboard/DoctorsAppointments"
