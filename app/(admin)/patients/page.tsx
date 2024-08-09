@@ -12,8 +12,6 @@ import Link from "next/link"
 import { GoPlus } from "react-icons/go"
 import { IoAddCircleSharp } from "react-icons/io5"
 import DeletePatientModal from "components/Modals/DeletePatientModal"
-import AOS from "aos"
-import "aos/dist/aos.css"
 
 interface Patients {
   id: string
@@ -49,13 +47,6 @@ export default function Patients() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [patientToDelete, setPatientToDelete] = useState<Patients | null>(null)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
-
-  useEffect(() => {
-    AOS.init({
-      duration: 1000,
-      once: true,
-    })
-  }, [])
 
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
@@ -216,9 +207,6 @@ export default function Patients() {
                   <div
                     key={patient.id}
                     className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2 "
-                    data-aos="fade-in"
-                    data-aos-duration="1000"
-                    data-aos-delay="500"
                   >
                     <div className="flex items-center gap-1 text-sm font-bold md:w-[20%]">
                       {/* {patient.image ? (

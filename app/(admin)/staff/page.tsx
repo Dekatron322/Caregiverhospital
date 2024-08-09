@@ -161,7 +161,7 @@ export default function Staff() {
                 ))}
               </div>
             ) : (
-              <div className="mt-10 grid grid-cols-2 gap-2 px-16 max-md:mt-4 max-md:grid-cols-1 max-md:px-3">
+              <div className="my-10 grid grid-cols-2 gap-2 px-16 max-md:mt-4 max-md:grid-cols-1 max-md:px-3">
                 {departments.map((department) => (
                   <div
                     key={department.id}

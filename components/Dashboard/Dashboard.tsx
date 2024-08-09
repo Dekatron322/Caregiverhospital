@@ -3,8 +3,6 @@ import React, { useEffect, useState } from "react"
 import Image from "next/image"
 import { PiDotsThree } from "react-icons/pi"
 import { useRouter } from "next/navigation"
-import AOS from "aos"
-import "aos/dist/aos.css"
 
 interface Appointment {
   id: number
@@ -48,13 +46,6 @@ const Appointments = () => {
   const [activeTab, setActiveTab] = useState("all")
   const [patients, setPatients] = useState<Patient[]>([])
   const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    AOS.init({
-      duration: 1000,
-      once: true,
-    })
-  }, [])
 
   const fetchPatients = async () => {
     try {
@@ -109,13 +100,7 @@ const Appointments = () => {
     const lastAppointment = sortedAppointments[0]
 
     return (
-      <div
-        data-aos="fade-in"
-        data-aos-duration="1000"
-        data-aos-delay="500"
-        key={patient.id}
-        className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
-      >
+      <div key={patient.id} className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2">
         {/* <div className="flex w-[20%] flex-col max-md:hidden">
           {lastAppointment && (
             <div
@@ -201,12 +186,7 @@ const Appointments = () => {
         </div>
       ) : (
         <>
-          <div
-            data-aos="fade-in"
-            data-aos-duration="1000"
-            data-aos-delay="500"
-            className="tab-bg mb-8 flex w-[190px] items-center gap-3 rounded-lg p-1 md:border"
-          >
+          <div className="tab-bg mb-8 flex w-[190px] items-center gap-3 rounded-lg p-1 md:border">
             <button
               className={`${activeTab === "all" ? "active-tab" : "inactive-tab"}`}
               onClick={() => setActiveTab("all")}

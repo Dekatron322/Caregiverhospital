@@ -2,8 +2,6 @@
 import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { PiDotsThree } from "react-icons/pi"
-import AOS from "aos"
-import "aos/dist/aos.css"
 
 interface CheckApp {
   id: string
@@ -39,13 +37,6 @@ const AllAdmission: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"all" | "checkout" | "checkin">("all")
   const [admissions, setAdmissions] = useState<Admission[]>([])
   const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    AOS.init({
-      duration: 1000,
-      once: true,
-    })
-  }, [])
 
   useEffect(() => {
     const fetchAdmissions = async () => {
@@ -116,9 +107,6 @@ const AllAdmission: React.FC = () => {
           <div
             key={appointment.id}
             className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
-            data-aos="fade-in"
-            data-aos-duration="1000"
-            data-aos-delay="500"
             onClick={() => handlePatientClick(appointment.id)}
           >
             <div className="flex w-full items-center gap-2 text-sm font-bold">

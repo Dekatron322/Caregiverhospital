@@ -6,8 +6,6 @@ import Image from "next/image"
 import Link from "next/link"
 import Appointments from "components/Dashboard/Dashboard"
 import { PiDotsThree } from "react-icons/pi"
-import AOS from "aos"
-import "aos/dist/aos.css"
 
 interface CheckApp {
   id: string
@@ -50,13 +48,6 @@ export default function Dashboard() {
   const [departmentCount, setDepartmentCount] = useState(0)
   const [staffCount, setStaffCount] = useState(0)
   const [recentCheckApps, setRecentCheckApps] = useState<PatientCheckApp[]>([])
-
-  useEffect(() => {
-    AOS.init({
-      duration: 1000,
-      once: true,
-    })
-  }, [])
 
   useEffect(() => {
     async function fetchPatients() {
