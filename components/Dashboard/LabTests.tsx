@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from "react"
 import axios from "axios"
-import { PiDotsThree } from "react-icons/pi"
 import { useRouter } from "next/navigation"
 import TestModal from "components/Modals/TestModal"
-import AOS from "aos"
-import "aos/dist/aos.css"
 import Image from "next/image"
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye"
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet"
@@ -66,13 +63,6 @@ const LabTests = () => {
   const [currentPage, setCurrentPage] = useState(1)
   const [searchQuery, setSearchQuery] = useState("")
   const resultsPerPage = 7
-
-  useEffect(() => {
-    AOS.init({
-      duration: 1000,
-      once: true,
-    })
-  }, [])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -275,7 +265,7 @@ const LabTests = () => {
 
   return (
     <>
-      <div className="flex w-full flex-col" data-aos="fade-in" data-aos-duration="1000" data-aos-delay="500">
+      <div className="flex w-full flex-col">
         {isLoading ? (
           <div className="loading-text flex h-full items-center justify-center">
             {"loading...".split("").map((letter, index) => (

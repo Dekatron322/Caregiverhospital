@@ -2,8 +2,6 @@ import React, { useEffect, useState } from "react"
 import axios from "axios"
 import { PiDotsThree } from "react-icons/pi"
 import { useRouter } from "next/navigation"
-import AOS from "aos"
-import "aos/dist/aos.css"
 
 interface LabTestResult {
   id: string
@@ -25,13 +23,6 @@ const LabResults = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
   const [labTestResults, setLabTestResults] = useState<LabTestResult[]>([])
   const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    AOS.init({
-      duration: 1000,
-      once: true,
-    })
-  }, [])
 
   const handlePatientClick = (patientId: any) => {
     router.push(`/reports/report/${patientId}`)
@@ -117,9 +108,6 @@ const LabResults = () => {
           <div
             key={results.id}
             className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
-            data-aos="fade-in"
-            data-aos-duration="1000"
-            data-aos-delay="500"
           >
             <div className="w-full">
               <div className="flex items-center gap-2 text-sm font-bold">
