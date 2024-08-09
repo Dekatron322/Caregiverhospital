@@ -8,8 +8,6 @@ import Link from "next/link"
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io"
 import { GoPlus } from "react-icons/go"
 import { IoAddCircleSharp } from "react-icons/io5"
-import AOS from "aos"
-import "aos/dist/aos.css"
 import PharmacyNav from "components/Navbar/PharmacyNav"
 
 interface Medicine {
@@ -39,13 +37,6 @@ export default function Medicines() {
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
-
-  useEffect(() => {
-    AOS.init({
-      duration: 1000,
-      once: true,
-    })
-  }, [])
 
   useEffect(() => {
     const fetchMedicines = async () => {
@@ -169,9 +160,6 @@ export default function Medicines() {
                   <div
                     key={medicine.id}
                     className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
-                    data-aos="fade-in"
-                    data-aos-duration="1000"
-                    data-aos-delay="500"
                     onClick={() => handlePatientClick(medicine.id)}
                   >
                     <div className="w-full">

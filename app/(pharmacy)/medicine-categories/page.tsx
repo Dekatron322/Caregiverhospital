@@ -9,8 +9,7 @@ import { IoAddCircleSharp } from "react-icons/io5"
 import { IoIosArrowBack, IoIosArrowForward, IoMdSearch } from "react-icons/io"
 import { usePathname, useRouter } from "next/navigation"
 import { SetStateAction, useEffect, useState } from "react"
-import AOS from "aos"
-import "aos/dist/aos.css"
+
 import PharmacyNav from "components/Navbar/PharmacyNav"
 
 // Define types
@@ -48,13 +47,6 @@ export default function MedicineCategories() {
 
   useEffect(() => {
     fetchCategories()
-  }, [])
-
-  useEffect(() => {
-    AOS.init({
-      duration: 1000,
-      once: true,
-    })
   }, [])
 
   const fetchCategories = async () => {
@@ -133,12 +125,7 @@ export default function MedicineCategories() {
             {filteredPatients.length === 0 ? (
               <></>
             ) : (
-              <div
-                className="mb-6 mt-10 flex items-center justify-between px-16 max-sm:px-3"
-                data-aos="fade-in"
-                data-aos-duration="1000"
-                data-aos-delay="500"
-              >
+              <div className="mb-6 mt-10 flex items-center justify-between px-16 max-sm:px-3">
                 <div className="search-bg flex h-10 items-center justify-between gap-2 rounded border border-[#CFDBD5] px-3 py-1 max-sm:w-[180px] lg:w-[300px]">
                   <Image className="dark-icon-style" src="/search-dark.svg" width={16} height={16} alt="dekalo" />
                   <input
