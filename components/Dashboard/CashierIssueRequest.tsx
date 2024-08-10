@@ -1,6 +1,4 @@
 import React, { useEffect, useState } from "react"
-import AOS from "aos"
-import "aos/dist/aos.css"
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet"
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye"
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline"
@@ -71,13 +69,6 @@ const CashierIssueRequest = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null)
   const [selectedPrescription, setSelectedPrescription] = useState<Prescription | null>(null)
-
-  useEffect(() => {
-    AOS.init({
-      duration: 1000,
-      once: true,
-    })
-  }, [])
 
   const fetchPatients = async () => {
     try {

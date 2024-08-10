@@ -1,8 +1,6 @@
 "use client"
-import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
 
-import IssueRequest from "components/Dashboard/IssueRequest"
 import { IoIosArrowForward } from "react-icons/io"
 import { usePathname, useRouter } from "next/navigation"
 import PharmacyNav from "components/Navbar/PharmacyNav"
