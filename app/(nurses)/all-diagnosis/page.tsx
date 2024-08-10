@@ -1,10 +1,8 @@
 "use client"
 import React, { SetStateAction, useEffect, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
-import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
 import { IoIosArrowBack, IoIosArrowForward, IoMdSearch } from "react-icons/io"
-import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye"
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
 import BorderColorOutlinedIcon from "@mui/icons-material/BorderColorOutlined"
 import Image from "next/image"
@@ -13,8 +11,7 @@ import { GoPlus } from "react-icons/go"
 import { IoAddCircleSharp } from "react-icons/io5"
 import DeletePatientModal from "components/Modals/DeletePatientModal"
 import EditDiagnosisModal from "components/Modals/EditDiagnosisModal"
-import AOS from "aos"
-import "aos/dist/aos.css"
+
 import NursesNav from "components/Navbar/NursesNav"
 
 interface Diagnosis {
@@ -39,13 +36,6 @@ export default function Patients() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [diagnosisToEdit, setDiagnosisToEdit] = useState<Diagnosis | null>(null)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
-
-  useEffect(() => {
-    AOS.init({
-      duration: 1000,
-      once: true,
-    })
-  }, [])
 
   useEffect(() => {
     fetchDiagnosis()
@@ -164,12 +154,7 @@ export default function Patients() {
               <p className="capitalize">{pathname.split("/").pop()}</p>
             </div>
 
-            <div
-              className="mb-6 mt-10 flex items-center justify-between px-16 max-md:px-3"
-              data-aos="fade-in"
-              data-aos-duration="1000"
-              data-aos-delay="500"
-            >
+            <div className="mb-6 mt-10 flex items-center justify-between px-16 max-md:px-3">
               <div className="search-bg flex h-10 items-center justify-between gap-2 rounded border border-[#CFDBD5] px-3 py-1 max-md:w-[180px] lg:w-[300px]">
                 <Image className="icon-style" src="/icons.svg" width={16} height={16} alt="dekalo" />
                 <Image className="dark-icon-style" src="/search-dark.svg" width={16} height={16} alt="dekalo" />
@@ -216,9 +201,6 @@ export default function Patients() {
                   <div
                     key={diagnosis.id}
                     className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
-                    data-aos="fade-in"
-                    data-aos-duration="1000"
-                    data-aos-delay="500"
                   >
                     <div className="flex w-[20%] items-center gap-1 text-sm font-bold">
                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46ffa6]">

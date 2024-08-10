@@ -1,4 +1,4 @@
-import { Tooltip } from "@mui/material"
+import { Skeleton, Tooltip } from "@mui/material"
 import React, { useEffect, useRef, useState } from "react"
 import axios from "axios"
 import Image from "next/image"
@@ -269,24 +269,34 @@ const NursesNav: React.FC = () => {
       {isDropdownOpen && (
         <div
           ref={dropdownRef}
-          className="fixed right-0 top-16 z-50 w-[200px] rounded-lg border bg-white py-2 shadow-md"
+          className="auth absolute right-16 top-14 z-10 w-64 rounded border shadow-md transition-opacity duration-300"
         >
-          <div className="flex flex-col px-4 py-2">
-            <Link href="/profile" className="flex items-center gap-2 py-1 text-gray-600 hover:text-gray-800">
+          <div className="border-b px-4 py-2">
+            <div className="flex items-center gap-2">
               <MdAccountCircle />
-              Profile
-            </Link>
-            <Link href="/change-password" className="flex items-center gap-2 py-1 text-gray-600 hover:text-gray-800">
-              <IoMdLock />
-              Change Password
-            </Link>
-            <button
-              onClick={handleLogoutClick}
-              className="flex items-center gap-2 py-1 text-gray-600 hover:text-gray-800"
-            >
-              <RiLogoutCircleRLine />
-              Logout
-            </button>
+              <p className="text-sm font-semibold">Account Information</p>
+            </div>
+            {loading ? (
+              <Skeleton variant="text" width={120} />
+            ) : error ? (
+              <small className="text-red-500">{error}</small>
+            ) : userDetails ? (
+              <>
+                <p className="text-xs">{userDetails.username}</p>
+                <p className="text-xs">{userDetails.email}</p>
+                <p className="text-xs">{userDetails.phone_number}</p>
+              </>
+            ) : (
+              <small className="text-red-500">No user details found.</small>
+            )}
+          </div>
+          <div className="flex items-center gap-2 border-b px-4 py-2" onClick={handleLogoutClick}>
+            <RiLogoutCircleRLine />
+            <p className="cursor-pointer text-sm font-semibold">Logout</p>
+          </div>
+          <div className="flex items-center gap-2 border-b px-4 py-2" onClick={closeDropdown}>
+            <IoMdLock />
+            <p className="text-sm font-semibold">Security</p>
           </div>
         </div>
       )}
