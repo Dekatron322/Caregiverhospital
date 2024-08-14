@@ -291,9 +291,9 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
                       </div>
                     </div>
 
-                    <div className="mb-6 md:w-3/4">
+                    {/* <div className="mb-6 md:w-3/4">
                       <PatientDetails params={{ patientId }} />
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>
