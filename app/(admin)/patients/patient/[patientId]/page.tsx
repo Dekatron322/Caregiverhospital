@@ -14,7 +14,7 @@ import AOS from "aos"
 import "aos/dist/aos.css"
 
 interface PatientDetail {
-  id: string
+  id: any
   name: string
   heart_rate?: string
   body_temperature?: string
