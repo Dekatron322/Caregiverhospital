@@ -14,7 +14,7 @@ import { IoAddCircleSharp } from "react-icons/io5"
 import DeletePatientModal from "components/Modals/DeletePatientModal"
 
 interface Patients {
-  id: any
+  id: string
   name: string
   gender: string
   dob: string

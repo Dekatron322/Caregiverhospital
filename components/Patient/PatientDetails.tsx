@@ -38,7 +38,7 @@ interface MedicalRecord {
 }
 
 interface PatientDetail {
-  id: any
+  id: string
   name: string
   appointments: Appointment[]
   prescriptions: Prescription[]
@@ -56,7 +56,7 @@ const formatDateTime = (dateString: string) => {
   return new Date(dateString).toLocaleDateString(undefined, options)
 }
 
-export default function PatientDetails({ params }: { params: { patientId: any } }) {
+export default function PatientDetails({ params }: { params: { patientId: string } }) {
   const router = useRouter()
   const [isDone, setIsDone] = useState<boolean>(false)
   const [activeTab, setActiveTab] = useState("appointments")
