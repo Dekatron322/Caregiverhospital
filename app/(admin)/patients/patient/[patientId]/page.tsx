@@ -86,7 +86,8 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
       try {
         const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${patientId}`)
         if (!response.ok) {
-          throw new Error("Network response was not ok")
+          const errorDetails = await response.text()
+          throw new Error(`Network response was not ok: ${errorDetails}`)
         }
         const data = (await response.json()) as PatientDetail
         setPatientDetail(data)
