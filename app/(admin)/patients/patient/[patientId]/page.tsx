@@ -84,7 +84,9 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
   useEffect(() => {
     const fetchPatientDetails = async () => {
       try {
-        const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${patientId}/`)
+        const response = await fetch(
+          `https://api.caregiverhospital.com/patient/patient/cfd0f6f0-69cc-4f0b-a8db-2118536947aa/`
+        )
         if (!response.ok) {
           const errorDetails = await response.text()
           throw new Error(`Network response was not ok: ${errorDetails}`)
@@ -127,7 +129,9 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
 
   const refreshPatientDetails = async () => {
     try {
-      const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${patientId}/detail/`)
+      const response = await fetch(
+        `https://api.caregiverhospital.com/patient/patient/cfd0f6f0-69cc-4f0b-a8db-2118536947aa/`
+      )
       if (!response.ok) {
         throw new Error("Network response was not ok")
       }
