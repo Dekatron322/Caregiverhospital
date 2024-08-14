@@ -69,7 +69,7 @@ export default function PatientDetails({ params }: { params: { patientId: string
   useEffect(() => {
     const fetchPatientDetails = async () => {
       try {
-        const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${patientId}`)
+        const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${patientId}/`)
         if (!response.ok) {
           throw new Error("Network response was not ok")
         }
