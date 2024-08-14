@@ -71,10 +71,12 @@ export default function PatientDetails({ params }: { params: { patientId: string
       try {
         const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${patientId}/`)
         if (!response.ok) {
-          throw new Error("Network response was not ok")
+          const errorDetails = await response.text() // Fetch error details from the response
+          console.error(`Network response was not ok: ${errorDetails}`)
+          throw new Error(`Error fetching patient details: ${errorDetails}`)
         }
-        const data = await response.json()
-        setPatientDetail(data as PatientDetail)
+        const data = (await response.json()) as PatientDetail
+        setPatientDetail(data)
       } catch (error) {
         console.error("Error fetching patient details:", error)
       }
