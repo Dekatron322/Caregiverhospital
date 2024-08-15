@@ -61,7 +61,8 @@ export default function Patients() {
   }
 
   const handlePatientClick = (patientId: string) => {
-    router.push(`/patients/patient/${patientId}`)
+    localStorage.setItem("selectedPatientId", patientId)
+    router.push(`/patients/patient`) // No need to pass the ID in the URL
   }
 
   useEffect(() => {
@@ -109,6 +110,28 @@ export default function Patients() {
     } catch (error) {
       console.error("Error fetching Patients:", error)
       setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    const storedPatientId = localStorage.getItem("selectedPatientId")
+    if (storedPatientId) {
+      fetchPatientDetails(storedPatientId)
+    } else {
+      console.error("No patient ID found in localStorage")
+    }
+  }, [])
+
+  const fetchPatientDetails = async (patientId: string) => {
+    try {
+      const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${patientId}/`)
+      if (!response.ok) {
+        throw new Error("Failed to fetch patient details")
+      }
+      const data = await response.json()
+      // Handle the data here
+    } catch (error) {
+      console.error("Error fetching patient details:", error)
     }
   }
 
