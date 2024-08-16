@@ -23,14 +23,66 @@ const wardOptions = [
   { id: "12", name: "Amenity 4" },
 ]
 
+// Define or import PatientDetail type
+interface PatientDetail {
+  id: string
+  name: string
+  heart_rate?: string
+  body_temperature?: string
+  glucose_level?: string
+  blood_pressure?: string
+  address: string
+  phone_no: string
+  dob: string
+  blood_group?: string
+  hmo: {
+    id: string
+    name: string
+    category: string
+    description: string
+    status: boolean
+    pub_date: string
+  }
+  policy_id?: string
+  allergies?: string
+  nok_name: string
+  nok_phone_no: string
+  appointments: { id: number; doctor: string; pub_date: string; detail: string }[]
+  prescriptions: {
+    id: string
+    category: string
+    name: string
+    complain: string
+    code: string
+    unit: number
+    dosage: number
+    rate: string
+    usage: string
+    note: string
+    status: boolean
+    pub_date: string
+    doctor_name: string
+  }[]
+  lab_tests: {
+    id: string
+    doctor_name: string
+    doctor_image: string
+    test: string
+    result: string
+    test_type: string
+    pub_date: string
+  }[]
+}
+
 interface ReviewModalProps {
   isOpen: boolean
   onSubmitSuccess: () => void
   onClose: () => void
+  patientDetail: PatientDetail // Add this line
   patientId: string
 }
 
-const AdmissionModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitSuccess, patientId }) => {
+const AdmissionModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitSuccess, patientId, patientDetail }) => {
   const [ward, setWard] = useState<string>("")
   const [reason, setReason] = useState<string>("")
   const [loading, setLoading] = useState(false)

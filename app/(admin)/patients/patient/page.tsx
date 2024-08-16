@@ -8,11 +8,12 @@ import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
 import Image from "next/image"
 import Link from "next/link"
-import PatientDetails from "components/Patient/PatientDetails"
+
 import { IoMdArrowBack } from "react-icons/io"
 import { MdLocationPin } from "react-icons/md"
 import AOS from "aos"
 import "aos/dist/aos.css"
+import PatientDetails from "components/Patient/PatientDetails"
 
 interface PatientDetail {
   id: string
@@ -37,7 +38,7 @@ interface PatientDetail {
   allergies?: string
   nok_name: string
   nok_phone_no: string
-  appointments: { id: number; doctor: string; pub_date: string }[]
+  appointments: { id: number; doctor: string; pub_date: string; detail: string }[]
   prescriptions: {
     id: string
     category: string
@@ -51,13 +52,15 @@ interface PatientDetail {
     note: string
     status: boolean
     pub_date: string
+    doctor_name: string
   }[]
-  medicals: {
+  lab_tests: {
     id: string
-    name: string
+    doctor_name: string
     doctor_image: string
     test: string
     result: string
+    test_type: string
     pub_date: string
   }[]
 }
@@ -223,56 +226,124 @@ export default function PatientDetailPage() {
                           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#46ffa6]">
                             <p className="capitalize text-[#000000]">{patientDetail.name.charAt(0)}</p>
                           </div>
+                          {/* <Image src="/default_patient_image.png" height={60} width={60} alt="Patient Image" /> */}
                         </div>
                         <h1 className="mt-3 text-center font-bold capitalize xl:text-sm">{patientDetail.name}</h1>
                         <p className="text-center text-base font-bold xl:text-sm">
-                          Patient ID: <span className="text-[#969696]">{patientDetail.id}</span>
+                          Patient ID: <span className="font-normal xl:text-sm">{patientDetail.policy_id}</span>
                         </p>
-                        <p className="text-center text-base font-bold xl:text-sm">
-                          Age: <span className="text-[#969696]">{calculateAge(patientDetail.dob)}</span>
-                        </p>
-                        <p className="text-center text-base font-bold capitalize xl:text-sm">
-                          {patientDetail.policy_id}
-                        </p>
+                        <div className="flex items-center justify-center gap-1 text-center">
+                          <MdLocationPin className="" />
+                          <p className="text-center">{patientDetail.address}</p>
+                        </div>
+                        <div className="my-4 flex w-full border"></div>
+                        <div className="">
+                          <div className="flex justify-between pb-2">
+                            <p className="xl:text-sm">Phone</p>
+                            <p className="xl:text-sm">{patientDetail.phone_no}</p>
+                          </div>
+                          <div className="flex justify-between pb-2">
+                            <p className="xl:text-sm">Age</p>
+                            <p className="xl:text-sm">{calculateAge(patientDetail.dob)}</p>
+                          </div>
+                          <div className="flex justify-between pb-2">
+                            <p className="xl:text-sm">Blood Group</p>
+                            <p className="xl:text-sm">{patientDetail.blood_group || "N/A"}</p>
+                          </div>
+                          <div className="flex justify-between pb-2">
+                            <p className="xl:text-sm">HMO Name</p>
+                            <p className="xl:text-sm">{patientDetail.hmo.name || "N/A"}</p>
+                          </div>
+                          <div className="flex justify-between">
+                            <p className="xl:text-sm">Policy ID</p>
+                            <p className="xl:text-sm">{patientDetail.policy_id || "N/A"}</p>
+                          </div>
+                          <div className="mt-6 flex w-full gap-2">
+                            <button
+                              onClick={openAppointmentModal}
+                              className="button-primary h-[40px] w-[60%] whitespace-nowrap rounded-md max-sm:h-[40px] xl:text-sm"
+                            >
+                              Book Appointment
+                            </button>
+                            <button
+                              onClick={openAdmissionModal}
+                              className="button-primary h-[40px] w-[40%] whitespace-nowrap rounded-md max-sm:h-[40px] xl:text-sm"
+                            >
+                              Check In
+                            </button>
+                          </div>
+                        </div>
                       </div>
-                      <div className="mt-2">
-                        <div className="flex items-center gap-1 text-center text-[#969696]">
-                          <MdLocationPin />
-                          <p className="text-sm xl:text-xs">{patientDetail.address}</p>
+
+                      <div className="py-2">
+                        <h3 className="mb-1 font-bold">Allergies</h3>
+                        <div className="flex flex-wrap">
+                          {patientDetail.allergies
+                            ? patientDetail.allergies.split(",").map((allergy, index) => (
+                                <div key={index} className="w-1/2">
+                                  <p className="m-1 rounded bg-[#F2B8B5] p-1 text-center text-sm font-medium capitalize text-[#601410]">
+                                    {allergy.trim()}
+                                  </p>
+                                </div>
+                              ))
+                            : "No allergies"}
                         </div>
-                        <div className="flex justify-center text-[#969696]">
-                          <p className="text-sm xl:text-xs">{patientDetail.phone_no}</p>
-                        </div>
-                        <div className="mt-5 flex flex-col gap-2">
-                          <Link
-                            href={`/patient/appointments/${patientDetail.id}`}
-                            className="btn-accent flex h-10 w-full items-center justify-center rounded-md px-8 py-2 text-sm font-bold uppercase text-[#333333] hover:bg-[#333333] hover:text-[#ffffff] xl:px-4"
-                          >
-                            Appointment
-                          </Link>
-                          <button
-                            className="btn-accent flex h-10 w-full items-center justify-center rounded-md px-8 py-2 text-sm font-bold uppercase text-[#333333] hover:bg-[#333333] hover:text-[#ffffff] xl:px-4"
-                            onClick={openAdmissionModal}
-                          >
-                            Admission
-                          </button>
-                          <button
-                            className="btn-accent flex h-10 w-full items-center justify-center rounded-md px-8 py-2 text-sm font-bold uppercase text-[#333333] hover:bg-[#333333] hover:text-[#ffffff] xl:px-4"
-                            onClick={openAppointmentModal}
-                          >
-                            Consultation
-                          </button>
+                        {/* <p className="mt-4 text-right font-medium">see all</p> */}
+                      </div>
+
+                      <div className="py-2">
+                        <div className="nok_area">
+                          <h4 className="mb-2 font-medium">Next of Kin</h4>
+                          <div className="flex justify-between">
+                            <p>{patientDetail.nok_name}</p>
+                            <Link href={`tel:${patientDetail.nok_phone_no}`}>
+                              <Image src="/phone.svg" height={18} width={18} alt="Call" />
+                            </Link>
+                          </div>
                         </div>
                       </div>
                     </div>
-                    <div className="md:w-3/4"></div>
+
+                    <div className="mb-6 md:w-3/4">
+                      <PatientDetails patientDetail={patientDetail} />
+                    </div>
                   </div>
                 </div>
               </div>
             )}
+            <Footer />
           </div>
         </div>
       </section>
+      <AdmissionModal
+        isOpen={isAdmissionOpen}
+        onClose={closeAdmissionModal}
+        onSubmitSuccess={handleHmoSubmissionSuccess}
+        patientDetail={patientDetail} // This should now be recognized
+        patientId={patientDetail.id} // Ensure this matches your interface requirements
+      />
+
+      <AppointmentModal
+        isOpen={isAppointmentOpen}
+        onClose={closeAppointmentModal}
+        onSubmitSuccess={handleHmoSubmissionSuccess}
+        patientDetail={patientDetail}
+        patientId={patientDetail.id}
+      />
+
+      {showSuccessNotification && (
+        <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
+          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
+          <span className="clash-font text-sm text-[#0F920F]">Successfully added</span>
+        </div>
+      )}
+
+      {showDeleteNotification && (
+        <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
+          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
+          <span className="clash-font text-sm text-[#0F920F]">Successfully deleted</span>
+        </div>
+      )}
     </>
   )
 }

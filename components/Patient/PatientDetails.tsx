@@ -28,7 +28,6 @@ interface Prescription {
 
 interface MedicalRecord {
   id: string
-
   doctor_name: string
   doctor_image: string
   test: string
@@ -40,9 +39,51 @@ interface MedicalRecord {
 interface PatientDetail {
   id: string
   name: string
-  appointments: Appointment[]
-  prescriptions: Prescription[]
-  lab_tests: MedicalRecord[]
+  heart_rate?: string
+  body_temperature?: string
+  glucose_level?: string
+  blood_pressure?: string
+  address: string
+  phone_no: string
+  dob: string
+  blood_group?: string
+  hmo: {
+    id: string
+    name: string
+    category: string
+    description: string
+    status: boolean
+    pub_date: string
+  }
+  policy_id?: string
+  allergies?: string
+  nok_name: string
+  nok_phone_no: string
+  appointments: { id: number; doctor: string; pub_date: string; detail: string }[]
+  prescriptions: {
+    id: string
+    category: string
+    name: string
+    complain: string
+    code: string
+    unit: number
+    dosage: number
+    rate: string
+    usage: string
+    note: string
+    status: boolean
+    pub_date: string
+    doctor_name: string
+  }[]
+  lab_tests: {
+    id: string
+    doctor_name: string
+    doctor_image: string
+    test: string
+    result: string
+    test_type: string
+    pub_date: string
+  }[]
 }
 
 const formatDateTime = (dateString: string) => {
@@ -56,34 +97,17 @@ const formatDateTime = (dateString: string) => {
   return new Date(dateString).toLocaleDateString(undefined, options)
 }
 
-export default function PatientDetails({ params }: { params: { patientId: string } }) {
+interface PatientDetailsProps {
+  patientDetail: PatientDetail
+}
+
+const PatientDetails: React.FC<PatientDetailsProps> = ({ patientDetail }) => {
   const router = useRouter()
   const [isDone, setIsDone] = useState<boolean>(false)
   const [activeTab, setActiveTab] = useState("appointments")
-  const { patientId } = params
   const [searchQuery, setSearchQuery] = useState<string>("")
   const [modalVisible, setModalVisible] = useState(false)
   const [selectedRecord, setSelectedRecord] = useState<MedicalRecord | null>(null)
-  const [patientDetail, setPatientDetail] = useState<PatientDetail | null>(null)
-
-  useEffect(() => {
-    const fetchPatientDetails = async () => {
-      try {
-        const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${patientId}/`)
-        if (!response.ok) {
-          const errorDetails = await response.text() // Fetch error details from the response
-          console.error(`Network response was not ok: ${errorDetails}`)
-          throw new Error(`Error fetching patient details: ${errorDetails}`)
-        }
-        const data = (await response.json()) as PatientDetail
-        setPatientDetail(data)
-      } catch (error) {
-        console.error("Error fetching patient details:", error)
-      }
-    }
-
-    fetchPatientDetails()
-  }, [patientId])
 
   const toggleDone = () => {
     setIsDone(!isDone)
@@ -91,18 +115,6 @@ export default function PatientDetails({ params }: { params: { patientId: string
 
   const handleGoBack = () => {
     router.back()
-  }
-
-  if (!patientDetail) {
-    return (
-      <div className="loading-text flex h-full items-center justify-center">
-        {"loading...".split("").map((letter, index) => (
-          <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>
-            {letter}
-          </span>
-        ))}
-      </div>
-    )
   }
 
   const filteredList = patientDetail.appointments.filter((appointment) =>
@@ -287,3 +299,5 @@ export default function PatientDetails({ params }: { params: { patientId: string
     </div>
   )
 }
+
+export default PatientDetails
