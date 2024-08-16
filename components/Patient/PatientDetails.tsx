@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation"
 import { IoEyeSharp, IoPrintOutline } from "react-icons/io5"
 // Lazy load PrintRecordModal only on the client-side
 const PrintRecordModal = dynamic(() => import("components/Modals/PrintRecordModal"), { ssr: false })
-import { IoMdSearch } from "react-icons/io"
 
 interface Appointment {
   id: number
