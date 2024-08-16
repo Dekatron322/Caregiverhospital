@@ -66,7 +66,8 @@ const HmoComponent: React.FC<HmoComponentProps> = ({ refreshKey, openDeleteModal
   }
 
   const handleHmoClick = (hmoId: string) => {
-    router.push(`/finance/hmos/hmo/${hmoId}`)
+    localStorage.setItem("selectedHmoId", hmoId)
+    router.push(`/finance/hmos/hmo`)
   }
 
   if (loading)
