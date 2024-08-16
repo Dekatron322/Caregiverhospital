@@ -158,20 +158,15 @@ export default function MedicineCategories() {
                 <p>{error}</p>
               ) : filteredPatients.length === 0 ? (
                 <>
-                  <div
-                    className="mt-auto flex h-full w-full items-center justify-center"
-                    data-aos="fade-in"
-                    data-aos-duration="1000"
-                    data-aos-delay="500"
-                  >
+                  <div className="mt-auto flex h-full w-full items-center justify-center">
                     <div>
                       <Image src="/undraw_medical_care_movn.svg" height={237} width={341} alt="pharmacy" />
                       <div className="mt-16 items-center justify-center">
-                        <h1 className="text-center text-5xl font-bold">No Patient Yet</h1>
-                        <Link className="flex cursor-pointer items-center justify-center" href="/patients/add">
-                          <p className="text-center">Add a new Patient</p>
+                        <h1 className="text-center text-5xl font-bold">No Medicine Yet</h1>
+                        <button className="flex cursor-pointer items-center justify-center" onClick={openCategoryModal}>
+                          <p className="text-center">Add a new Medicine</p>
                           <IoAddCircleSharp />
-                        </Link>
+                        </button>
                       </div>
                     </div>
                     <div></div>
@@ -182,9 +177,6 @@ export default function MedicineCategories() {
                   <div
                     key={patient.id}
                     className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
-                    data-aos="fade-in"
-                    data-aos-duration="1000"
-                    data-aos-delay="500"
                   >
                     <div className="w-full">
                       <p className="text-sm font-bold">{patient.name}</p>
