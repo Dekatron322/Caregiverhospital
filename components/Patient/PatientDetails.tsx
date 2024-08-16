@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react"
+import dynamic from "next/dynamic"
 import Image from "next/image"
 import { PiDotsThree } from "react-icons/pi"
-import { useRouter } from "next/navigation" // Corrected import statement
+import { useRouter } from "next/navigation"
 import { IoEyeSharp, IoPrintOutline } from "react-icons/io5"
-import PrintRecordModal from "components/Modals/PrintRecordModal"
+// Lazy load PrintRecordModal only on the client-side
+const PrintRecordModal = dynamic(() => import("components/Modals/PrintRecordModal"), { ssr: false })
 import { IoMdSearch } from "react-icons/io"
 
 interface Appointment {
