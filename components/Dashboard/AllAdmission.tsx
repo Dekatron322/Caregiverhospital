@@ -85,7 +85,7 @@ const AllAdmission: React.FC = () => {
   }, [])
 
   const handlePatientClick = (admissionId: string) => {
-    localStorage.setItem("selectedPatientId", admissionId)
+    localStorage.setItem("selectedAdmissionId", admissionId)
     router.push(`/admissions/admission`)
   }
 
