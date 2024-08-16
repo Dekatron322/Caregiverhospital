@@ -44,11 +44,16 @@ export default function InvoicesPage({ params }: HmoDetailPageProps) {
   const [hmoDetails, setHmoDetails] = useState<Hmo | null>(null)
   const [selectedMonth, setSelectedMonth] = useState<number>(new Date().getMonth() + 1)
   const router = useRouter()
-  const { hmoId } = params
+  // const { hmoId } = params
 
   useEffect(() => {
     const fetchHmoDetails = async () => {
       try {
+        const hmoId = localStorage.getItem("selectedHmoId")
+        if (!hmoId) {
+          console.error("No admission ID found in localStorage.")
+          return
+        }
         const response = await fetch(`https://api.caregiverhospital.com/hmo/hmo/${hmoId}/`)
         if (!response.ok) {
           throw new Error("Network response was not ok")
@@ -61,7 +66,7 @@ export default function InvoicesPage({ params }: HmoDetailPageProps) {
     }
 
     fetchHmoDetails()
-  }, [hmoId])
+  })
 
   const handleGoBack = () => {
     router.back()

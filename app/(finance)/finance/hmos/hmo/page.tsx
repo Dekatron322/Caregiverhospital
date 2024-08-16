@@ -82,7 +82,9 @@ export default function HmoDetailPage() {
   }
 
   const handleNavigateToInvoices = (hmoId: string) => {
-    router.push(`/invoices/${hmoId}`)
+    localStorage.setItem("selectedHmoId", hmoId)
+
+    router.push(`/invoices`)
   }
 
   let filteredList = hmoDetail?.hmos || []
