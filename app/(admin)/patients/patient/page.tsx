@@ -296,7 +296,9 @@ export default function PatientDetailPage() {
                       </div>
                     </div>
 
-                    <div className="mb-6 md:w-3/4">{/* <PatientDetails patientDetail={patientDetail} /> */}</div>
+                    <div className="mb-6 md:w-3/4">
+                      <PatientDetails patientDetail={patientDetail} />
+                    </div>
                   </div>
                 </div>
               </div>
