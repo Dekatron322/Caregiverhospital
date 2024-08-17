@@ -45,8 +45,11 @@ const DoctorsAppointments = () => {
   const [activeTab, setActiveTab] = useState("all")
   const [patients, setPatients] = useState<Patient[]>([])
   const [isLoading, setIsLoading] = useState(true)
+
   const handlePatientClick = (patientId: string) => {
-    router.push(`/doctor-dashboard/doctor/${patientId}`)
+    // router.push(`/doctor-dashboard/doctor/${patientId}`)
+    localStorage.setItem("selectedPatientId", patientId)
+    router.push(`/doctor-dashboard/doctor/`)
   }
 
   const fetchPatients = async () => {

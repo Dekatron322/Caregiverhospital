@@ -118,15 +118,15 @@ export default function PatientDetailPage() {
     })
   }, [])
 
-  useEffect(() => {
-    if (patientId) {
-      fetchPatientDetails(patientId)
-    }
-  }, [patientId])
-
-  const fetchPatientDetails = async (id: string) => {
+  const fetchPatientDetails = async () => {
     try {
-      const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${id}/`)
+      const patientId = localStorage.getItem("selectedPatientId")
+      if (!patientId) {
+        console.error("No appointment ID found in localStorage.")
+        return
+      }
+
+      const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${patientId}/`)
       if (!response.ok) {
         throw new Error("Failed to fetch patient details")
       }
@@ -141,6 +141,10 @@ export default function PatientDetailPage() {
   const handleGoBack = () => {
     router.back()
   }
+
+  useEffect(() => {
+    fetchPatientDetails()
+  }, [])
 
   const handleCardClick = (results: AddPrescription) => {
     setClickedCard(results)
@@ -301,7 +305,7 @@ export default function PatientDetailPage() {
                       </div>
                     </div>
                     <div className="w-3/4">
-                      <PatientDetailsForDoctor params={{ patientId }} />
+                      {/* <PatientDetailsForDoctor params={{ patientId }} /> */}
 
                       {/* Notes Section */}
                       <div className="notes-section mb-4 mt-10 rounded border p-4">
