@@ -2,9 +2,6 @@ import React, { useEffect, useState } from "react"
 import styles from "./modal.module.css"
 import { HiMiniStar } from "react-icons/hi2"
 import { LiaTimesSolid } from "react-icons/lia"
-import Image from "next/image"
-import AOS from "aos"
-import "aos/dist/aos.css"
 import axios from "axios"
 
 interface RateIconProps {
@@ -24,9 +21,9 @@ const RateIcon: React.FC<RateIconProps> = ({ filled, onClick }) => {
   )
 }
 
-interface ReviewModalProps {
+interface PrescribeMedicationModalProps {
   isOpen: boolean
-  onSubmitSuccess: any
+  onSubmitSuccess: () => void
   onClose: () => void
   patientId: string
 }
@@ -40,9 +37,12 @@ interface UserDetails {
   account_type: string
 }
 
-const PrescribeMedicationModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitSuccess, patientId }) => {
-  const [rating, setRating] = useState<number>(0)
-  const [comment, setComment] = useState<string>("")
+const PrescribeMedicationModal: React.FC<PrescribeMedicationModalProps> = ({
+  isOpen,
+  onClose,
+  onSubmitSuccess,
+  patientId,
+}) => {
   const [description, setDescription] = useState<string>("")
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -50,16 +50,11 @@ const PrescribeMedicationModal: React.FC<ReviewModalProps> = ({ isOpen, onClose,
   const [checkAppId, setCheckAppId] = useState<string | null>(null)
 
   useEffect(() => {
-    AOS.init({
-      duration: 1000,
-      once: true,
-    })
-  }, [])
-
-  useEffect(() => {
-    fetchUserDetails()
-    fetchCheckAppId()
-  }, [])
+    if (isOpen) {
+      fetchUserDetails()
+      fetchCheckAppId()
+    }
+  }, [isOpen])
 
   const fetchUserDetails = async () => {
     try {
@@ -127,7 +122,7 @@ const PrescribeMedicationModal: React.FC<ReviewModalProps> = ({ isOpen, onClose,
         }
       } catch (error) {
         console.error("Error prescribing medication:", error)
-        // alert(`Error prescribing medication: ${error.message}`)
+        setError("Error prescribing medication. Please try again.")
       }
     }
   }
@@ -146,6 +141,8 @@ const PrescribeMedicationModal: React.FC<ReviewModalProps> = ({ isOpen, onClose,
               <LiaTimesSolid className="m-1 cursor-pointer" onClick={onClose} />
             </div>
           </div>
+
+          {error && <p className="mt-4 text-sm text-red-500">{error}</p>}
 
           <div className="mt-3">
             <p className="text-sm">Description</p>

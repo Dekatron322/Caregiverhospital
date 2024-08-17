@@ -305,7 +305,7 @@ export default function PatientDetailPage() {
                       </div>
                     </div>
                     <div className="w-3/4">
-                      {/* <PatientDetailsForDoctor params={{ patientId }} /> */}
+                      {/* <PatientDetailsForDoctor patientId={{ patientId }} />  */}
 
                       {/* Notes Section */}
                       <div className="notes-section mb-4 mt-10 rounded border p-4">

@@ -85,12 +85,11 @@ interface PatientDetailPageProps {
   params: { admissionId: string }
 }
 
-export default function PatientDetailPage({ params }: PatientDetailPageProps) {
+export default function PatientDetailPage() {
   const [isAdmissionOpen, setIsAdmissionOpen] = useState(false)
   const [patientDetail, setPatientDetail] = useState<PatientDetail | null>(null)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const router = useRouter()
-  const { admissionId } = params
 
   const [searchQuery, setSearchQuery] = useState<string>("")
 
@@ -98,22 +97,28 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
     router.back()
   }
 
-  useEffect(() => {
-    const fetchPatientDetails = async () => {
-      try {
-        const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${admissionId}`)
-        if (!response.ok) {
-          throw new Error("Network response was not ok")
-        }
-        const data = (await response.json()) as PatientDetail
-        setPatientDetail(data)
-      } catch (error) {
-        console.error("Error fetching patient details:", error)
+  const fetchPatientDetails = async () => {
+    try {
+      const admissionId = localStorage.getItem("selectedAdmissionId")
+      if (!admissionId) {
+        console.error("No admission ID found in localStorage.")
+        return
       }
-    }
 
+      const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${admissionId}`)
+      if (!response.ok) {
+        throw new Error("Network response was not ok")
+      }
+      const data = (await response.json()) as PatientDetail
+      setPatientDetail(data)
+    } catch (error) {
+      console.error("Error fetching patient details:", error)
+    }
+  }
+
+  useEffect(() => {
     fetchPatientDetails()
-  }, [admissionId])
+  }, [])
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value)
@@ -288,12 +293,14 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
           </div>
         </div>
       </section>
-      <PrescribeMedicationModal
-        isOpen={isAdmissionOpen}
-        onClose={closeAdmissionModal}
-        onSubmitSuccess={handleHmoSubmissionSuccess}
-        patientId={admissionId}
-      />
+      {patientDetail && (
+        <PrescribeMedicationModal
+          isOpen={isAdmissionOpen}
+          onClose={closeAdmissionModal}
+          onSubmitSuccess={handleHmoSubmissionSuccess}
+          patientId={patientDetail.id}
+        />
+      )}
     </>
   )
 }

@@ -94,7 +94,8 @@ const DoctorAdmission: React.FC = () => {
   }, [])
 
   const handlePatientClick = (admissionId: string) => {
-    router.push(`/doctor-admission/admission/${admissionId}`)
+    localStorage.setItem("selectedAdmissionId", admissionId)
+    router.push(`/doctor-admission/admission`)
   }
 
   const formatDate = (dateString: string) => {
