@@ -1,4 +1,5 @@
-"use client"
+"use client" // Add this directive to ensure the code runs on the client-side
+
 import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import AdmissionModal from "components/Modals/AdmissionModal"
@@ -7,12 +8,11 @@ import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
 import Image from "next/image"
 import Link from "next/link"
-import PatientDetails from "components/Patient/PatientDetails"
+
 import { IoMdArrowBack } from "react-icons/io"
 import { MdLocationPin } from "react-icons/md"
-import AOS from "aos"
-import "aos/dist/aos.css"
-import LaboratoryNav from "components/Navbar/LaboratoryNav"
+
+import PatientDetails from "components/Patient/PatientDetails"
 
 interface PatientDetail {
   id: string
@@ -37,7 +37,7 @@ interface PatientDetail {
   allergies?: string
   nok_name: string
   nok_phone_no: string
-  appointments: { id: number; doctor: string; pub_date: string }[]
+  appointments: { id: number; doctor: string; pub_date: string; detail: string }[]
   prescriptions: {
     id: string
     category: string
@@ -51,43 +51,41 @@ interface PatientDetail {
     note: string
     status: boolean
     pub_date: string
+    doctor_name: string
   }[]
-  medicals: {
+  lab_tests: {
     id: string
-    name: string
+    doctor_name: string
     doctor_image: string
     test: string
     result: string
+    test_type: string
     pub_date: string
   }[]
 }
 
-interface PatientDetailPageProps {
-  params: { patientId: string }
-}
-
-export default function PatientDetailPage({ params }: PatientDetailPageProps) {
+export default function PatientDetailPage() {
   const [patientDetail, setPatientDetail] = useState<PatientDetail | null>(null)
   const [isAdmissionOpen, setIsAdmissionOpen] = useState(false)
   const [isAppointmentOpen, setIsAppointmentOpen] = useState(false)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const [showDeleteNotification, setShowDeleteNotification] = useState(false)
   const router = useRouter()
-  const { patientId } = params
-
-  useEffect(() => {
-    AOS.init({
-      duration: 1000,
-      once: true,
-    })
-  }, [])
 
   useEffect(() => {
     const fetchPatientDetails = async () => {
+      const patientId = localStorage.getItem("selectedPatientId")
+
+      if (!patientId) {
+        console.error("No patient ID found in localStorage")
+        return
+      }
+
       try {
         const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${patientId}/`)
         if (!response.ok) {
-          throw new Error("Network response was not ok")
+          const errorDetails = await response.text()
+          throw new Error(`Network response was not ok: ${errorDetails}`)
         }
         const data = (await response.json()) as PatientDetail
         setPatientDetail(data)
@@ -97,7 +95,7 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
     }
 
     fetchPatientDetails()
-  }, [patientId])
+  }, [])
 
   const handleGoBack = () => {
     router.back()
@@ -126,6 +124,13 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
   }
 
   const refreshPatientDetails = async () => {
+    const patientId = localStorage.getItem("selectedPatientId")
+
+    if (!patientId) {
+      console.error("No patient ID found in localStorage")
+      return
+    }
+
     try {
       const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${patientId}/`)
       if (!response.ok) {
@@ -143,7 +148,7 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
       <section className="h-full">
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
-            <LaboratoryNav />
+            <DashboardNav />
             <div className="loading-text flex h-full items-center justify-center">
               {"loading...".split("").map((letter, index) => (
                 <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>
@@ -181,7 +186,7 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
                   <IoMdArrowBack />
                   <p className="capitalize">Go back</p>
                 </button>
-                <div className="pt-10" data-aos="fade-in" data-aos-duration="1000" data-aos-delay="500">
+                <div className="pt-10">
                   <div className="mb-3 grid w-full grid-cols-4 gap-2 max-sm:grid-cols-2">
                     <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
                       <Image src="/pt-dashboard-01.svg" height={40} width={40} alt="" />
@@ -245,6 +250,20 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
                             <p className="xl:text-sm">Policy ID</p>
                             <p className="xl:text-sm">{patientDetail.policy_id || "N/A"}</p>
                           </div>
+                          {/* <div className="mt-6 flex w-full gap-2">
+                            <button
+                              onClick={openAppointmentModal}
+                              className="button-primary h-[40px] w-[60%] whitespace-nowrap rounded-md max-sm:h-[40px] xl:text-sm"
+                            >
+                              Book Appointment
+                            </button>
+                            <button
+                              onClick={openAdmissionModal}
+                              className="button-primary h-[40px] w-[40%] whitespace-nowrap rounded-md max-sm:h-[40px] xl:text-sm"
+                            >
+                              Check In
+                            </button>
+                          </div> */}
                         </div>
                       </div>
 
@@ -277,7 +296,9 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
                       </div>
                     </div>
 
-                    <div className="mb-6 md:w-3/4">{/* <PatientDetails params={{ patientId }} /> */}</div>
+                    <div className="mb-6 md:w-3/4">
+                      <PatientDetails patientDetail={patientDetail} />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -286,6 +307,35 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
           </div>
         </div>
       </section>
+      <AdmissionModal
+        isOpen={isAdmissionOpen}
+        onClose={closeAdmissionModal}
+        onSubmitSuccess={handleHmoSubmissionSuccess}
+        patientDetail={patientDetail} // This should now be recognized
+        patientId={patientDetail.id} // Ensure this matches your interface requirements
+      />
+
+      <AppointmentModal
+        isOpen={isAppointmentOpen}
+        onClose={closeAppointmentModal}
+        onSubmitSuccess={handleHmoSubmissionSuccess}
+        patientDetail={patientDetail}
+        patientId={patientDetail.id}
+      />
+
+      {showSuccessNotification && (
+        <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
+          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
+          <span className="clash-font text-sm text-[#0F920F]">Successfully added</span>
+        </div>
+      )}
+
+      {showDeleteNotification && (
+        <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
+          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
+          <span className="clash-font text-sm text-[#0F920F]">Successfully deleted</span>
+        </div>
+      )}
     </>
   )
 }
