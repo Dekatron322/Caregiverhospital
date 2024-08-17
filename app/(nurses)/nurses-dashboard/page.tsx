@@ -1,15 +1,17 @@
 "use client"
+import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
 import { IoIosArrowBack, IoIosArrowForward, IoMdSearch } from "react-icons/io"
 import { usePathname, useRouter } from "next/navigation"
 import { SetStateAction, useEffect, useState } from "react"
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye"
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
+import BorderColorOutlinedIcon from "@mui/icons-material/BorderColorOutlined"
 import Image from "next/image"
 import Link from "next/link"
 import { GoPlus } from "react-icons/go"
 import { IoAddCircleSharp } from "react-icons/io5"
 import DeletePatientModal from "components/Modals/DeletePatientModal"
-import NursesNav from "components/Navbar/NursesNav"
 
 interface Patients {
   id: string
@@ -46,8 +48,21 @@ export default function Patients() {
   const [patientToDelete, setPatientToDelete] = useState<Patients | null>(null)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
 
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }
+    return new Date(dateString).toLocaleDateString(undefined, options)
+  }
+
   const handlePatientClick = (patientId: string) => {
-    router.push(`/nurses-dashboard/${patientId}`)
+    localStorage.setItem("selectedPatientId", patientId)
+    router.push(`/nurses-dashboard/patient`) // No need to pass the ID in the URL
   }
 
   useEffect(() => {
@@ -83,18 +98,6 @@ export default function Patients() {
     }
   }
 
-  const formatDate = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    }
-    return new Date(dateString).toLocaleDateString(undefined, options)
-  }
-
   const fetchPatients = async () => {
     try {
       const response = await fetch("https://api.caregiverhospital.com/patient/patient/")
@@ -107,6 +110,28 @@ export default function Patients() {
     } catch (error) {
       console.error("Error fetching Patients:", error)
       setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    const storedPatientId = localStorage.getItem("selectedPatientId")
+    if (storedPatientId) {
+      fetchPatientDetails(storedPatientId)
+    } else {
+      console.error("No patient ID found in localStorage")
+    }
+  }, [])
+
+  const fetchPatientDetails = async (patientId: string) => {
+    try {
+      const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${patientId}/`)
+      if (!response.ok) {
+        throw new Error("Failed to fetch patient details")
+      }
+      const data = await response.json()
+      // Handle the data here
+    } catch (error) {
+      console.error("Error fetching patient details:", error)
     }
   }
 
@@ -145,7 +170,7 @@ export default function Patients() {
       <section className="h-full ">
         <div className="flex min-h-screen ">
           <div className="flex w-screen flex-col ">
-            <NursesNav />
+            <DashboardNav />
 
             <div className="flex items-center gap-2 px-16 pt-4 max-md:px-3">
               <p className="font-bold">Admin Dashboard</p>
@@ -153,7 +178,12 @@ export default function Patients() {
               <p className="capitalize">{pathname.split("/").pop()}</p>
             </div>
 
-            <div className="mb-6 mt-10 flex items-center justify-between px-16 max-md:px-3">
+            <div
+              className="mb-6 mt-1 flex items-center justify-between px-16 max-md:px-3"
+              data-aos="fade-in"
+              data-aos-duration="1000"
+              data-aos-delay="500"
+            >
               <div className="search-bg flex h-10 items-center justify-between gap-2 rounded border border-[#CFDBD5] px-3 py-1 max-md:w-[180px] lg:w-[300px]">
                 <Image className="icon-style" src="/icons.svg" width={16} height={16} alt="dekalo" />
                 <Image className="dark-icon-style" src="/search-dark.svg" width={16} height={16} alt="dekalo" />
@@ -167,10 +197,10 @@ export default function Patients() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-              <Link href="/patients/add" className="add-button">
+              {/* <Link href="/patients/add" className="add-button">
                 <p className="text-[12px]">Add Patient</p>
                 <GoPlus />
-              </Link>
+              </Link> */}
             </div>
 
             <div className="mb-4 flex h-full flex-col gap-2 px-16 max-sm:px-4">
@@ -201,7 +231,7 @@ export default function Patients() {
                     key={patient.id}
                     className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2 "
                   >
-                    <div className="flex w-[20%] items-center gap-1 text-sm font-bold">
+                    <div className="flex items-center gap-1 text-sm font-bold md:w-[20%]">
                       {/* {patient.image ? (
                         <img
                           src={`https://api.caregiverhospital.com${patient.image}`}
@@ -211,7 +241,7 @@ export default function Patients() {
                           className="rounded-full"
                         />
                       ) : ( */}
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46ffa6]">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46ffa6] max-sm:hidden">
                         <p className="capitalize text-[#000000]">{patient.name.charAt(0)}</p>
                       </div>
                       {/* )} */}
@@ -224,7 +254,7 @@ export default function Patients() {
                     </div>
 
                     <div className="w-full max-md:hidden">
-                      <p className="text-sm font-bold">{formatDate(patient.dob)}</p>
+                      <p className="text-xs font-bold">{formatDate(patient.dob)}</p>
                       <small className="text-xs">Date of Birth</small>
                     </div>
                     <div className="w-full max-md:hidden">
@@ -233,12 +263,20 @@ export default function Patients() {
                     </div>
                     <div className="w-full">
                       <p className="text-sm font-bold">{patient.hmo.name}</p>
-                      <small className="text-xs">Hmo name</small>
+                      <small className="text-xs">
+                        {patient.hmo.name === "Cargivers Finance" ? "Out of Pocket" : "Hmo name"}
+                      </small>
                     </div>
                     <div className="w-full max-md:hidden">
-                      <p className="w-[100px] rounded bg-[#46FFA6] px-2 py-[2px] text-center text-xs text-[#000000]">
-                        {patient.status ? "Active" : "Inactive"}
-                      </p>
+                      {patient.hmo.status ? (
+                        <p className="w-[100px] rounded bg-[#46FFA6] px-2 py-[2px] text-center text-xs text-[#000000]">
+                          Active
+                        </p>
+                      ) : (
+                        <p className="w-[100px] rounded bg-[#F20089] px-2 py-[2px] text-center text-xs text-[#ffffff]">
+                          Inactive
+                        </p>
+                      )}
                     </div>
                     <div className="flex gap-2">
                       <RemoveRedEyeIcon className="text-[#46FFA6]" onClick={() => handlePatientClick(patient.id)} />
@@ -290,12 +328,12 @@ export default function Patients() {
         </div>
       </section>
 
-      <DeletePatientModal
+      {/* <DeletePatientModal
         isOpen={isModalOpen}
         onClose={closeModal}
         onConfirm={confirmDelete}
         patientName={patientToDelete?.name || ""}
-      />
+      /> */}
 
       {showSuccessNotification && (
         <div className="animation-fade-in absolute bottom-16  right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">

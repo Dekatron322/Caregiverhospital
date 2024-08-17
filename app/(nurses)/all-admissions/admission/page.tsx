@@ -87,15 +87,14 @@ interface PatientDetailPageProps {
   params: { admissionId: string }
 }
 
-export default function PatientDetailPage({ params }: PatientDetailPageProps) {
-  const [isAdmissionOpen, setIsAdmissionOpen] = useState(false)
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false)
+export default function PatientDetailPage() {
+  const [isAdministerDrugModalOpen, setIsAdministerDrugModalOpen] = useState(false)
+  const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false)
   const [patientDetail, setPatientDetail] = useState<PatientDetail | null>(null)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
-  const { admissionId } = params
 
   const handleGoBack = () => {
     router.back()
@@ -110,6 +109,12 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
 
   const fetchPatientDetails = async () => {
     try {
+      const admissionId = localStorage.getItem("selectedAdmissionId")
+      if (!admissionId) {
+        console.error("No admission ID found in localStorage.")
+        return
+      }
+
       const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${admissionId}`)
       if (!response.ok) {
         throw new Error("Network response was not ok")
@@ -123,22 +128,22 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
 
   useEffect(() => {
     fetchPatientDetails()
-  }, [admissionId, refreshKey])
+  }, [refreshKey])
 
-  const openAdmissionModal = () => {
-    setIsAdmissionOpen(true)
+  const openAdministerDrugModal = () => {
+    setIsAdministerDrugModalOpen(true)
   }
 
   const openCheckoutModal = () => {
-    setIsCheckoutOpen(true)
+    setIsCheckoutModalOpen(true)
   }
 
-  const closeAdmissionModal = () => {
-    setIsAdmissionOpen(false)
+  const closeAdministerDrugModal = () => {
+    setIsAdministerDrugModalOpen(false)
   }
 
   const closeCheckoutModal = () => {
-    setIsCheckoutOpen(false)
+    setIsCheckoutModalOpen(false)
   }
 
   const handleHmoSubmissionSuccess = () => {
@@ -187,14 +192,14 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
             <DashboardNav />
 
             {patientDetail && (
-              <div className="px-16 py-6" data-aos="fade-in" data-aos-duration="1000" data-aos-delay="500">
+              <div className="px-16 py-6">
                 <button onClick={handleGoBack} className="redirect">
                   <IoMdArrowBack />
                   <p className="capitalize">Go back</p>
                 </button>
                 <div className="mt-10 flex items-center justify-between">
                   <h3 className="font-semibold">Details</h3>
-                  <button onClick={openAdmissionModal} className="add-button">
+                  <button onClick={openAdministerDrugModal} className="add-button">
                     <p className="text-xs">Administer Drug</p>
                     <GoPlus />
                   </button>
@@ -331,19 +336,23 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
           <span className="clash-font text-sm text-[#0F920F]">Checkedout Successfully</span>
         </div>
       )}
-      <AdministerDrugModal
-        isOpen={isAdmissionOpen}
-        onClose={closeAdmissionModal}
-        onSubmitSuccess={handleHmoSubmissionSuccess}
-        patientId={admissionId}
-      />
+      {isAdministerDrugModalOpen && (
+        <AdministerDrugModal
+          isOpen={isAdministerDrugModalOpen}
+          onClose={closeAdministerDrugModal}
+          onSubmitSuccess={handleHmoSubmissionSuccess}
+          patientId={patientDetail.id}
+        />
+      )}
 
-      <CheckoutPatientModal
-        isOpen={isCheckoutOpen}
-        onClose={closeCheckoutModal}
-        onSubmitSuccess={handleHmoSubmissionSuccess}
-        patientId={admissionId}
-      />
+      {isCheckoutModalOpen && (
+        <CheckoutPatientModal
+          isOpen={isCheckoutModalOpen}
+          onClose={closeCheckoutModal}
+          onSubmitSuccess={handleHmoSubmissionSuccess}
+          patientId={patientDetail.id}
+        />
+      )}
     </>
   )
 }

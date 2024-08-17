@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useEffect, useState } from "react"
 import styles from "./modal.module.css"
 import { LiaTimesSolid } from "react-icons/lia"
@@ -59,8 +61,10 @@ const UpdateAllergiesModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onS
       const fetchPatientData = async () => {
         try {
           const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${patientId}/`)
+          if (!response.ok) {
+            throw new Error("Failed to fetch patient data")
+          }
           const data = (await response.json()) as PatientData
-          // Set state variables with the existing data
           setAllergies(data.allergies || "")
         } catch (error) {
           console.error("Error fetching patient data", error)
@@ -76,19 +80,14 @@ const UpdateAllergiesModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onS
     event.preventDefault()
     setLoading(true)
     try {
-      // Fetch current patient data
       const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${patientId}/`)
       const patientData = (await response.json()) as PatientData
 
-      // Create an object with all the required fields, using the existing values for the fields you don't want to change
       const updatedData = {
         ...patientData,
-        allergies: allergies,
-        hmo: patientData.hmo.id, // Only include the HMO ID
+        allergies,
+        hmo: patientData.hmo.id,
       }
-
-      // Log the updatedData to check its structure
-      console.log("Payload to be sent:", updatedData)
 
       const updateResponse = await fetch(`https://api.caregiverhospital.com/patient/patient/${patientId}/`, {
         method: "PUT",
@@ -118,6 +117,10 @@ const UpdateAllergiesModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onS
     }
   }
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAllergies(e.target.value)
+  }
+
   return (
     <div className={styles.modalOverlay} data-aos="fade-up" data-aos-duration="1000" data-aos-delay="500">
       <div className={styles.modalContent}>
@@ -136,7 +139,7 @@ const UpdateAllergiesModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onS
               placeholder="Allergies"
               className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
               value={allergies}
-              onChange={(e) => setAllergies(e.target.value)}
+              onChange={handleInputChange}
             />
           </div>
 

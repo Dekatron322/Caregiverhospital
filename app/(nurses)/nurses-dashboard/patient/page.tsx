@@ -18,6 +18,14 @@ import EditNoteIcon from "@mui/icons-material/EditNote"
 import UpdateAllergiesModal from "components/Modals/UpdateAllergiesModal"
 import NursesNav from "components/Navbar/NursesNav"
 
+interface LabTest {
+  id: string
+  name: string
+  result: string
+  status: boolean
+  pub_date: string
+}
+
 interface PatientDetail {
   id: string
   name: string
@@ -41,7 +49,7 @@ interface PatientDetail {
   allergies?: string
   nok_name: string
   nok_phone_no: string
-  appointments: { id: number; doctor: string; pub_date: string }[]
+  appointments: { id: number; doctor: string; pub_date: string; detail: string }[]
   prescriptions: {
     id: string
     category: string
@@ -55,6 +63,7 @@ interface PatientDetail {
     note: string
     status: boolean
     pub_date: string
+    doctor_name: string
   }[]
   medicals: {
     id: string
@@ -64,13 +73,18 @@ interface PatientDetail {
     result: string
     pub_date: string
   }[]
+  lab_tests: {
+    id: string
+    doctor_name: string
+    doctor_image: string
+    test: string
+    result: string
+    test_type: string
+    pub_date: string
+  }[]
 }
 
-interface PatientDetailPageProps {
-  params: { patientId: string }
-}
-
-export default function PatientDetailPage({ params }: PatientDetailPageProps) {
+export default function PatientDetailPage() {
   const [patientDetail, setPatientDetail] = useState<PatientDetail | null>(null)
   const [isAdmissionOpen, setIsAdmissionOpen] = useState(false)
   const [isUpdateVitalsOpen, setIsUpdateVitalsOpen] = useState(false)
@@ -78,8 +92,8 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
   const [isAppointmentOpen, setIsAppointmentOpen] = useState(false)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const [showDeleteNotification, setShowDeleteNotification] = useState(false)
+  const [patientId, setPatientId] = useState<string | null>(null) // New state variable for patientId
   const router = useRouter()
-  const { patientId } = params
 
   useEffect(() => {
     AOS.init({
@@ -89,11 +103,19 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
   }, [])
 
   useEffect(() => {
+    const storedPatientId = localStorage.getItem("selectedPatientId")
+    if (!storedPatientId) {
+      console.error("No patient ID found in localStorage")
+      return
+    }
+    setPatientId(storedPatientId) // Set the patientId in the state
+
     const fetchPatientDetails = async () => {
       try {
-        const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${patientId}/`)
+        const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${storedPatientId}/`)
         if (!response.ok) {
-          throw new Error("Network response was not ok")
+          const errorDetails = await response.text()
+          throw new Error(`Network response was not ok: ${errorDetails}`)
         }
         const data = (await response.json()) as PatientDetail
         setPatientDetail(data)
@@ -103,7 +125,7 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
     }
 
     fetchPatientDetails()
-  }, [patientId])
+  }, [])
 
   const handleGoBack = () => {
     router.back()
@@ -148,6 +170,13 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
   }
 
   const refreshPatientDetails = async () => {
+    const patientId = localStorage.getItem("selectedPatientId")
+
+    if (!patientId) {
+      console.error("No patient ID found in localStorage")
+      return
+    }
+
     try {
       const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${patientId}/`)
       if (!response.ok) {
@@ -322,7 +351,9 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
                       </div>
                     </div>
 
-                    <div className="mb-6 md:w-3/4">{/* <PatientDetails params={{ patientId }} /> */}</div>
+                    <div className="mb-6 md:w-3/4">
+                      <PatientDetails patientDetail={patientDetail} />{" "}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -331,17 +362,18 @@ export default function PatientDetailPage({ params }: PatientDetailPageProps) {
           </div>
         </div>
       </section>
+
       <UpdateAllergiesModal
         isOpen={isUpdateAllergiesOpen}
         onClose={closeUpdateAllergiesModal}
         onSubmitSuccess={handleHmoSubmissionSuccess}
-        patientId={patientId}
+        patientId={patientDetail.id}
       />
       <UpdateVitalsModal
         isOpen={isUpdateVitalsOpen}
         onClose={closeUpdateVitalsModal}
         onSubmitSuccess={handleHmoSubmissionSuccess}
-        patientId={patientId}
+        patientId={patientDetail.id}
       />
 
       {/* <AdmissionModal
