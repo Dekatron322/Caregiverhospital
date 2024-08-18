@@ -7,8 +7,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { IoMdArrowBack } from "react-icons/io"
 import { MdLocationPin } from "react-icons/md"
-import AOS from "aos"
-import "aos/dist/aos.css"
+
 import PatientDetailsForDoctor from "components/Patient/PatientDetailsForDoctor"
 import LabTestModal from "components/Modals/LabTestModal"
 import PrescriptionModal from "components/Modals/PrescriptionModal"
@@ -116,13 +115,6 @@ export default function PatientDetailPage() {
   const [isRequestModalOpen, setIsRequestModalOpen] = useState<boolean>(false)
   const [isNoteModalOpen, setIsNoteModalOpen] = useState<boolean>(false)
 
-  useEffect(() => {
-    AOS.init({
-      duration: 1000,
-      once: true,
-    })
-  }, [])
-
   const fetchPatientDetails = async () => {
     try {
       const patientId = localStorage.getItem("selectedPatientId")
@@ -195,7 +187,7 @@ export default function PatientDetailPage() {
                   <IoMdArrowBack />
                   <p className="capitalize">Go back</p>
                 </button>
-                <div className="pt-10" data-aos="fade-in" data-aos-duration="1000" data-aos-delay="500">
+                <div className="pt-10">
                   <div className="mb-3 grid w-full grid-cols-4 gap-2 max-sm:grid-cols-2">
                     <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
                       <Image src="/pt-dashboard-01.svg" height={40} width={40} alt="" />
