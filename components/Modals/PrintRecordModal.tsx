@@ -1,5 +1,6 @@
 // components/Modal.tsx
 import React, { useRef } from "react"
+import dynamic from "next/dynamic"
 import styles from "./modal.module.css"
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined"
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined"
@@ -11,7 +12,12 @@ import KeyboardArrowLeftOutlinedIcon from "@mui/icons-material/KeyboardArrowLeft
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined"
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined"
 import Image from "next/image"
-import html2pdf from "html2pdf.js"
+
+// Regular dynamic import for html2pdf.js
+const loadHtml2pdf = async () => {
+  const html2pdf = (await import("html2pdf.js")).default
+  return html2pdf
+}
 
 type ModalProps = {
   show: boolean
@@ -39,9 +45,10 @@ const PrintRecordModal: React.FC<ModalProps> = ({ show, onClose, record }) => {
     window.print()
   }
 
-  const handleDownloadPDF = () => {
+  const handleDownloadPDF = async () => {
     const element = modalContentRef.current
     if (element) {
+      const html2pdf = await loadHtml2pdf()
       const opt = {
         margin: 1,
         filename: "medical_record.pdf",
