@@ -87,7 +87,7 @@ const Page: React.FC = () => {
     setError(null)
 
     try {
-      const response = await axios.post("https://api.caregiverhospital.com/patient/patient/login/", {
+      const response = await axios.post("https://api.caregiverhospital.com/patient/patient-login/", {
         email_address: email,
         password: password,
       })
@@ -207,7 +207,7 @@ const Page: React.FC = () => {
         </div>
       )}
       {showErrorNotification && (
-        <div className="animation-fade-in 0 absolute bottom-16  m-5 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#D14343] bg-[#FEE5E5] text-[#D14343] shadow-[#05420514] md:right-16">
+        <div className="animation-fade-in absolute bottom-16  m-5 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#D14343] bg-[#FEE5E5] text-[#D14343] shadow-[#05420514] md:right-16">
           <Image src="/check-circle-failed.svg" width={16} height={16} alt="dekalo" />
           <span className="clash-font text-sm text-[#D14343]">Login Failed</span>
         </div>
