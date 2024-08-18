@@ -1,14 +1,16 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import Image from "next/image"
 import { PiDotsThree } from "react-icons/pi"
 import { useRouter } from "next/navigation"
-import { IoEyeSharp, IoPrintOutline } from "react-icons/io5"
+import { IoEyeSharp } from "react-icons/io5"
 import PrintRecordModal from "components/Modals/PrintRecordModal"
 import { IoMdSearch } from "react-icons/io"
 import { CiDiscount1 } from "react-icons/ci"
-import styles from "../Modals/modal.module.css"
-import AddDiscountModal from "components/Modals/AddDiscountModal"
 import AddTestDiscountModal from "components/Modals/AddTestDiscountModal"
+
+import styles from "../Modals/modal.module.css"
+import AddMedicalDiscountModal from "components/Modals/AddMedicalDiscountModal"
+import { LiaTimesSolid } from "react-icons/lia"
 
 interface Appointment {
   id: number
@@ -83,11 +85,9 @@ interface Patient {
     note: string
     status: boolean
     pub_date: string
-
     doctor_name: string
     discount_value: string
   }[]
-
   lab_tests: {
     id: string
     doctor_name: string
@@ -106,8 +106,8 @@ const formatDateTime = (dateString: string) => {
     year: "numeric",
     month: "long",
     day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
+    // hour: "2-digit",
+    // minute: "2-digit",
   }
   return new Date(dateString).toLocaleDateString(undefined, options)
 }
@@ -128,23 +128,6 @@ const PatientDetailsForDoctor: React.FC<PatientDetailsProps> = ({ patient }) => 
   const [discountModalVisible, setDiscountModalVisible] = useState(false)
   const [newDiscountModalVisible, setNewDiscountModalVisible] = useState(false)
   const [selectedPrescription, setSelectedPrescription] = useState<Prescription | null>(null)
-
-  // useEffect(() => {
-  //   const fetchPatientDetails = async () => {
-  //     try {
-  //       const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${patientId}/`)
-  //       if (!response.ok) {
-  //         throw new Error("Network response was not ok")
-  //       }
-  //       const data = await response.json()
-  //       setPatientDetail(data as Patient)
-  //     } catch (error) {
-  //       console.error("Error fetching patient details:", error)
-  //     }
-  //   }
-
-  //   fetchPatientDetails()
-  // }, [])
 
   const toggleDone = () => {
     setIsDone(!isDone)
@@ -198,7 +181,7 @@ const PatientDetailsForDoctor: React.FC<PatientDetailsProps> = ({ patient }) => 
     setNewDiscountModalVisible(true)
   }
 
-  const handleSaveDiscount = async (discountValue: string) => {
+  const handleSavePrescriptionDiscount = async (discountValue: string) => {
     if (!selectedPrescription) return
 
     try {
@@ -220,8 +203,10 @@ const PatientDetailsForDoctor: React.FC<PatientDetailsProps> = ({ patient }) => 
       setPatientDetail((prevDetail) => {
         if (!prevDetail) return prevDetail
 
-        const updatedPrescriptions = prevDetail.prescriptions.map((p) =>
-          p.id === selectedPrescription.id ? { ...p, discount_value: discountValue } : p
+        const updatedPrescriptions = prevDetail.prescriptions.map((prescription) =>
+          prescription.id === selectedPrescription.id
+            ? { ...prescription, discount_value: discountValue }
+            : prescription
         )
 
         return { ...prevDetail, prescriptions: updatedPrescriptions }
@@ -305,43 +290,46 @@ const PatientDetailsForDoctor: React.FC<PatientDetailsProps> = ({ patient }) => 
           key={prescription.id}
           className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
         >
-          <div className="w-full">
+          {/* <div className="w-full">
             <p className="text-sm font-bold">{prescription.doctor_name}</p>
             <small className="text-xm ">doctor</small>
+          </div> */}
+          <div className="w-full">
+            <p className="text-sm font-bold">{formatDateTime(prescription.pub_date)}</p>
+            <small className="text-xm ">Prescription date</small>
           </div>
           <div className="w-full">
             <p className="text-sm font-bold">{prescription.name}</p>
-            <small className="text-xm ">Medication name</small>
+            <small className="text-xm ">Prescription</small>
           </div>
-          <div className="w-full max-md:hidden">
-            <p className="text-sm font-bold">{prescription.category}</p>
-            <small className="text-xm ">Category</small>
-          </div>
-          <div className="w-full max-md:hidden">
-            <p className="text-sm font-bold">{prescription.unit}</p>
-            <small className="text-xm ">Unit</small>
-          </div>
-
-          <div className="w-full max-md:hidden">
-            <p className="text-sm font-bold">{prescription.dosage}</p>
-            <small className="text-xm ">Dosage</small>
-          </div>
-          <div className="w-full max-md:hidden">
+          {/* <div className="w-full">
+            <p className="text-sm font-bold">{prescription.complain}</p>
+            <small className="text-xm ">Complain</small>
+          </div> */}
+          <div className="w-full">
             <p className="text-sm font-bold">{prescription.usage}</p>
             <small className="text-xm ">Usage</small>
           </div>
-          <div className="max-md:hidden">
-            {prescription.discount_value ? (
-              <>
-                <p className="text-sm font-bold">{prescription.discount_value}</p>
-                <small className="text-xm ">Discount</small>
-              </>
-            ) : (
-              <CiDiscount1
-                className="fon text-2xl text-[#197046]"
-                onClick={() => handleAddDiscountClick(prescription)}
-              />
-            )}
+          <div className="w-full">
+            <p className="text-sm font-bold">{prescription.dosage}</p>
+            <small className="text-xm ">Dosage</small>
+          </div>
+          <div className="w-full">
+            <p className="text-sm font-bold">{prescription.rate}</p>
+            <small className="text-xm ">Rate</small>
+          </div>
+          <div className="w-full ">
+            <p className="text-sm font-bold">{prescription.unit}</p>
+            <small className="text-xm ">Unit</small>
+          </div>
+          <div className="w-full ">
+            <p className="text-sm font-bold">{prescription.discount_value}</p>
+            <small className="text-xm ">Discount Value</small>
+          </div>
+          <div>
+            <button className="rounded-full p-1 text-blue-500" onClick={() => handleAddDiscountClick(prescription)}>
+              <CiDiscount1 size={20} />
+            </button>
           </div>
         </div>
       ))}
@@ -352,48 +340,37 @@ const PatientDetailsForDoctor: React.FC<PatientDetailsProps> = ({ patient }) => 
     <div className="flex flex-col gap-2">
       {filteredMedicalRecords.map((medical) => (
         <div key={medical.id} className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2">
-          <div className="w-full max-md:hidden">
-            <p className="text-sm font-bold">{formatDateTime(medical.pub_date)}</p>
-            <small className="text-xm ">Date and Time</small>
-          </div>
-          {/* <div className="">
-            <p className="text-sm font-bold">{medical.test_type}</p>
-            <small className="text-xm ">Test Type</small>
-          </div> */}
-          <div className="flex w-full items-center gap-2 text-sm font-bold max-md:hidden">
-            <span>
-              {/* <Image src={medical.doctor_image} height={40} width={40} alt="" /> */}
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46ffa6]">
-                <p className="capitalize text-[#000000]">{medical.doctor_name.charAt(0)}</p>
-              </div>
-            </span>
+          <div className="flex w-full items-center gap-1 text-sm font-bold">
             <div>
-              <p>{medical.doctor_name}</p>
-              <small className="text-xm ">Doctor Name</small>
+              <p>{medical.test_type}</p>
+              <small className="text-xm ">Test Type</small>
             </div>
           </div>
-          <div className="w-full max-md:hidden">
-            <p className="text-sm font-bold">{medical.test_type}</p>
-            <small className="text-xm ">Test</small>
+          <div className="flex w-full items-center gap-1 text-sm font-bold">
+            <div>
+              <p>{medical.result}</p>
+              <small className="text-xm ">Result</small>
+            </div>
           </div>
-
-          <div className="w-full max-md:hidden">
-            {medical.discount_value ? (
-              <>
-                <p className="text-sm font-bold">{medical.discount_value}</p>
-                <small className="text-xm ">Discount</small>
-              </>
-            ) : (
-              <CiDiscount1 className="text-2xl text-[#197046]" onClick={() => handleAddMedicalDiscountClick(medical)} />
-            )}
+          <div className="flex w-full items-center gap-1 text-sm font-bold">
+            <div>
+              <p>{medical.status_note}</p>
+              <small className="text-xm ">Status</small>
+            </div>
           </div>
-          <div className="flex gap-2">
+          <div className="md:flex md:w-full md:flex-col md:items-center">
+            <p className="rounded bg-[#46FFA6] px-2 py-[2px] text-center text-xs font-bold text-black">
+              {medical.discount_value ? `Discount: ${medical.discount_value}` : "No Discount"}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
             <button
-              className="flex w-28 items-center justify-center gap-1 rounded bg-[#349DFB] px-2 py-2 text-xs text-[#000000]"
-              onClick={() => handleViewClick(medical)}
+              className="flex items-center justify-center    text-blue-500"
+              onClick={() => handleAddMedicalDiscountClick(medical)}
             >
-              <IoEyeSharp /> View
+              <CiDiscount1 size={20} />
             </button>
+            <IoEyeSharp size={20} onClick={() => handleViewClick(medical)} />
           </div>
         </div>
       ))}
@@ -404,19 +381,19 @@ const PatientDetailsForDoctor: React.FC<PatientDetailsProps> = ({ patient }) => 
     <div className="flex flex-col">
       <div className="tab-bg mb-4 flex items-center gap-3 rounded-lg p-1 md:w-[350px] md:border">
         <button
-          className={`${activeTab === "appointments" ? "active-tab" : "inactive-tab"}`}
+          className={activeTab === "appointments" ? "active-tab" : "inactive-tab"}
           onClick={() => setActiveTab("appointments")}
         >
           Appointments
         </button>
         <button
-          className={`${activeTab === "prescriptions" ? "active-tab" : "inactive-tab"}`}
+          className={activeTab === "prescriptions" ? "active-tab" : "inactive-tab"}
           onClick={() => setActiveTab("prescriptions")}
         >
           Prescriptions
         </button>
         <button
-          className={`${activeTab === "medicals" ? "active-tab" : "inactive-tab"}`}
+          className={activeTab === "medicals" ? "active-tab" : "inactive-tab"}
           onClick={() => setActiveTab("medicals")}
         >
           Medical Records
@@ -443,13 +420,22 @@ const PatientDetailsForDoctor: React.FC<PatientDetailsProps> = ({ patient }) => 
       {activeTab === "medicals" && renderMedicalRecord()}
 
       <PrintRecordModal show={modalVisible} onClose={() => setModalVisible(false)} record={selectedRecord} />
+
+      <AddTestDiscountModal
+        show={newDiscountModalVisible}
+        onClose={() => setNewDiscountModalVisible(false)}
+        onSave={handleSaveRecordDiscount}
+        record={selectedRecord}
+      />
+
       <AddDiscountModal
         show={discountModalVisible}
         onClose={() => setDiscountModalVisible(false)}
-        onSave={handleSaveDiscount}
+        onSave={handleSavePrescriptionDiscount}
         prescription={selectedPrescription}
       />
-      <AddTestDiscountModal
+
+      <AddMedicalDiscountModal
         show={newDiscountModalVisible}
         onClose={() => setNewDiscountModalVisible(false)}
         onSave={handleSaveRecordDiscount}
@@ -460,3 +446,54 @@ const PatientDetailsForDoctor: React.FC<PatientDetailsProps> = ({ patient }) => 
 }
 
 export default PatientDetailsForDoctor
+
+interface AddPrescriptionDiscountModalProps {
+  show: boolean
+  onClose: () => void
+  onSave: (discountValue: string) => void
+  prescription: Prescription | null
+}
+
+const AddDiscountModal: React.FC<AddPrescriptionDiscountModalProps> = ({ show, onClose, onSave, prescription }) => {
+  const [discountValue, setDiscountValue] = useState<string>("")
+
+  const handleSave = () => {
+    onSave(discountValue)
+    setDiscountValue("")
+  }
+
+  if (!show) return null
+
+  return (
+    <div className={styles.modalOverlay}>
+      <div className={styles.modalContent}>
+        <div className="px-6 py-6">
+          <div className="flex items-center justify-between">
+            <h6 className="text-lg font-medium">Apply Discount</h6>
+            <div className="hover:rounded-md hover:border">
+              <LiaTimesSolid className="m-1 cursor-pointer" onClick={onClose} />
+            </div>
+          </div>
+          <div className="my-4">
+            <div className="search-bg mt-1 flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 text-xs hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+              <input
+                type="text"
+                value={discountValue}
+                onChange={(e) => setDiscountValue(e.target.value)}
+                placeholder="Enter discount value"
+                className="h-[45px] w-full bg-transparent outline-none focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <button
+            className="button-primary h-[50px] w-full rounded-sm text-[#FFFFFF] max-sm:h-[45px]"
+            onClick={handleSave}
+          >
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}

@@ -1,5 +1,5 @@
 "use client"
-import React, { ChangeEvent, FormEvent, useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import styles from "./modal.module.css"
 import { LiaTimesSolid } from "react-icons/lia"
 import axios from "axios"
@@ -19,7 +19,6 @@ interface Prescription {
   note: string
   status: boolean
   pub_date: string
-
   doctor_name: string
   discount_value: string
 }
@@ -43,14 +42,24 @@ const AddDiscountModal = ({
     }
   }, [prescription])
 
-  const handleSave = () => {
-    onSave(discountValue)
+  const handleSave = async () => {
+    try {
+      // Assuming you have an API endpoint to update the discount
+      await axios.post(`https://api.caregiverhospital.com/prescription/add-discount-to/${prescription?.id}/`, {
+        discount_value: discountValue,
+      })
+      onSave(discountValue)
+      onClose() // Close the modal after saving
+    } catch (error) {
+      console.error("Failed to update discount:", error)
+      // Handle error (e.g., display a notification to the user)
+    }
   }
 
   if (!show || !prescription) return null
 
   return (
-    <div className={styles.modalOverlay} data-aos="fade-up" data-aos-duration="1000" data-aos-delay="500">
+    <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>
         <div className="px-6 py-6">
           <div className="flex items-center justify-between">
