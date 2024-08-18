@@ -376,19 +376,21 @@ export default function PatientDetailPage() {
         patientId={patientDetail.id}
       />
 
-      {/* <AdmissionModal
+      <AdmissionModal
         isOpen={isAdmissionOpen}
         onClose={closeAdmissionModal}
         onSubmitSuccess={handleHmoSubmissionSuccess}
-        patientId={patientId}
-      /> */}
+        patientId={patientDetail.id}
+        patientDetail={patientDetail}
+      />
 
-      {/* <AppointmentModal
+      <AppointmentModal
         isOpen={isAppointmentOpen}
         onClose={closeAppointmentModal}
         onSubmitSuccess={handleHmoSubmissionSuccess}
-        patientId={patientId}
-      /> */}
+        patientDetail={patientDetail}
+        patientId={patientDetail.id}
+      />
 
       {showSuccessNotification && (
         <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
