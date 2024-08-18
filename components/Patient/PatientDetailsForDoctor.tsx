@@ -29,6 +29,9 @@ interface Prescription {
   rate: string
   usage: string
   discount_value: string
+  note: string
+  status: boolean
+  pub_date: string
 }
 
 interface MedicalRecord {
@@ -43,12 +46,59 @@ interface MedicalRecord {
   discount_value: string
 }
 
-interface PatientDetail {
+interface Patient {
   id: string
   name: string
-  appointments: Appointment[]
-  prescriptions: Prescription[]
-  lab_tests: MedicalRecord[]
+  heart_rate?: string
+  body_temperature?: string
+  glucose_level?: string
+  blood_pressure?: string
+  address: string
+  phone_no: string
+  dob: string
+  blood_group?: string
+  hmo: {
+    id: string
+    name: string
+    category: string
+    description: string
+    status: boolean
+    pub_date: string
+  }
+  policy_id?: string
+  allergies?: string
+  nok_name: string
+  nok_phone_no: string
+  appointments: { id: number; doctor: string; pub_date: string; detail: string }[]
+  prescriptions: {
+    id: string
+    category: string
+    name: string
+    complain: string
+    code: string
+    unit: string
+    dosage: string
+    rate: string
+    usage: string
+    note: string
+    status: boolean
+    pub_date: string
+
+    doctor_name: string
+    discount_value: string
+  }[]
+
+  lab_tests: {
+    id: string
+    doctor_name: string
+    doctor_request_title: string
+    doctor_request_description: string
+    test_type: string
+    result: string
+    pub_date: string
+    status_note: string
+    discount_value: string
+  }[]
 }
 
 const formatDateTime = (dateString: string) => {
@@ -62,35 +112,39 @@ const formatDateTime = (dateString: string) => {
   return new Date(dateString).toLocaleDateString(undefined, options)
 }
 
-export default function PatientDetailsForDoctor({ params }: { params: { patientId: any } }) {
+interface PatientDetailsProps {
+  patient: Patient
+}
+
+const PatientDetailsForDoctor: React.FC<PatientDetailsProps> = ({ patient }) => {
   const router = useRouter()
   const [isDone, setIsDone] = useState<boolean>(false)
   const [activeTab, setActiveTab] = useState("appointments")
-  const { patientId } = params
+
   const [searchQuery, setSearchQuery] = useState<string>("")
   const [modalVisible, setModalVisible] = useState(false)
   const [selectedRecord, setSelectedRecord] = useState<MedicalRecord | null>(null)
-  const [patientDetail, setPatientDetail] = useState<PatientDetail | null>(null)
+  const [patientDetail, setPatientDetail] = useState<Patient | null>(null)
   const [discountModalVisible, setDiscountModalVisible] = useState(false)
   const [newDiscountModalVisible, setNewDiscountModalVisible] = useState(false)
   const [selectedPrescription, setSelectedPrescription] = useState<Prescription | null>(null)
 
-  useEffect(() => {
-    const fetchPatientDetails = async () => {
-      try {
-        const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${patientId}/`)
-        if (!response.ok) {
-          throw new Error("Network response was not ok")
-        }
-        const data = await response.json()
-        setPatientDetail(data as PatientDetail)
-      } catch (error) {
-        console.error("Error fetching patient details:", error)
-      }
-    }
+  // useEffect(() => {
+  //   const fetchPatientDetails = async () => {
+  //     try {
+  //       const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${patientId}/`)
+  //       if (!response.ok) {
+  //         throw new Error("Network response was not ok")
+  //       }
+  //       const data = await response.json()
+  //       setPatientDetail(data as Patient)
+  //     } catch (error) {
+  //       console.error("Error fetching patient details:", error)
+  //     }
+  //   }
 
-    fetchPatientDetails()
-  }, [patientId])
+  //   fetchPatientDetails()
+  // }, [])
 
   const toggleDone = () => {
     setIsDone(!isDone)
@@ -100,7 +154,7 @@ export default function PatientDetailsForDoctor({ params }: { params: { patientI
     router.back()
   }
 
-  if (!patientDetail) {
+  if (!patient) {
     return (
       <div className="loading-text flex h-full items-center justify-center">
         {"loading...".split("").map((letter, index) => (
@@ -112,15 +166,15 @@ export default function PatientDetailsForDoctor({ params }: { params: { patientI
     )
   }
 
-  const filteredList = patientDetail.appointments.filter((appointment) =>
+  const filteredList = patient.appointments.filter((appointment) =>
     appointment.doctor.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  const filteredPrescription = patientDetail.prescriptions.filter((prescription) =>
+  const filteredPrescription = patient.prescriptions.filter((prescription) =>
     prescription.name.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
-  const filteredMedicalRecords = patientDetail.lab_tests.filter((medical) =>
+  const filteredMedicalRecords = patient.lab_tests.filter((medical) =>
     medical.test_type.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
@@ -129,7 +183,7 @@ export default function PatientDetailsForDoctor({ params }: { params: { patientI
   }
 
   const handleViewClick = (record: MedicalRecord) => {
-    const recordWithPatientName = { ...record, patient_name: patientDetail?.name }
+    const recordWithPatientName = { ...record, patient_name: patient?.name }
     setSelectedRecord(recordWithPatientName)
     setModalVisible(true)
   }
@@ -404,3 +458,5 @@ export default function PatientDetailsForDoctor({ params }: { params: { patientI
     </div>
   )
 }
+
+export default PatientDetailsForDoctor

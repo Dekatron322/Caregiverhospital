@@ -38,20 +38,22 @@ interface Patient {
   allergies?: string
   nok_name: string
   nok_phone_no: string
-  appointments: { id: number; doctor: string; pub_date: string }[]
+  appointments: { id: number; doctor: string; pub_date: string; detail: string }[]
   prescriptions: {
     id: string
     category: string
     name: string
     complain: string
     code: string
-    unit: number
-    dosage: number
+    unit: string
+    dosage: string
     rate: string
     usage: string
     note: string
     status: boolean
     pub_date: string
+
+    doctor_name: string
     discount_value: string
   }[]
   medicals: {
@@ -61,15 +63,18 @@ interface Patient {
     test: string
     result: string
     pub_date: string
+    discount_value: string
   }[]
   lab_tests: {
     id: string
     doctor_name: string
     doctor_request_title: string
     doctor_request_description: string
-    test: string
+    test_type: string
     result: string
     pub_date: string
+    status_note: string
+    discount_value: string
   }[]
   notes: [
     {
@@ -305,7 +310,7 @@ export default function PatientDetailPage() {
                       </div>
                     </div>
                     <div className="w-3/4">
-                      {/* <PatientDetailsForDoctor patientId={{ patientId }} />  */}
+                      <PatientDetailsForDoctor patient={patient} />
 
                       {/* Notes Section */}
                       <div className="notes-section mb-4 mt-10 rounded border p-4">

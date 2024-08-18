@@ -8,7 +8,6 @@ import "aos/dist/aos.css"
 
 interface Prescription {
   id: string
-  doctor_name: string
   category: string
   name: string
   complain: string
@@ -17,6 +16,11 @@ interface Prescription {
   dosage: string
   rate: string
   usage: string
+  note: string
+  status: boolean
+  pub_date: string
+
+  doctor_name: string
   discount_value: string
 }
 
