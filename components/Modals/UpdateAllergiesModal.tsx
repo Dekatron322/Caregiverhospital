@@ -32,6 +32,7 @@ interface PatientData {
   glucose_level: string
   blood_pressure: string
   status: boolean
+  discount_value: string
   pub_date: string
   hmo: {
     id: string
@@ -80,21 +81,36 @@ const UpdateAllergiesModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onS
     event.preventDefault()
     setLoading(true)
     try {
+      // Fetch the current patient data
       const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${patientId}/`)
+      if (!response.ok) {
+        throw new Error("Failed to fetch patient data")
+      }
       const patientData = (await response.json()) as PatientData
 
+      // Ensure the hmo field only includes the ID
+      const updatedHmo = patientData.hmo?.id
+
+      // Create an object with all current fields, updating only the allergies field
       const updatedData = {
         ...patientData,
-        allergies,
-        hmo: patientData.hmo.id,
+        hmo: updatedHmo, // Only send the ID for hmo
+        allergies, // Update the allergies field
+        // Ensure other fields like heart_rate, body_temperature, etc. are not blank
+        heart_rate: patientData.heart_rate || "0",
+        body_temperature: patientData.body_temperature || "0",
+        glucose_level: patientData.glucose_level || "0",
+        blood_pressure: patientData.blood_pressure || "0",
+        discount_value: patientData.discount_value || "0",
       }
 
+      // Send the update request with the full data object
       const updateResponse = await fetch(`https://api.caregiverhospital.com/patient/patient/${patientId}/`, {
-        method: "PUT",
+        method: "PUT", // Using PUT method
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(updatedData),
+        body: JSON.stringify(updatedData), // Send the entire data object
       })
 
       if (updateResponse.ok) {
