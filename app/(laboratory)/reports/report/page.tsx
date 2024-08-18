@@ -91,14 +91,17 @@ export default function PatientDetailPage() {
   }, [])
 
   useEffect(() => {
-    if (patientId) {
-      fetchPatientDetails(patientId)
-    }
-  }, [patientId])
+    fetchPatientDetails()
+  }, [])
 
-  const fetchPatientDetails = async (id: string) => {
+  const fetchPatientDetails = async () => {
     try {
-      const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${id}/`)
+      const patientId = localStorage.getItem("selectedPatientId")
+      if (!patientId) {
+        console.error("No admission ID found in localStorage.")
+        return
+      }
+      const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${patientId}/`)
       if (!response.ok) {
         throw new Error("Failed to fetch patient details")
       }

@@ -25,7 +25,8 @@ const LabResults = () => {
   const [isLoading, setIsLoading] = useState(true)
 
   const handlePatientClick = (patientId: any) => {
-    router.push(`/reports/report/${patientId}`)
+    localStorage.setItem("selectedPatientId", patientId)
+    router.push(`/reports/report`)
   }
 
   useEffect(() => {
