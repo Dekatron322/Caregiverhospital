@@ -78,13 +78,13 @@ export default function Staff() {
 
   const fetchDepartments = async () => {
     try {
-      const departmentResponse = await fetch("https://api.caregiverhospital.com/department/department/")
+      const departmentResponse = await fetch("https://api2.caregiverhospital.com/department/department/")
       if (!departmentResponse.ok) {
         throw new Error("Failed to fetch departments")
       }
       const departmentsData = (await departmentResponse.json()) as Department[]
 
-      const userResponse = await fetch("https://api.caregiverhospital.com/app_user/all/")
+      const userResponse = await fetch("https://api2.caregiverhospital.com/app_user/all/")
       if (!userResponse.ok) {
         throw new Error("Failed to fetch users")
       }

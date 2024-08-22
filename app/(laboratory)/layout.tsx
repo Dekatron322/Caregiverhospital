@@ -2,13 +2,13 @@ import LaboratorySideBar from "components/Sidebar/LaboratorySidebar"
 import { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Laboratory Dashboard | Caregivers Hospital",
+  title: "Laboratory Dashboard | CityMed Hospital",
   description: "We are a family with a major focus in both primary and secondary healthcare service.",
   twitter: {
     card: "summary_large_image",
   },
   openGraph: {
-    url: "https://app.caregiverhospital.com/",
+    url: "https://citymed.com/",
     images: [
       {
         width: 1200,

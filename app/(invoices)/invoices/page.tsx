@@ -54,7 +54,7 @@ export default function InvoicesPage({ params }: HmoDetailPageProps) {
           console.error("No admission ID found in localStorage.")
           return
         }
-        const response = await fetch(`https://api.caregiverhospital.com/hmo/hmo/${hmoId}/`)
+        const response = await fetch(`https://api2.caregiverhospital.com/hmo/hmo/${hmoId}/`)
         if (!response.ok) {
           throw new Error("Network response was not ok")
         }

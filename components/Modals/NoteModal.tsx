@@ -42,7 +42,7 @@ const NoteModal: React.FC<ModalProps> = ({ results, onClose, userId }) => {
     }
 
     try {
-      const response = await fetch(`https://api.caregiverhospital.com/patient/add-note-to-patient/${results.id}/`, {
+      const response = await fetch(`https://api2.caregiverhospital.com/patient/add-note-to-patient/${results.id}/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

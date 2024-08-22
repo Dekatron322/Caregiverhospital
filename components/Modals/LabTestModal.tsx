@@ -90,7 +90,7 @@ const LabTestModal: React.FC<ModalProps> = ({ results, onClose, userId }) => {
       const userId = localStorage.getItem("id")
       if (userId) {
         const response = await axios.get<UserDetails>(
-          `https://api.caregiverhospital.com/app_user/get-user-detail/${userId}/`
+          `https://api2.caregiverhospital.com/app_user/get-user-detail/${userId}/`
         )
         if (response.data) {
           setUserDetails(response.data)
@@ -110,7 +110,7 @@ const LabTestModal: React.FC<ModalProps> = ({ results, onClose, userId }) => {
 
   const fetchDiagnosis = async () => {
     try {
-      const response = await fetch(`https://api.caregiverhospital.com/diagnosis/diagnosis/`)
+      const response = await fetch(`https://api2.caregiverhospital.com/diagnosis/diagnosis/`)
       if (!response.ok) {
         throw new Error("Failed to fetch diagnosis")
       }
@@ -144,13 +144,16 @@ const LabTestModal: React.FC<ModalProps> = ({ results, onClose, userId }) => {
     try {
       console.log("Prescription data being sent:", prescriptionData)
 
-      const response = await fetch(`https://api.caregiverhospital.com/patient/add-lab-test-to-patient/${results.id}/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(prescriptionData),
-      })
+      const response = await fetch(
+        `https://api2.caregiverhospital.com/patient/add-lab-test-to-patient/${results.id}/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(prescriptionData),
+        }
+      )
 
       if (!response.ok) {
         const responseBody = await response.json()

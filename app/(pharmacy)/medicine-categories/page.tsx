@@ -51,7 +51,7 @@ export default function MedicineCategories() {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch("https://api.caregiverhospital.com/medicine-category/medicine-category/")
+      const response = await fetch("https://api2.caregiverhospital.com/medicine-category/medicine-category/")
       if (!response.ok) {
         throw new Error("Failed to fetch categories")
       }

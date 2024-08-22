@@ -102,7 +102,7 @@ export default function MedicineExpiring({ params }: MedicineExpiringProps) {
 
   const fetchMedicines = async () => {
     try {
-      const response = await fetch("https://api.caregiverhospital.com/medicine/medicine")
+      const response = await fetch("https://api2.caregiverhospital.com/medicine/medicine")
       const data = (await response.json()) as Medicine[]
       const today = new Date()
       const filteredData = data.filter((medicine) => {
@@ -118,7 +118,7 @@ export default function MedicineExpiring({ params }: MedicineExpiringProps) {
   // Fetch categories from the API
   const fetchCategories = async () => {
     try {
-      const response = await fetch("https://api.caregiverhospital.com/medicine-category/medicine-category/")
+      const response = await fetch("https://api2.caregiverhospital.com/medicine-category/medicine-category/")
       const data = (await response.json()) as Category[]
       setCategories(data)
     } catch (error) {

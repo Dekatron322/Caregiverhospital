@@ -102,16 +102,19 @@ const AdmissionModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitS
     event.preventDefault()
     setLoading(true)
     try {
-      const response = await fetch(`https://api.caregiverhospital.com/patient/add-check-app-to-patient/${patientId}/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ward,
-          reason,
-        }),
-      })
+      const response = await fetch(
+        `https://api2.caregiverhospital.com/patient/add-check-app-to-patient/${patientId}/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ward,
+            reason,
+          }),
+        }
+      )
 
       if (response.ok) {
         onSubmitSuccess()

@@ -17,7 +17,7 @@ interface HmoCategory {
 }
 
 export const fetchHmos = async (): Promise<HmoCategory[]> => {
-  const response = await fetch("https://api.caregiverhospital.com/hmo-category/hmo-category/")
+  const response = await fetch("https://api2.caregiverhospital.com/hmo-category/hmo-category/")
   if (!response.ok) {
     throw new Error("Failed to fetch data")
   }

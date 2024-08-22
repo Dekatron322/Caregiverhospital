@@ -151,13 +151,13 @@ const IssueRequestModal: React.FC<PrescriptionModalProps> = ({
       console.log("Payload:", payload) // Log the payload to verify its structure
 
       const response = await axios.post(
-        `https://api.caregiverhospital.com/patient/add-billing-to-patient/${patient.id}/`,
+        `https://api2.caregiverhospital.com/patient/add-billing-to-patient/${patient.id}/`,
         payload
       )
       console.log("Response data:", response.data)
 
       // Update the issue_status of the prescription
-      await axios.put(`https://api.caregiverhospital.com/prescription/prescription/${prescription.id}/`, {
+      await axios.put(`https://api2.caregiverhospital.com/prescription/prescription/${prescription.id}/`, {
         issue_status: true,
       })
 

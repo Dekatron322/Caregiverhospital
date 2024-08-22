@@ -82,7 +82,7 @@ export default function Patients() {
   const confirmDelete = async () => {
     if (patientToDelete) {
       try {
-        const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${patientToDelete.id}/`, {
+        const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${patientToDelete.id}/`, {
           method: "DELETE",
         })
         if (!response.ok) {
@@ -100,7 +100,7 @@ export default function Patients() {
 
   const fetchPatients = async () => {
     try {
-      const response = await fetch("https://api.caregiverhospital.com/patient/patient/")
+      const response = await fetch("https://api2.caregiverhospital.com/patient/patient/")
       if (!response.ok) {
         throw new Error("Failed to fetch patients")
       }
@@ -124,7 +124,7 @@ export default function Patients() {
 
   const fetchPatientDetails = async (patientId: string) => {
     try {
-      const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${patientId}/`)
+      const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${patientId}/`)
       if (!response.ok) {
         throw new Error("Failed to fetch patient details")
       }
@@ -234,14 +234,14 @@ export default function Patients() {
                     <div className="flex items-center gap-1 text-sm font-bold md:w-[20%]">
                       {/* {patient.image ? (
                         <img
-                          src={`https://api.caregiverhospital.com${patient.image}`}
+                          src={`https://api2.caregiverhospital.com${patient.image}`}
                           alt={patient.name}
                           width={32}
                           height={32}
                           className="rounded-full"
                         />
                       ) : ( */}
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46ffa6] max-sm:hidden">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#50c9f4] max-sm:hidden">
                         <p className="capitalize text-[#000000]">{patient.name.charAt(0)}</p>
                       </div>
                       {/* )} */}
@@ -269,7 +269,7 @@ export default function Patients() {
                     </div>
                     <div className="w-full max-md:hidden">
                       {patient.hmo.status ? (
-                        <p className="w-[100px] rounded bg-[#46FFA6] px-2 py-[2px] text-center text-xs text-[#000000]">
+                        <p className="w-[100px] rounded bg-[#50c9f4] px-2 py-[2px] text-center text-xs text-[#000000]">
                           Active
                         </p>
                       ) : (
@@ -279,7 +279,7 @@ export default function Patients() {
                       )}
                     </div>
                     <div className="flex gap-2">
-                      <RemoveRedEyeIcon className="text-[#46FFA6]" onClick={() => handlePatientClick(patient.id)} />
+                      <RemoveRedEyeIcon className="text-[#50c9f4]" onClick={() => handlePatientClick(patient.id)} />
                       {/* <BorderColorOutlinedIcon />
                       <DeleteForeverIcon className="text-[#F2B8B5]" onClick={() => openModal(patient)} /> */}
                     </div>

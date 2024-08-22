@@ -45,7 +45,7 @@ const AddDiscountModal = ({
   const handleSave = async () => {
     try {
       // Assuming you have an API endpoint to update the discount
-      await axios.post(`https://api.caregiverhospital.com/prescription/add-discount-to/${prescription?.id}/`, {
+      await axios.post(`https://api2.caregiverhospital.com/prescription/add-discount-to/${prescription?.id}/`, {
         discount_value: discountValue,
       })
       onSave(discountValue)

@@ -117,7 +117,7 @@ const Page: React.FC = () => {
     setError(null)
 
     try {
-      const response = await axios.post("https://api.caregiverhospital.com/app_user/sign-in/", {
+      const response = await axios.post("https://api2.caregiverhospital.com/app_user/sign-in/", {
         username: username,
         password: password,
         department: searchTerm,
@@ -267,7 +267,7 @@ const Page: React.FC = () => {
             </div>
             <div className="flex justify-center gap-1">
               <p>you&apos;re a patient? </p>
-              <Link href="/signin/patient" className="text-[#46FFA6]">
+              <Link href="/signin/patient" className="text-[#50c9f4]">
                 Login as Patient
               </Link>
             </div>

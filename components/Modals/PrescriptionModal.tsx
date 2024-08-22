@@ -94,7 +94,7 @@ const PrescriptionModal: React.FC<ModalProps> = ({ results, onClose, userId }) =
       const userId = localStorage.getItem("id")
       if (userId) {
         const response = await axios.get<UserDetails>(
-          `https://api.caregiverhospital.com/app_user/get-user-detail/${userId}/`
+          `https://api2.caregiverhospital.com/app_user/get-user-detail/${userId}/`
         )
         if (response.data) {
           setUserDetails(response.data)
@@ -114,7 +114,7 @@ const PrescriptionModal: React.FC<ModalProps> = ({ results, onClose, userId }) =
 
   const fetchProcedure = async () => {
     try {
-      const response = await fetch(`https://api.caregiverhospital.com/procedure/procedure/`)
+      const response = await fetch(`https://api2.caregiverhospital.com/procedure/procedure/`)
       if (!response.ok) {
         throw new Error("Failed to fetch procedure")
       }
@@ -128,7 +128,7 @@ const PrescriptionModal: React.FC<ModalProps> = ({ results, onClose, userId }) =
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch(`https://api.caregiverhospital.com/medicine-category/medicine-category/`)
+        const response = await fetch(`https://api2.caregiverhospital.com/medicine-category/medicine-category/`)
         if (!response.ok) {
           throw new Error("Failed to fetch medicine categories")
         }
@@ -182,7 +182,7 @@ const PrescriptionModal: React.FC<ModalProps> = ({ results, onClose, userId }) =
       console.log("Prescription data being sent:", prescriptionData)
 
       const response = await fetch(
-        `https://api.caregiverhospital.com/patient/add-prescription-to-patient/${results.id}/`,
+        `https://api2.caregiverhospital.com/patient/add-prescription-to-patient/${results.id}/`,
         {
           method: "POST",
           headers: {

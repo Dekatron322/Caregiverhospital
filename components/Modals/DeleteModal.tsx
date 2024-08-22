@@ -18,7 +18,7 @@ const DeleteModal: React.FC<DeleteModalProps> = ({ isOpen, onClose, onSubmitSucc
     if (!hmoId) return
     setIsLoading(true)
     try {
-      const response = await fetch(`https://api.caregiverhospital.com/hmo/hmo/${hmoId}/`, {
+      const response = await fetch(`https://api2.caregiverhospital.com/hmo/hmo/${hmoId}/`, {
         method: "DELETE",
       })
       if (!response.ok) {

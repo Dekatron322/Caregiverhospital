@@ -111,7 +111,7 @@ const AppointmentModal: React.FC<ReviewModalProps> = ({
 
   const fetchDoctors = async () => {
     try {
-      const response = await fetch("https://api.caregiverhospital.com/app_user/all/")
+      const response = await fetch("https://api2.caregiverhospital.com/app_user/all/")
       const data = (await response.json()) as any[]
       const filteredDoctors = data
         .filter((user: any) => user.account_type === "Doctors")
@@ -132,7 +132,7 @@ const AppointmentModal: React.FC<ReviewModalProps> = ({
     setLoading(true)
     try {
       const response = await fetch(
-        `https://api.caregiverhospital.com/patient/add-appointment-to-patient/${patientId}/`,
+        `https://api2.caregiverhospital.com/patient/add-appointment-to-patient/${patientId}/`,
         {
           method: "POST",
           headers: {

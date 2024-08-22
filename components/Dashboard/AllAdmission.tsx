@@ -41,7 +41,7 @@ const AllAdmission: React.FC = () => {
   useEffect(() => {
     const fetchAdmissions = async () => {
       try {
-        const response = await fetch("https://api.caregiverhospital.com/patient/patient/")
+        const response = await fetch("https://api2.caregiverhospital.com/patient/patient/")
         if (!response.ok) {
           throw new Error("Network response was not ok")
         }

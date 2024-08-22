@@ -62,7 +62,7 @@ export default function Dashboard() {
 
   const fetchDepartments = async () => {
     try {
-      const response = await fetch("https://api.caregiverhospital.com/department/department/")
+      const response = await fetch("https://api2.caregiverhospital.com/department/department/")
       if (!response.ok) {
         throw new Error("Failed to fetch departments")
       }

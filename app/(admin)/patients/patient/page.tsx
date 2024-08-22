@@ -82,7 +82,7 @@ export default function PatientDetailPage() {
       }
 
       try {
-        const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${patientId}/`)
+        const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${patientId}/`)
         if (!response.ok) {
           const errorDetails = await response.text()
           throw new Error(`Network response was not ok: ${errorDetails}`)
@@ -132,7 +132,7 @@ export default function PatientDetailPage() {
     }
 
     try {
-      const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${patientId}/`)
+      const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${patientId}/`)
       if (!response.ok) {
         throw new Error("Network response was not ok")
       }
@@ -215,7 +215,7 @@ export default function PatientDetailPage() {
                     <div className="md:w-1/4">
                       <div className="flex flex-col justify-center rounded-md border px-4 py-8">
                         <div className="flex items-center justify-center">
-                          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#46ffa6]">
+                          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#50c9f4]">
                             <p className="capitalize text-[#000000]">{patientDetail.name.charAt(0)}</p>
                           </div>
                           {/* <Image src="/default_patient_image.png" height={60} width={60} alt="Patient Image" /> */}

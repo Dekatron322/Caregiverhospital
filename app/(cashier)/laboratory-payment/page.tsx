@@ -25,7 +25,7 @@ export default function PharmacyDashboard() {
   const [notApprovedTests, setNotApprovedTests] = useState(0)
 
   useEffect(() => {
-    fetch("https://api.caregiverhospital.com/lab-test/lab-test/")
+    fetch("https://api2.caregiverhospital.com/lab-test/lab-test/")
       .then((response) => response.json())
       .then((data: unknown) => {
         const labTests = data as LabTest[]

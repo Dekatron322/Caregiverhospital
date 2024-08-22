@@ -32,7 +32,7 @@ const LabResults = () => {
   useEffect(() => {
     const fetchLabTestResults = async () => {
       try {
-        const response = await axios.get("https://api.caregiverhospital.com/patient/patient/")
+        const response = await axios.get("https://api2.caregiverhospital.com/patient/patient/")
         const results = response.data.flatMap((patient: any) =>
           patient.lab_tests
             .filter((test: any) => test.status_note.toLowerCase() === "approved") // Filter for approved tests

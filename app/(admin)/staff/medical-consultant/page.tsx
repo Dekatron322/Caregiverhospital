@@ -49,7 +49,7 @@ export default function Dashboard() {
                   <div>
                     <Link
                       href="/staff/add-staff"
-                      className="flex content-center items-center gap-1 rounded-md bg-[#087A43] px-2 py-2 text-[#ffffff]"
+                      className="flex content-center items-center gap-1 rounded-md bg-[#076fc6] px-2 py-2 text-[#ffffff]"
                     >
                       <p className="text-[12px]">Add Doctor</p>
                       <GoPlus />

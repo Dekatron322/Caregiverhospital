@@ -62,7 +62,7 @@ export default function HmoDetailPage() {
         return
       }
 
-      const response = await fetch(`https://api.caregiverhospital.com/hmo-category/hmo_category/${hmoId}/`)
+      const response = await fetch(`https://api2.caregiverhospital.com/hmo-category/hmo_category/${hmoId}/`)
       if (!response.ok) {
         throw new Error("Network response was not ok")
       }
@@ -214,7 +214,7 @@ export default function HmoDetailPage() {
                               {item.status ? (
                                 <p
                                   onClick={() => openUpdateModal(item)}
-                                  className="h-6 justify-center rounded bg-[#46FFA6] p-1 text-xs text-[#000000]"
+                                  className="h-6 justify-center rounded bg-[#50c9f4] p-1 text-xs text-[#000000]"
                                 >
                                   Active
                                 </p>
@@ -255,7 +255,7 @@ export default function HmoDetailPage() {
                                   </div>
                                   <div
                                     onClick={openEditModal}
-                                    className="flex cursor-pointer content-center items-center justify-center rounded bg-[#46FFA6] text-[#000000] transition-colors duration-500 hover:bg-[#087A43] hover:text-[#ffffff] max-md:p-2 md:h-[50px] md:w-[50px]"
+                                    className="flex cursor-pointer content-center items-center justify-center rounded bg-[#50c9f4] text-[#000000] transition-colors duration-500 hover:bg-[#076fc6] hover:text-[#ffffff] max-md:p-2 md:h-[50px] md:w-[50px]"
                                   >
                                     <FaRegEdit className="" />
                                   </div>

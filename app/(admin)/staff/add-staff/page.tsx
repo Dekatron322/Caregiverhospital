@@ -81,7 +81,7 @@ const Page: React.FC = () => {
     const selectedGender = genderOptions.find((gend) => gend.id === gender)
 
     try {
-      const response = await axios.post("https://api.caregiverhospital.com/app_user/sign-up/", {
+      const response = await axios.post("https://api2.caregiverhospital.com/app_user/sign-up/", {
         username,
         password,
         email,
@@ -136,7 +136,7 @@ const Page: React.FC = () => {
                   <form onSubmit={handleSubmit} className="mt-12">
                     <div className="mb-3">
                       <div className="search-bg flex h-20 w-full content-center items-center justify-center rounded border border-dotted">
-                        <RiImageAddLine className="text-[#087A43]" />
+                        <RiImageAddLine className="text-[#076fc6]" />
                       </div>
                     </div>
                     <div className="mb-3 flex gap-3">

@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "Admission Details | Caregivers Hospital",
+  title: "Admission Details | CityMed Hospital",
   description: "Account",
 }
 

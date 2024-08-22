@@ -44,7 +44,7 @@ const EditProcedureModal: React.FC<EditProcedureModalProps> = ({ isOpen, onClose
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch(`https://api.caregiverhospital.com/procedure/procedure/${formData.id}/`, {
+      const response = await fetch(`https://api2.caregiverhospital.com/procedure/procedure/${formData.id}/`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

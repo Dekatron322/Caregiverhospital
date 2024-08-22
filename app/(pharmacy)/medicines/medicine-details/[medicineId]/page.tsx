@@ -54,14 +54,14 @@ export default function MedicineDetailPage({ params }: { params: { medicineId: s
   useEffect(() => {
     const fetchMedicineDetail = async () => {
       try {
-        const response = await fetch(`https://api.caregiverhospital.com/medicine/medicine/${medicineId}`)
+        const response = await fetch(`https://api2.caregiverhospital.com/medicine/medicine/${medicineId}`)
         if (!response.ok) {
           throw new Error("Failed to fetch medicine details")
         }
         const data = (await response.json()) as Medicine
         // Fetch category name
         const categoryResponse = await fetch(
-          `https://api.caregiverhospital.com/medicine-category/medicine_category/${data.category}`
+          `https://api2.caregiverhospital.com/medicine-category/medicine_category/${data.category}`
         )
         if (!categoryResponse.ok) {
           throw new Error("Failed to fetch category details")
@@ -196,7 +196,7 @@ export default function MedicineDetailPage({ params }: { params: { medicineId: s
                 <div className="flex gap-3">
                   <div
                     onClick={openAdmissionModal}
-                    className="mt-4 flex h-[50px] w-[150px] cursor-pointer  content-center items-center justify-center gap-2 rounded bg-[#46FFA6] text-[#000000]"
+                    className="mt-4 flex h-[50px] w-[150px] cursor-pointer  content-center items-center justify-center gap-2 rounded bg-[#50c9f4] text-[#000000]"
                   >
                     <FaRegEdit />
                     <p className="text-sm">Restock Medicine</p>

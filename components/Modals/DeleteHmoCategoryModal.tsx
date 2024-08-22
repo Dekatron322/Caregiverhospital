@@ -18,7 +18,7 @@ const DeleteHmoCategoryModal: React.FC<DeleteModalProps> = ({ isOpen, onClose, o
     if (!hmoId) return
     setIsLoading(true)
     try {
-      const response = await fetch(`https://api.caregiverhospital.com/hmo-category/hmo_category/${hmoId}/`, {
+      const response = await fetch(`https://api2.caregiverhospital.com/hmo-category/hmo_category/${hmoId}/`, {
         method: "DELETE",
       })
       if (!response.ok) {

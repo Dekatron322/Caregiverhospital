@@ -52,7 +52,7 @@ export default function PharmacyDashboard() {
 
   useEffect(() => {
     axios
-      .get<Category[]>("https://api.caregiverhospital.com/medicine-category/medicine-category/")
+      .get<Category[]>("https://api2.caregiverhospital.com/medicine-category/medicine-category/")
       .then((response) => {
         setPharmacyData(response.data)
         setLoading(false)

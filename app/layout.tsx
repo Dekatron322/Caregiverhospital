@@ -9,13 +9,13 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: "Caregivers Hospital - A Beacon of Quality Healthcare!",
+  title: "CityMed Hospital - A Beacon of Quality Healthcare!",
   description: "We are a family with a major focus in both primary and secondary healthcare service.",
   twitter: {
     card: "summary_large_image",
   },
   openGraph: {
-    url: "https://app.caregiverhospital.com/",
+    url: "https://citymed.com/",
     images: [
       {
         width: 1200,

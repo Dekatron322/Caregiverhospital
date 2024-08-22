@@ -92,7 +92,7 @@ const AdministerDrugModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSu
       const userId = localStorage.getItem("id")
       if (userId) {
         const response = await axios.get<UserDetails>(
-          `https://api.caregiverhospital.com/app_user/get-user-detail/${userId}/`
+          `https://api2.caregiverhospital.com/app_user/get-user-detail/${userId}/`
         )
         if (response.data) {
           setUserDetails(response.data)
@@ -112,7 +112,7 @@ const AdministerDrugModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSu
 
   const fetchCheckAppId = async () => {
     try {
-      const response = await axios.get(`https://api.caregiverhospital.com/patient/patient/${patientId}/`)
+      const response = await axios.get(`https://api2.caregiverhospital.com/patient/patient/${patientId}/`)
       const patient = response.data
       if (patient && patient.check_apps && patient.check_apps.length > 0) {
         setCheckAppId(patient.check_apps[0].id)
@@ -127,7 +127,7 @@ const AdministerDrugModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSu
   const fetchCategoriesAndMedicines = async () => {
     try {
       const response = await axios.get<Category[]>(
-        `https://api.caregiverhospital.com/medicine-category/medicine-category/`
+        `https://api2.caregiverhospital.com/medicine-category/medicine-category/`
       )
       setCategories(response.data)
     } catch (error) {
@@ -158,7 +158,7 @@ const AdministerDrugModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSu
     if (userDetails && checkAppId) {
       try {
         const response = await axios.post(
-          `https://api.caregiverhospital.com/check-app/add-drug-to-check-app/${checkAppId}/`,
+          `https://api2.caregiverhospital.com/check-app/add-drug-to-check-app/${checkAppId}/`,
           {
             nurse_name: userDetails.username,
             category: categories.find((cat) => cat.id === category)?.name || "",

@@ -44,7 +44,7 @@ const CheckoutPatientModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onS
       const userId = localStorage.getItem("id")
       if (userId) {
         const response = await axios.get<UserDetails>(
-          `https://api.caregiverhospital.com/app_user/get-user-detail/${userId}/`
+          `https://api2.caregiverhospital.com/app_user/get-user-detail/${userId}/`
         )
         if (response.data) {
           setUserDetails(response.data)
@@ -64,7 +64,7 @@ const CheckoutPatientModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onS
 
   const fetchCheckAppId = async () => {
     try {
-      const response = await axios.get(`https://api.caregiverhospital.com/patient/patient/${patientId}/`)
+      const response = await axios.get(`https://api2.caregiverhospital.com/patient/patient/${patientId}/`)
       const patient = response.data
       if (patient && patient.check_apps && patient.check_apps.length > 0) {
         setCheckAppId(patient.check_apps[0].id)
@@ -81,7 +81,7 @@ const CheckoutPatientModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onS
     if (userDetails && checkAppId) {
       try {
         const response = await axios.put(
-          `https://api.caregiverhospital.com/check-app/check-app/${checkAppId}/`,
+          `https://api2.caregiverhospital.com/check-app/check-app/${checkAppId}/`,
           {
             checkout_date: new Date().toISOString(),
           },

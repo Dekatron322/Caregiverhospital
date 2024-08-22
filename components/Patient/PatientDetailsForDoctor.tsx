@@ -186,7 +186,7 @@ const PatientDetailsForDoctor: React.FC<PatientDetailsProps> = ({ patient }) => 
 
     try {
       const response = await fetch(
-        `https://api.caregiverhospital.com/prescription/add-discount-to/${selectedPrescription.id}/`,
+        `https://api2.caregiverhospital.com/prescription/add-discount-to/${selectedPrescription.id}/`,
         {
           method: "PUT",
           headers: {
@@ -222,13 +222,16 @@ const PatientDetailsForDoctor: React.FC<PatientDetailsProps> = ({ patient }) => 
     if (!selectedRecord) return
 
     try {
-      const response = await fetch(`https://api.caregiverhospital.com/lab-test/add-discount-to/${selectedRecord.id}/`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ discount_value: discountValue }),
-      })
+      const response = await fetch(
+        `https://api2.caregiverhospital.com/lab-test/add-discount-to/${selectedRecord.id}/`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ discount_value: discountValue }),
+        }
+      )
 
       if (!response.ok) {
         throw new Error("Network response was not ok")

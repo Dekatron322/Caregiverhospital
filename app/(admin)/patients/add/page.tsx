@@ -66,7 +66,7 @@ const Page = () => {
   useEffect(() => {
     const fetchHmos = async () => {
       try {
-        const response = await fetch("https://api.caregiverhospital.com/hmo/hmo/")
+        const response = await fetch("https://api2.caregiverhospital.com/hmo/hmo/")
         const data = await response.json()
         setHmos(data as Hmo[])
       } catch (error) {
@@ -133,7 +133,7 @@ const Page = () => {
     }
 
     try {
-      const response = await fetch("https://api.caregiverhospital.com/patient/patient/", {
+      const response = await fetch("https://api2.caregiverhospital.com/patient/patient/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -194,7 +194,7 @@ const Page = () => {
                   <div className="mt-6">
                     {/* <div className="mb-3">
                       <div className="search-bg flex h-20 w-full content-center items-center justify-center rounded border border-dotted">
-                        <RiImageAddLine className="text-[#087A43]" />
+                        <RiImageAddLine className="text-[#076fc6]" />
                       </div>
                     </div> */}
                     <div className="mb-3 grid grid-cols-3 gap-3 max-sm:grid-cols-2">

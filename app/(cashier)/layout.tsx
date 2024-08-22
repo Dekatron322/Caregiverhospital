@@ -3,13 +3,13 @@ import CashierSideBar from "components/Sidebar/CashierSideBar"
 import { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Cashier's Dashboard | Caregivers Hospital",
+  title: "Cashier's Dashboard | CityMed Hospital",
   description: "We are a family with a major focus in both primary and secondary healthcare service.",
   twitter: {
     card: "summary_large_image",
   },
   openGraph: {
-    url: "https://app.caregiverhospital.com/",
+    url: "https://citymed.com/",
     images: [
       {
         width: 1200,

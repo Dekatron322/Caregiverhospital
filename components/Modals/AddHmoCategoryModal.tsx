@@ -46,7 +46,7 @@ const AddHmoCategoryModal: React.FC<AddHmoCategoryModalProps> = ({ isOpen, onClo
     setError(null)
 
     try {
-      await axios.post("https://api.caregiverhospital.com/hmo-category/hmo-category/", {
+      await axios.post("https://api2.caregiverhospital.com/hmo-category/hmo-category/", {
         name,
         detail: description,
         status: true,

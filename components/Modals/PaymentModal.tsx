@@ -79,7 +79,7 @@ const PaymentModal: React.FC<ModalProps> = ({ results, onClose }) => {
   const fetchDiagnosisInfo = async (diagnosisName: string) => {
     try {
       const response = await axios.get(
-        `https://api.caregiverhospital.com/diagnosis/diagnosis/?name=${encodeURIComponent(diagnosisName)}`
+        `https://api2.caregiverhospital.com/diagnosis/diagnosis/?name=${encodeURIComponent(diagnosisName)}`
       )
       const data = response.data
       if (data.length > 0) {
@@ -138,7 +138,7 @@ const PaymentModal: React.FC<ModalProps> = ({ results, onClose }) => {
       console.log("Payload:", payload) // Log the payload to verify its structure
 
       const response = await axios.post(
-        `https://api.caregiverhospital.com/patient/add-billing-to-patient/${results.patient_id}/`,
+        `https://api2.caregiverhospital.com/patient/add-billing-to-patient/${results.patient_id}/`,
         payload
       )
       console.log("Response data:", response.data)

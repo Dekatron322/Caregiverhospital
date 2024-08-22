@@ -46,7 +46,7 @@ const HmoModal: React.FC<HmoModalProps> = ({ isOpen, onClose, onSubmitSuccess, h
 
     try {
       const response = await fetch(
-        `https://api.caregiverhospital.com/hmo-category/add-hmo-to-hmo_category/${hmoCategoryId}/`,
+        `https://api2.caregiverhospital.com/hmo-category/add-hmo-to-hmo_category/${hmoCategoryId}/`,
         {
           method: "POST",
           headers: {

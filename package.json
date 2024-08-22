@@ -135,7 +135,7 @@
     "typescript": "5.3.2",
     "webpack": "5.89.0"
   },
-  "proxy": "https://api.caregiverhospital.com",
+  "proxy": "https://api2.caregiverhospital.com",
   "engines": {
     "node": ">=18.17.0"
   },

@@ -16,7 +16,7 @@ export default function PharmacyDashboard() {
   useEffect(() => {
     const fetchDoctorCount = async () => {
       try {
-        const response = await axios.get("https://api.caregiverhospital.com/app_user/all/")
+        const response = await axios.get("https://api2.caregiverhospital.com/app_user/all/")
         const doctors = response.data.filter((user: any) => user.account_type === "Doctors")
         setDoctorCount(doctors.length)
       } catch (error) {
@@ -26,7 +26,7 @@ export default function PharmacyDashboard() {
 
     const fetchPatientData = async () => {
       try {
-        const response = await axios.get("https://api.caregiverhospital.com/patient/patient/")
+        const response = await axios.get("https://api2.caregiverhospital.com/patient/patient/")
         let appointmentCount = 0
         let checkAppCount = 0
         response.data.forEach((patient: any) => {

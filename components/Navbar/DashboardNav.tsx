@@ -57,7 +57,7 @@ const DashboardNav: React.FC = () => {
       const userId = localStorage.getItem("id")
       if (userId) {
         const response = await axios.get<UserDetails>(
-          `https://api.caregiverhospital.com/app_user/get-user-detail/${userId}/`
+          `https://api2.caregiverhospital.com/app_user/get-user-detail/${userId}/`
         )
         if (response.data) {
           setUserDetails(response.data)

@@ -54,7 +54,7 @@ const TrashDrugModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitS
     }
 
     try {
-      const response = await fetch(`https://api.caregiverhospital.com/medicine/medicine/${medicineId}/`, {
+      const response = await fetch(`https://api2.caregiverhospital.com/medicine/medicine/${medicineId}/`, {
         method: "DELETE",
       })
 

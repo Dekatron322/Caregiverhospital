@@ -87,7 +87,7 @@ const Page: React.FC = () => {
     setError(null)
 
     try {
-      const response = await axios.post("https://api.caregiverhospital.com/patient/patient-login/", {
+      const response = await axios.post("https://api2.caregiverhospital.com/patient/patient-login/", {
         email_address: email,
         password: password,
       })
@@ -193,7 +193,7 @@ const Page: React.FC = () => {
             </div>
             <div className="flex justify-center gap-1">
               <p>you&apos;re a staff? </p>
-              <Link href="/signin" className="text-[#46FFA6]">
+              <Link href="/signin" className="text-[#50c9f4]">
                 Sign In
               </Link>
             </div>

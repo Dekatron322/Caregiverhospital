@@ -61,7 +61,7 @@ const UpdateVitalsModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubm
     if (isOpen) {
       const fetchPatientData = async () => {
         try {
-          const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${patientId}/`)
+          const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${patientId}/`)
           const data = (await response.json()) as PatientData
           // Set state variables with the existing data
           setHeartRate(data.heart_rate || "")
@@ -83,7 +83,7 @@ const UpdateVitalsModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubm
     setLoading(true)
     try {
       // Fetch current patient data
-      const response = await fetch(`https://api.caregiverhospital.com/patient/patient/${patientId}/`)
+      const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${patientId}/`)
       const patientData = (await response.json()) as PatientData
 
       // Create an object with all the required fields, using the existing values for the fields you don't want to change
@@ -99,7 +99,7 @@ const UpdateVitalsModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubm
       // Log the updatedData to check its structure
       console.log("Payload to be sent:", updatedData)
 
-      const updateResponse = await fetch(`https://api.caregiverhospital.com/patient/patient/${patientId}/`, {
+      const updateResponse = await fetch(`https://api2.caregiverhospital.com/patient/patient/${patientId}/`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

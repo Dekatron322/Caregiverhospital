@@ -31,7 +31,7 @@ const DeleteDepartmentModal: React.FC<DeleteDepartmentModalProps> = ({
   const submitForm = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): Promise<void> => {
     setLoading(true)
     try {
-      const response = await fetch(`https://api.caregiverhospital.com/department/department/${departmentId}/`, {
+      const response = await fetch(`https://api2.caregiverhospital.com/department/department/${departmentId}/`, {
         method: "DELETE",
       })
       if (!response.ok) {

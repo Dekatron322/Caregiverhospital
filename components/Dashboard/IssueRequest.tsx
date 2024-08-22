@@ -83,7 +83,7 @@ const IssueRequest = () => {
 
   const fetchPatients = async () => {
     try {
-      const response = await fetch("https://api.caregiverhospital.com/patient/patient/")
+      const response = await fetch("https://api2.caregiverhospital.com/patient/patient/")
       const data = (await response.json()) as ApiResponse
       const patientsWithAppointments = data.filter((patient) => patient.prescriptions.length > 0)
       setPatients(patientsWithAppointments)
@@ -96,7 +96,7 @@ const IssueRequest = () => {
 
   const fetchProcedures = async () => {
     try {
-      const response = await fetch("https://api.caregiverhospital.com/procedure/procedure/")
+      const response = await fetch("https://api2.caregiverhospital.com/procedure/procedure/")
       const data = (await response.json()) as ProcedureResponse
       const proceduresMap = new Map(data.map((procedure) => [procedure.name, procedure]))
       setProceduresMap(proceduresMap)
@@ -134,7 +134,7 @@ const IssueRequest = () => {
 
   const updateIssueStatus = async (prescriptionId: string) => {
     try {
-      const response = await fetch(`https://api.caregiverhospital.com/prescription/prescription/${prescriptionId}/`, {
+      const response = await fetch(`https://api2.caregiverhospital.com/prescription/prescription/${prescriptionId}/`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

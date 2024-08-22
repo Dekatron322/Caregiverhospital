@@ -136,7 +136,7 @@ const TestModal: React.FC<ModalProps> = ({ results, onClose }) => {
   const handleSubmit = async () => {
     setIsLoading(true)
     try {
-      const response = await axios.put(`https://api.caregiverhospital.com/lab-test/lab-test/${results.id}/`, {
+      const response = await axios.put(`https://api2.caregiverhospital.com/lab-test/lab-test/${results.id}/`, {
         test: test,
         result: result,
         status_note: statusNote,

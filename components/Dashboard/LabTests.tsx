@@ -69,11 +69,11 @@ const LabTests = () => {
       setIsLoading(true)
       try {
         // Fetch lab test results
-        const labTestResponse = await axios.get("https://api.caregiverhospital.com/patient/patient/")
+        const labTestResponse = await axios.get("https://api2.caregiverhospital.com/patient/patient/")
         const patientData = labTestResponse.data
 
         // Fetch diagnosis data
-        const diagnosisResponse = await axios.get("https://api.caregiverhospital.com/diagnosis/diagnosis/")
+        const diagnosisResponse = await axios.get("https://api2.caregiverhospital.com/diagnosis/diagnosis/")
         const fetchedDiagnosisData = diagnosisResponse.data
         setDiagnosisData(fetchedDiagnosisData)
 

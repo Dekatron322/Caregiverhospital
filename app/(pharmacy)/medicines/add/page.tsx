@@ -63,7 +63,7 @@ const Page: React.FC = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch("https://api.caregiverhospital.com/medicine-category/medicine-category/")
+        const response = await fetch("https://api2.caregiverhospital.com/medicine-category/medicine-category/")
         if (!response.ok) {
           throw new Error("Failed to fetch categories")
         }
@@ -94,7 +94,7 @@ const Page: React.FC = () => {
 
     try {
       const response = await fetch(
-        `https://api.caregiverhospital.com/medicine-category/add-medicine-to-medicine_category/${selectedCategory}/`,
+        `https://api2.caregiverhospital.com/medicine-category/add-medicine-to-medicine_category/${selectedCategory}/`,
         {
           method: "POST",
           headers: {

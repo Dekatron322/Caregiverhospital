@@ -54,7 +54,7 @@ const DoctorsAppointments = () => {
 
   const fetchPatients = async () => {
     try {
-      const response = await fetch("https://api.caregiverhospital.com/patient/patient/")
+      const response = await fetch("https://api2.caregiverhospital.com/patient/patient/")
       const data = (await response.json()) as ApiResponse
       const patientsWithAppointments = data.filter((patient) => patient.appointments.length > 0)
       setPatients(patientsWithAppointments)

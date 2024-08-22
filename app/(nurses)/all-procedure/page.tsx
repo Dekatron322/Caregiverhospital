@@ -58,9 +58,12 @@ export default function Patients() {
   const confirmDelete = async () => {
     if (procedureToDelete) {
       try {
-        const response = await fetch(`https://api.caregiverhospital.com/procedure/procedure/${procedureToDelete.id}/`, {
-          method: "DELETE",
-        })
+        const response = await fetch(
+          `https://api2.caregiverhospital.com/procedure/procedure/${procedureToDelete.id}/`,
+          {
+            method: "DELETE",
+          }
+        )
         if (!response.ok) {
           throw new Error("Failed to delete patient")
         }
@@ -89,7 +92,7 @@ export default function Patients() {
 
   const fetchProcedure = async () => {
     try {
-      const response = await fetch("https://api.caregiverhospital.com/procedure/procedure/")
+      const response = await fetch("https://api2.caregiverhospital.com/procedure/procedure/")
       if (!response.ok) {
         throw new Error("Failed to fetch diagnosis")
       }
@@ -208,14 +211,14 @@ export default function Patients() {
                     <div className="flex w-[20%] items-center gap-1 text-sm font-bold">
                       {/* {patient.image ? (
                         <img
-                          src={`https://api.caregiverhospital.com${patient.image}`}
+                          src={`https://api2.caregiverhospital.com${patient.image}`}
                           alt={patient.name}
                           width={32}
                           height={32}
                           className="rounded-full"
                         />
                       ) : ( */}
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46ffa6]">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#50c9f4]">
                         <p className="capitalize text-[#000000]">{procedure.name.charAt(0)}</p>
                       </div>
                       {/* )} */}

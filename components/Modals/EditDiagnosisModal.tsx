@@ -44,7 +44,7 @@ const EditDiagnosisModal: React.FC<EditDiagnosisModalProps> = ({ isOpen, onClose
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch(`https://api.caregiverhospital.com/diagnosis/diagnosis/${formData.id}/`, {
+      const response = await fetch(`https://api2.caregiverhospital.com/diagnosis/diagnosis/${formData.id}/`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

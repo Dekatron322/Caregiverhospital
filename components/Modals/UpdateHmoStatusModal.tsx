@@ -40,7 +40,7 @@ const UpdateHmoStatusModal: React.FC<UpdateHmoStatusModalProps> = ({ isOpen, onC
   const handleSubmit = async () => {
     if (hmo) {
       try {
-        const response = await fetch(`https://api.caregiverhospital.com/hmo/hmo/${hmo.id}/`, {
+        const response = await fetch(`https://api2.caregiverhospital.com/hmo/hmo/${hmo.id}/`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",

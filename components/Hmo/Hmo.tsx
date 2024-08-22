@@ -51,7 +51,7 @@ const HmoComponent: React.FC<HmoComponentProps> = ({ refreshKey, openDeleteModal
   const fetchHmoCategories = async () => {
     setLoading(true)
     try {
-      const response = await fetch("https://api.caregiverhospital.com/hmo-category/hmo-category/")
+      const response = await fetch("https://api2.caregiverhospital.com/hmo-category/hmo-category/")
       if (!response.ok) {
         throw new Error("Failed to fetch HMOs")
       }

@@ -19,7 +19,7 @@ const AddCategoryModal: React.FC<AddCategoryModalProps> = ({ isOpen, onClose, on
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch("https://api.caregiverhospital.com/medicine-category/medicine-category/", {
+      const response = await fetch("https://api2.caregiverhospital.com/medicine-category/medicine-category/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

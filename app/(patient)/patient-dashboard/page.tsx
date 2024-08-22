@@ -27,7 +27,7 @@ const PatientDetailPage: React.FC = () => {
       }
 
       try {
-        const response = await axios.get(`https://api.caregiverhospital.com/patient/patient/${id}/`)
+        const response = await axios.get(`https://api2.caregiverhospital.com/patient/patient/${id}/`)
         setPatient(response.data)
       } catch (error) {
         setError("Failed to fetch patient details.")
@@ -104,7 +104,7 @@ const PatientDetailPage: React.FC = () => {
                       <div className="md:w-1/4">
                         <div className="flex flex-col justify-center rounded-md border px-4 py-8">
                           <div className="flex items-center justify-center">
-                            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#46ffa6]">
+                            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#50c9f4]">
                               <p className="capitalize text-[#000000]">{patient.name.charAt(0)}</p>
                             </div>
                             {/* <Image src="/default_patient_image.png" height={60} width={60} alt="Patient Image" /> */}
@@ -201,7 +201,7 @@ const PatientDetailPage: React.FC = () => {
                                   <div className="flex w-full items-center gap-1 text-sm font-bold">
                                     <span>
                                       {/* <Image src={record.doctor_image} height={40} width={40} alt="" /> */}
-                                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46ffa6]">
+                                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#50c9f4]">
                                         <p className="capitalize text-[#000000]">{record.doctor_name.charAt(0)}</p>
                                       </div>
                                     </span>
@@ -222,7 +222,7 @@ const PatientDetailPage: React.FC = () => {
                                   </div>
 
                                   <div className="flex gap-2">
-                                    <button className="flex w-28 items-center justify-center gap-1 rounded bg-[#46FFA6] px-2 py-[2px] text-xs text-[#000000]">
+                                    <button className="flex w-28 items-center justify-center gap-1 rounded bg-[#50c9f4] px-2 py-[2px] text-xs text-[#000000]">
                                       <IoPrintOutline /> Print
                                     </button>
                                     <button className="flex w-28 items-center justify-center gap-1 rounded bg-[#349DFB] px-2 py-[2px] text-xs text-[#000000]">

@@ -41,7 +41,7 @@ export default function Medicines() {
   useEffect(() => {
     const fetchMedicines = async () => {
       try {
-        const response = await fetch("https://api.caregiverhospital.com/medicine-category/medicine-category/")
+        const response = await fetch("https://api2.caregiverhospital.com/medicine-category/medicine-category/")
         if (!response.ok) {
           throw new Error("Failed to fetch medicines")
         }

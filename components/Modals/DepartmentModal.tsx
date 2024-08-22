@@ -29,7 +29,7 @@ const DepartmentModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmit
     event.preventDefault()
     setLoading(true)
     try {
-      const response = await fetch("https://api.caregiverhospital.com/department/department/", {
+      const response = await fetch("https://api2.caregiverhospital.com/department/department/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

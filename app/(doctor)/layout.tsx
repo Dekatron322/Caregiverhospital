@@ -2,13 +2,13 @@ import DoctorSideBar from "components/Sidebar/DoctorSidebar"
 import { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Doctor's Dashboard | Caregivers Hospital",
+  title: "Doctor's Dashboard | CityMed Hospital",
   description: "We are a family with a major focus in both primary and secondary healthcare service.",
   twitter: {
     card: "summary_large_image",
   },
   openGraph: {
-    url: "https://app.caregiverhospital.com/",
+    url: "https://citymed.com/",
     images: [
       {
         width: 1200,
