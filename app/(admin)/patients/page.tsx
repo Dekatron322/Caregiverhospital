@@ -241,7 +241,7 @@ export default function Patients() {
                           className="rounded-full"
                         />
                       ) : ( */}
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#50c9f4] max-sm:hidden">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46FFA6] max-sm:hidden">
                         <p className="capitalize text-[#000000]">{patient.name.charAt(0)}</p>
                       </div>
                       {/* )} */}
@@ -269,7 +269,7 @@ export default function Patients() {
                     </div>
                     <div className="w-full max-md:hidden">
                       {patient.hmo.status ? (
-                        <p className="w-[100px] rounded bg-[#50c9f4] px-2 py-[2px] text-center text-xs text-[#000000]">
+                        <p className="w-[100px] rounded bg-[#46FFA6] px-2 py-[2px] text-center text-xs text-[#000000]">
                           Active
                         </p>
                       ) : (
@@ -279,7 +279,7 @@ export default function Patients() {
                       )}
                     </div>
                     <div className="flex gap-2">
-                      <RemoveRedEyeIcon className="text-[#50c9f4]" onClick={() => handlePatientClick(patient.id)} />
+                      <RemoveRedEyeIcon className="text-[#46FFA6]" onClick={() => handlePatientClick(patient.id)} />
                       <BorderColorOutlinedIcon />
                       <DeleteForeverIcon className="text-[#F2B8B5]" onClick={() => openModal(patient)} />
                     </div>

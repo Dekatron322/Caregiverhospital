@@ -206,7 +206,7 @@ export default function Patients() {
                     className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
                   >
                     <div className="flex w-[20%] items-center gap-1 text-sm font-bold">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#50c9f4]">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46FFA6]">
                         <p className="capitalize text-[#000000]">{diagnosis.name.charAt(0)}</p>
                       </div>
                     </div>

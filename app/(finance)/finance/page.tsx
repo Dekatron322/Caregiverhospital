@@ -54,7 +54,7 @@ export default function Dashboard() {
                       </div>
                       <div className="flex justify-between">
                         <h6 className="font-bold">₦{finance.income}</h6>
-                        <span className="rounded bg-[#50c9f466] px-[10px] py-[5px]">{finance.status}</span>
+                        <span className="rounded bg-[#46FFA666] px-[10px] py-[5px]">{finance.status}</span>
                       </div>
                       <div className="mt-6 flex w-full ">
                         <Link href={finance.url} className="button-primary h-[50px] w-full rounded-sm max-sm:h-[45px]">

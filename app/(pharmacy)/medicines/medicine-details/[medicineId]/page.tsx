@@ -196,7 +196,7 @@ export default function MedicineDetailPage({ params }: { params: { medicineId: s
                 <div className="flex gap-3">
                   <div
                     onClick={openAdmissionModal}
-                    className="mt-4 flex h-[50px] w-[150px] cursor-pointer  content-center items-center justify-center gap-2 rounded bg-[#50c9f4] text-[#000000]"
+                    className="mt-4 flex h-[50px] w-[150px] cursor-pointer  content-center items-center justify-center gap-2 rounded bg-[#46FFA6] text-[#000000]"
                   >
                     <FaRegEdit />
                     <p className="text-sm">Restock Medicine</p>

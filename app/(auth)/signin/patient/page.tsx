@@ -193,7 +193,7 @@ const Page: React.FC = () => {
             </div>
             <div className="flex justify-center gap-1">
               <p>you&apos;re a staff? </p>
-              <Link href="/signin" className="text-[#50c9f4]">
+              <Link href="/signin" className="text-[#46FFA6]">
                 Sign In
               </Link>
             </div>

@@ -267,7 +267,7 @@ const Page: React.FC = () => {
             </div>
             <div className="flex justify-center gap-1">
               <p>you&apos;re a patient? </p>
-              <Link href="/signin/patient" className="text-[#50c9f4]">
+              <Link href="/signin/patient" className="text-[#46FFA6]">
                 Login as Patient
               </Link>
             </div>

@@ -139,7 +139,7 @@ export default function Dashboard() {
                 </div>
                 <div className="flex justify-between">
                   <h6 className="font-bold">{patientsWithAppointments.length}</h6>
-                  <Link href="/appointments" className="rounded-full bg-[#50c9f4] px-2 py-1 text-xs text-[#000000]">
+                  <Link href="/appointments" className="rounded-full bg-[#46FFA6] px-2 py-1 text-xs text-[#000000]">
                     View
                   </Link>
                 </div>
@@ -152,7 +152,7 @@ export default function Dashboard() {
                 </div>
                 <div className="flex justify-between">
                   <h6 className="font-bold">{departmentCount}</h6>
-                  <Link href="/department" className="rounded-full bg-[#50c9f4] px-2 py-1 text-xs text-[#000000]">
+                  <Link href="/department" className="rounded-full bg-[#46FFA6] px-2 py-1 text-xs text-[#000000]">
                     View
                   </Link>
                 </div>
@@ -166,7 +166,7 @@ export default function Dashboard() {
                 </div>
                 <div className="flex justify-between">
                   <h6 className="font-bold">{staffCount}</h6>
-                  <Link href="/staff" className="rounded-full bg-[#50c9f4] px-2 py-1 text-xs text-[#000000]">
+                  <Link href="/staff" className="rounded-full bg-[#46FFA6] px-2 py-1 text-xs text-[#000000]">
                     View
                   </Link>
                 </div>
@@ -179,7 +179,7 @@ export default function Dashboard() {
                 </div>
                 <div className="flex justify-between">
                   <h6 className="font-bold">{patients.length}</h6>
-                  <Link href="/patients" className="rounded-full bg-[#50c9f4] px-2 py-1 text-xs text-[#000000]">
+                  <Link href="/patients" className="rounded-full bg-[#46FFA6] px-2 py-1 text-xs text-[#000000]">
                     View
                   </Link>
                 </div>
@@ -207,7 +207,7 @@ export default function Dashboard() {
                 {recentCheckApps.map((item, index) => (
                   <div key={index} className="flex items-center justify-between">
                     <div className="mb-4 flex items-center gap-1">
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#50c9f4] max-md:hidden">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46FFA6] max-md:hidden">
                         <p className="capitalize text-[#000000]">{item.patientName.charAt(0)}</p>
                       </div>
                       {/* <Image src="/path/to/default/image" height={40} width={40} alt="" /> */}

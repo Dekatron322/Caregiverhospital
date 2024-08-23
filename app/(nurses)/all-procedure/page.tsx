@@ -218,7 +218,7 @@ export default function Patients() {
                           className="rounded-full"
                         />
                       ) : ( */}
-                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#50c9f4]">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46FFA6]">
                         <p className="capitalize text-[#000000]">{procedure.name.charAt(0)}</p>
                       </div>
                       {/* )} */}
