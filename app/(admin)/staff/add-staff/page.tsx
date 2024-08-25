@@ -8,8 +8,7 @@ import { RiImageAddLine } from "react-icons/ri"
 import { useRouter } from "next/navigation"
 import { IoMdArrowBack } from "react-icons/io"
 import Image from "next/image"
-import AOS from "aos"
-import "aos/dist/aos.css"
+
 import CustomDropdown from "components/Patient/CustomDropdown"
 
 interface RateIconProps {
@@ -47,13 +46,6 @@ const Page: React.FC = () => {
   const [showErrorNotification, setShowErrorNotification] = useState(false)
   const departments: Department[] = ["Admin", "Doctors", "Pharmacy", "Laboratory", "Nurses", "Patients", "Cashier"]
   const router = useRouter()
-
-  useEffect(() => {
-    AOS.init({
-      duration: 1000,
-      once: true,
-    })
-  }, [])
 
   const handleGoBack = () => {
     router.back()
@@ -123,12 +115,7 @@ const Page: React.FC = () => {
                 <p className="">Go back</p>
               </button>
             </div>
-            <div
-              className="mb-2 flex h-full w-full items-center justify-center"
-              data-aos="fade-in"
-              data-aos-duration="1000"
-              data-aos-delay="500"
-            >
+            <div className="mb-2 flex h-full w-full items-center justify-center">
               <div className="auth flex rounded-lg md:w-2/3">
                 <div className="w-full px-6 py-8">
                   <h6 className="text-lg font-medium">Register Staff</h6>

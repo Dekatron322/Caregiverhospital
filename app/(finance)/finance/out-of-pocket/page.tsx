@@ -3,8 +3,6 @@ import React, { useEffect, useState } from "react"
 import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
 import { usePathname, useRouter } from "next/navigation"
-import AOS from "aos"
-import "aos/dist/aos.css"
 
 import Image from "next/image"
 import { IoMdArrowBack } from "react-icons/io"
@@ -29,13 +27,6 @@ const Dashboard: React.FC = () => {
   const handleGoBack = () => {
     router.back()
   }
-
-  useEffect(() => {
-    AOS.init({
-      duration: 1000,
-      once: true,
-    })
-  }, [])
 
   const openHmoModal = () => {
     setIsAddHmoOpen(true)
@@ -66,12 +57,7 @@ const Dashboard: React.FC = () => {
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
             <DashboardNav />
-            <div
-              className="flex justify-between px-16 pt-4 max-md:px-3"
-              data-aos="fade-in"
-              data-aos-duration="1000"
-              data-aos-delay="500"
-            >
+            <div className="flex justify-between px-16 pt-4 max-md:px-3">
               <button onClick={handleGoBack} className="redirect">
                 <IoMdArrowBack />
                 <p className="capitalize">Go Back</p>
@@ -83,12 +69,7 @@ const Dashboard: React.FC = () => {
             </div>
             <div className="flex justify-center">
               <div className="flex flex-col items-center max-md:w-full">
-                <div
-                  className="mt-4 w-full px-16 max-md:flex-col max-md:px-3 md:min-w-[650px]"
-                  data-aos="fade-in"
-                  data-aos-duration="1000"
-                  data-aos-delay="500"
-                >
+                <div className="mt-4 w-full px-16 max-md:flex-col max-md:px-3 md:min-w-[650px]">
                   <p className="mb-4 font-semibold">Out of pocket</p>
                   <OutOfPocketComponent refreshKey={refreshKey} openDeleteModal={openDeleteModal} />
                 </div>

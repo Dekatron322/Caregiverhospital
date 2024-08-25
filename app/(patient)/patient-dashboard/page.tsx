@@ -75,7 +75,7 @@ const PatientDetailPage: React.FC = () => {
                     <IoMdArrowBack />
                     <p className="capitalize">Go back</p>
                   </button> */}
-                  <div className="pt-10" data-aos="fade-in" data-aos-duration="1000" data-aos-delay="500">
+                  <div className="pt-10">
                     <div className="mb-3 grid w-full grid-cols-4 gap-2 max-sm:grid-cols-2">
                       <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
                         <Image src="/pt-dashboard-01.svg" height={40} width={40} alt="" />

@@ -12,8 +12,7 @@ import Image from "next/image"
 import DeleteModal from "components/Modals/DeleteModal"
 import EditModal from "components/Modals/EditModal"
 import { IoAddCircleSharp, IoReceipt } from "react-icons/io5"
-import AOS from "aos"
-import "aos/dist/aos.css"
+
 import UpdateHmoStatusModal from "components/Modals/UpdateHmoStatusModal"
 
 interface Hmo {
@@ -136,13 +135,6 @@ export default function HmoDetailPage() {
     setTimeout(() => setShowSuccessNotification(false), 5000)
     setRefreshKey((prevKey) => prevKey + 1)
   }
-
-  useEffect(() => {
-    AOS.init({
-      duration: 1000,
-      once: true,
-    })
-  }, [])
 
   return (
     <>

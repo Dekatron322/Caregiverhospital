@@ -10,8 +10,7 @@ import Link from "next/link"
 import PatientDetails from "components/Patient/PatientDetails"
 import { IoMdArrowBack } from "react-icons/io"
 import { MdLocationPin } from "react-icons/md"
-import AOS from "aos"
-import "aos/dist/aos.css"
+
 import { GoPlus } from "react-icons/go"
 import UpdateVitalsModal from "components/Modals/UpdateVitalsModal"
 import EditNoteIcon from "@mui/icons-material/EditNote"
@@ -94,13 +93,6 @@ export default function PatientDetailPage() {
   const [showDeleteNotification, setShowDeleteNotification] = useState(false)
   const [patientId, setPatientId] = useState<string | null>(null) // New state variable for patientId
   const router = useRouter()
-
-  useEffect(() => {
-    AOS.init({
-      duration: 1000,
-      once: true,
-    })
-  }, [])
 
   useEffect(() => {
     const storedPatientId = localStorage.getItem("selectedPatientId")
@@ -238,7 +230,7 @@ export default function PatientDetailPage() {
                     <GoPlus />
                   </button>
                 </div>
-                <div className="pt-10" data-aos="fade-in" data-aos-duration="1000" data-aos-delay="500">
+                <div className="pt-10">
                   <div className="mb-3 grid w-full grid-cols-4 gap-2 max-sm:grid-cols-2">
                     <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
                       <Image src="/pt-dashboard-01.svg" height={40} width={40} alt="" />

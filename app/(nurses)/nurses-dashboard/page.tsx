@@ -178,12 +178,7 @@ export default function Patients() {
               <p className="capitalize">{pathname.split("/").pop()}</p>
             </div>
 
-            <div
-              className="mb-6 mt-1 flex items-center justify-between px-16 max-md:px-3"
-              data-aos="fade-in"
-              data-aos-duration="1000"
-              data-aos-delay="500"
-            >
+            <div className="mb-6 mt-1 flex items-center justify-between px-16 max-md:px-3">
               <div className="search-bg flex h-10 items-center justify-between gap-2 rounded border border-[#CFDBD5] px-3 py-1 max-md:w-[180px] lg:w-[300px]">
                 <Image className="icon-style" src="/icons.svg" width={16} height={16} alt="dekalo" />
                 <Image className="dark-icon-style" src="/search-dark.svg" width={16} height={16} alt="dekalo" />

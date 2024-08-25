@@ -20,12 +20,7 @@ export default function Admission() {
         <div className=" flex min-h-screen ">
           <div className="flex  w-screen flex-col ">
             <DashboardNav />
-            <div
-              className="flex justify-between px-16 py-6 max-md:px-3"
-              data-aos="fade-in"
-              data-aos-duration="1000"
-              data-aos-delay="500"
-            >
+            <div className="flex justify-between px-16 py-6 max-md:px-3">
               <button onClick={handleGoBack} className="redirect">
                 <IoMdArrowBack />
                 <p className="capitalize">Go back</p>

@@ -9,8 +9,7 @@ import { IoMdArrowBack } from "react-icons/io"
 import Link from "next/link"
 import { GoPlus } from "react-icons/go"
 import AdministerDrugModal from "components/Modals/AdministerDrugModal"
-import AOS from "aos"
-import "aos/dist/aos.css"
+
 import CheckoutPatientModal from "components/Modals/CheckoutPatientModal"
 import NursesNav from "components/Navbar/NursesNav"
 
@@ -99,13 +98,6 @@ export default function PatientDetailPage() {
   const handleGoBack = () => {
     router.back()
   }
-
-  useEffect(() => {
-    AOS.init({
-      duration: 1000,
-      once: true,
-    })
-  }, [])
 
   const fetchPatientDetails = async () => {
     try {

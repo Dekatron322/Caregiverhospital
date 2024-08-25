@@ -6,8 +6,7 @@ import Footer from "components/Footer/Footer"
 import Image from "next/image"
 import { IoMdArrowBack } from "react-icons/io"
 import { useRouter } from "next/navigation"
-import AOS from "aos"
-import "aos/dist/aos.css"
+
 import NursesNav from "components/Navbar/NursesNav"
 
 type Hmo = {
@@ -32,13 +31,6 @@ const Page = () => {
   const [hmos, setHmos] = useState<Hmo[]>([])
 
   const dropdownRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    AOS.init({
-      duration: 1000,
-      once: true,
-    })
-  }, [])
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -140,23 +132,13 @@ const Page = () => {
         <div className="flex min-h-screen ">
           <div className="flex w-screen flex-col ">
             <NursesNav />
-            <div
-              className="flex justify-between px-16 py-4 max-md:px-3"
-              data-aos="fade-in"
-              data-aos-duration="1000"
-              data-aos-delay="500"
-            >
+            <div className="flex justify-between px-16 py-4 max-md:px-3">
               <button onClick={handleGoBack} className="redirect">
                 <IoMdArrowBack />
                 <p className="capitalize">Go back</p>
               </button>
             </div>
-            <div
-              className="mb-2 flex h-full w-full items-center justify-center"
-              data-aos="fade-in"
-              data-aos-duration="1000"
-              data-aos-delay="500"
-            >
+            <div className="mb-2 flex h-full w-full items-center justify-center">
               <div className="auth flex rounded-lg shadow md:w-1/3">
                 <form className="w-full px-6 py-8 max-md:px-3" onSubmit={handleSubmit}>
                   <h6 className="text-lg font-medium">Add New Procedure</h6>

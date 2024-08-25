@@ -4,8 +4,6 @@ import { useRouter } from "next/navigation"
 import { HiOutlineTrash } from "react-icons/hi2"
 import Image from "next/image"
 import DeleteHmoCategoryModal from "components/Modals/DeleteHmoCategoryModal"
-import AOS from "aos"
-import "aos/dist/aos.css"
 
 interface HmoDetail {
   id: string
@@ -40,13 +38,6 @@ const OutOfPocketComponent: React.FC<HmoComponentProps> = ({ refreshKey, openDel
   useEffect(() => {
     fetchHmoCategories()
   }, [refreshKey])
-
-  useEffect(() => {
-    AOS.init({
-      duration: 1000,
-      once: true,
-    })
-  }, [])
 
   const fetchHmoCategories = async () => {
     setLoading(true)
@@ -96,13 +87,7 @@ const OutOfPocketComponent: React.FC<HmoComponentProps> = ({ refreshKey, openDel
   return (
     <>
       {filteredCategories.map((category) => (
-        <div
-          key={category.id}
-          className="mb-3 w-full rounded border p-4 shadow-md"
-          data-aos="fade-in"
-          data-aos-duration="1000"
-          data-aos-delay="500"
-        >
+        <div key={category.id} className="mb-3 w-full rounded border p-4 shadow-md">
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-2">

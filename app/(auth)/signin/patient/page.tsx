@@ -6,8 +6,6 @@ import Image from "next/image"
 import Navbar from "components/Navbar/Navbar"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import AOS from "aos"
-import "aos/dist/aos.css"
 
 interface RateIconProps {
   filled: boolean
@@ -39,13 +37,6 @@ const Page: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const [showErrorNotification, setShowErrorNotification] = useState(false)
-
-  useEffect(() => {
-    AOS.init({
-      duration: 1000,
-      once: true,
-    })
-  }, [])
 
   const router = useRouter() // Initialize the router
 
@@ -122,12 +113,7 @@ const Page: React.FC = () => {
   return (
     <>
       <Navbar />
-      <div
-        className="flex h-screen w-full items-center justify-center"
-        data-aos="fade-up"
-        data-aos-duration="1000"
-        data-aos-delay="500"
-      >
+      <div className="flex h-screen w-full items-center justify-center">
         <div className="auth flex rounded-lg max-sm:w-full xl:min-w-[498px]">
           <div className="w-full justify-center px-6 py-6">
             <h6 className="mb-6 text-center text-lg font-medium">Sign In</h6>

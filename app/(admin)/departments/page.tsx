@@ -10,8 +10,6 @@ import { GoPlus } from "react-icons/go"
 import DepartmentModal from "components/Modals/DepartmentModal"
 import { HiOutlineTrash } from "react-icons/hi2"
 import DeleteDepartmentModal from "components/Modals/DeleteDepartmentModal"
-import AOS from "aos"
-import "aos/dist/aos.css"
 
 interface Department {
   id: number
@@ -105,13 +103,6 @@ export default function Dashboard() {
     handleHmoSubmissionSuccess()
   }
 
-  useEffect(() => {
-    AOS.init({
-      duration: 1000,
-      once: true,
-    })
-  }, [])
-
   return (
     <>
       <section className="h-full">
@@ -140,13 +131,7 @@ export default function Dashboard() {
             ) : (
               <div className="my-10 grid grid-cols-2 gap-4 px-16 max-md:mt-4 max-md:grid-cols-1 max-md:px-3">
                 {departments.map((department) => (
-                  <div
-                    key={department.id}
-                    className="w-full rounded border p-4"
-                    data-aos="fade-in"
-                    data-aos-duration="1000"
-                    data-aos-delay="500"
-                  >
+                  <div key={department.id} className="w-full rounded border p-4">
                     <div className="mb-4 flex justify-between">
                       <h6 className="font-bold">{department.name}</h6>
                       <Image src={getDepartmentImage(department.name)} height={48} width={48} alt={department.name} />

@@ -126,12 +126,7 @@ export default function Dashboard() {
             <div className="px-16 py-4 max-md:px-3 md:mt-10">
               <h4 className="font-semibold">Statistics</h4>
             </div>
-            <div
-              data-aos="fade-in"
-              data-aos-duration="1000"
-              data-aos-delay="500"
-              className="flex gap-2 px-16 max-md:grid max-md:grid-cols-2 max-md:px-3"
-            >
+            <div className="flex gap-2 px-16 max-md:grid max-md:grid-cols-2 max-md:px-3">
               <div className="w-full rounded border-[0.5px] p-4 shadow">
                 <div className="mb-8 flex justify-between">
                   <h6 className="font-bold">Appointments</h6>
@@ -190,12 +185,7 @@ export default function Dashboard() {
                 <p className="mb-8 font-semibold max-md:mb-4">Appointments</p>
                 <Appointments />
               </div>
-              <div
-                data-aos="fade-in"
-                data-aos-duration="1000"
-                data-aos-delay="500"
-                className=" w-full rounded-xl border-[0.5px] px-4 py-4 shadow md:w-[25%]"
-              >
+              <div className=" w-full rounded-xl border-[0.5px] px-4 py-4 shadow md:w-[25%]">
                 <div className="mb-4 flex items-center justify-between">
                   <h3 className="font-bold">Admissions</h3>
                   <button className="redirect">

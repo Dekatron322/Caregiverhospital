@@ -7,8 +7,7 @@ import Image from "next/image"
 import { RxCalendar } from "react-icons/rx"
 import { useRouter } from "next/navigation"
 import { IoMdArrowBack } from "react-icons/io"
-import AOS from "aos"
-import "aos/dist/aos.css"
+
 import CustomDropdown from "components/Patient/CustomDropdown"
 import PharmacyNav from "components/Navbar/PharmacyNav"
 
@@ -52,13 +51,6 @@ const Page: React.FC = () => {
   const handleGoBack = () => {
     router.back()
   }
-
-  useEffect(() => {
-    AOS.init({
-      duration: 1000,
-      once: true,
-    })
-  }, [])
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -140,12 +132,7 @@ const Page: React.FC = () => {
                 <p className="capitalize">Go back</p>
               </button>
             </div>
-            <div
-              className="mb-6 flex h-full w-full items-center justify-center"
-              data-aos="fade-in"
-              data-aos-duration="1000"
-              data-aos-delay="500"
-            >
+            <div className="mb-6 flex h-full w-full items-center justify-center">
               <div className="auth flex w-2/3 rounded-lg max-sm:w-full">
                 <div className="w-full px-6 py-6 max-sm:px-3">
                   <h6 className="text-lg font-medium">Add New Medicine</h6>
