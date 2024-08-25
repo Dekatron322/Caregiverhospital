@@ -57,7 +57,8 @@ const OutOfPocketComponent: React.FC<HmoComponentProps> = ({ refreshKey, openDel
   }
 
   const handleHmoClick = (hmoId: string) => {
-    router.push(`/finance/hmos/hmo/${hmoId}`)
+    localStorage.setItem("selectedHmoId", hmoId)
+    router.push(`/finance/hmos/hmo`)
   }
 
   if (loading)
