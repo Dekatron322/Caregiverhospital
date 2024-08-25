@@ -206,14 +206,14 @@ export default function HmoDetailPage() {
                               {item.status ? (
                                 <p
                                   onClick={() => openUpdateModal(item)}
-                                  className="h-6 justify-center rounded bg-[#46FFA6] p-1 text-xs text-[#000000]"
+                                  className="h-6 cursor-pointer justify-center rounded bg-[#46FFA6] p-1 text-xs text-[#000000]"
                                 >
                                   Active
                                 </p>
                               ) : (
                                 <p
                                   onClick={() => openUpdateModal(item)}
-                                  className="h-6 justify-center rounded bg-[#F20089] p-1 text-xs text-[#ffffff]"
+                                  className="h-6 cursor-pointer justify-center rounded bg-[#F20089] p-1 text-xs text-[#ffffff]"
                                 >
                                   Inactive
                                 </p>
