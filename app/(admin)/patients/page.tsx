@@ -12,8 +12,9 @@ import Link from "next/link"
 import { GoPlus } from "react-icons/go"
 import { IoAddCircleSharp } from "react-icons/io5"
 import DeletePatientModal from "components/Modals/DeletePatientModal"
+import EditPatientModal from "components/Modals/EditPatientModal"
 
-interface Patients {
+export interface Patients {
   id: string
   name: string
   gender: string
@@ -23,10 +24,15 @@ interface Patients {
   email_address: string
   phone_no: string
   address: string
+  allergies: string
   age: string
+  nok_name: string
   image: string
+  password: string
+  nok_phone_no: string
+  nok_address: string
   hmo: {
-    id: string
+    id: any
     name: string
     category: string
     description: string
@@ -34,6 +40,11 @@ interface Patients {
     pub_date: string
   }
   status: boolean
+  heart_rate: string
+  body_temperature: string
+  glucose_level: string
+  blood_pressure: string
+  discount_value: string
 }
 
 export default function Patients() {
@@ -47,6 +58,90 @@ export default function Patients() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [patientToDelete, setPatientToDelete] = useState<Patients | null>(null)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false) // State to handle the edit modal
+  const [patientToEdit, setPatientToEdit] = useState<Patients | null>(null) // State to handle the patient to edit
+
+  const handleEditClick = (patient: Patients) => {
+    setPatientToEdit(patient) // Set the patient to be edited
+    setIsEditModalOpen(true) // Open the modal
+  }
+
+  const closeEditModal = () => {
+    setPatientToEdit(null)
+    setIsEditModalOpen(false)
+  }
+
+  const preprocessPatientData = (data: Patients) => {
+    const processedData: Partial<Patients> = {}
+
+    if (data.heart_rate) processedData.heart_rate = data.heart_rate
+    if (data.body_temperature) processedData.body_temperature = data.body_temperature
+    if (data.glucose_level) processedData.glucose_level = data.glucose_level
+    if (data.blood_pressure) processedData.blood_pressure = data.blood_pressure
+    if (data.discount_value) processedData.discount_value = data.discount_value
+
+    // Send hmo ID as a string
+    if (data.hmo) {
+      processedData.hmo = {
+        id: data.hmo.id,
+        name: data.hmo.name || "", // Use an empty string or default value if not present
+        category: data.hmo.category || "", // Use an empty string or default value if not present
+        description: data.hmo.description || "", // Use an empty string or default value if not present
+        status: data.hmo.status ?? false, // Use false or a default boolean value if not present
+        pub_date: data.hmo.pub_date || "", // Use an empty string or default value if not present
+      }
+    }
+
+    // Add other fields that are required
+    processedData.name = data.name
+    processedData.gender = data.gender
+    processedData.dob = data.dob
+    processedData.membership_no = data.membership_no
+    processedData.email_address = data.email_address
+    processedData.phone_no = data.phone_no
+    processedData.address = data.address
+    processedData.allergies = data.allergies
+    processedData.age = data.age
+    processedData.nok_name = data.nok_name
+    processedData.password = data.password
+    processedData.nok_phone_no = data.nok_phone_no
+    processedData.nok_address = data.nok_address
+    processedData.status = data.status
+    processedData.policy_id = data.policy_id
+
+    return processedData
+  }
+
+  const confirmEdit = async (updatedPatientData: Patients) => {
+    if (patientToEdit) {
+      try {
+        const preprocessedData = preprocessPatientData(updatedPatientData)
+
+        const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${patientToEdit.id}/`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(preprocessedData),
+        })
+
+        if (!response.ok) {
+          const errorData = await response.json()
+          console.error("Failed to update patient:", errorData)
+          throw new Error("Failed to update patient")
+        }
+
+        setPatients((prevPatients) =>
+          prevPatients.map((patient) => (patient.id === updatedPatientData.id ? updatedPatientData : patient))
+        )
+        closeEditModal() // Close the modal
+        setShowSuccessNotification(true)
+        setTimeout(() => setShowSuccessNotification(false), 5000)
+      } catch (error) {
+        console.error("Error updating patient:", error)
+      }
+    }
+  }
 
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
@@ -275,7 +370,7 @@ export default function Patients() {
                     </div>
                     <div className="flex gap-2">
                       <RemoveRedEyeIcon className="text-[#46FFA6]" onClick={() => handlePatientClick(patient.id)} />
-                      <BorderColorOutlinedIcon />
+                      <BorderColorOutlinedIcon onClick={() => handleEditClick(patient)} />
                       <DeleteForeverIcon className="text-[#F2B8B5]" onClick={() => openModal(patient)} />
                     </div>
                   </div>
@@ -329,6 +424,15 @@ export default function Patients() {
         onConfirm={confirmDelete}
         patientName={patientToDelete?.name || ""}
       />
+
+      {patientToEdit && (
+        <EditPatientModal
+          isOpen={isEditModalOpen}
+          onClose={closeEditModal}
+          onConfirm={confirmEdit}
+          patient={patientToEdit}
+        />
+      )}
 
       {showSuccessNotification && (
         <div className="animation-fade-in absolute bottom-16  right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">

@@ -9,6 +9,7 @@ import { IoMdArrowBack } from "react-icons/io"
 import { IoChevronDownOutline } from "react-icons/io5"
 import { RxCalendar } from "react-icons/rx"
 import { useRouter } from "next/navigation"
+import CustomDropdown from "components/Patient/CustomDropdown"
 
 type Hmo = {
   id: string
@@ -270,36 +271,13 @@ const Page = () => {
                       </div>
                     </div>
                     <div className="mb-3">
-                      <div className="relative">
-                        <div className="search-bg relative flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
-                          <input
-                            type="text"
-                            name="hmo"
-                            placeholder="Select HMO"
-                            className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
-                            style={{ width: "100%", height: "50px" }}
-                            value={searchTerm}
-                            onChange={handleInputChange}
-                            onClick={() => setShowDropdown(!showDropdown)}
-                          />
-                          {showDropdown && (
-                            <div
-                              ref={dropdownRef}
-                              className="dropdown shadow-mdc absolute left-0 top-[55px] z-10 w-full  rounded"
-                            >
-                              {hmos.map((hmo) => (
-                                <div
-                                  key={hmo.id}
-                                  className="cursor-pointer px-4 py-2 text-sm hover:overflow-hidden hover:bg-[#747A80]"
-                                  onClick={() => handleDropdownSelect(hmo.id)}
-                                >
-                                  {hmo.name}
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                          <IoChevronDownOutline />
-                        </div>
+                      <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+                        <CustomDropdown
+                          options={hmos}
+                          selectedOption={formData.hmo}
+                          onChange={handleDropdownSelect}
+                          placeholder="Select HMO"
+                        />
                       </div>
                     </div>
                     <div className="mb-3 flex gap-3">
