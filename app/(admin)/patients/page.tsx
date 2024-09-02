@@ -58,6 +58,7 @@ export default function Patients() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [patientToDelete, setPatientToDelete] = useState<Patients | null>(null)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
+  const [showEditedNotification, setShowEditedNotification] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false) // State to handle the edit modal
   const [patientToEdit, setPatientToEdit] = useState<Patients | null>(null) // State to handle the patient to edit
 
@@ -135,8 +136,8 @@ export default function Patients() {
           prevPatients.map((patient) => (patient.id === updatedPatientData.id ? updatedPatientData : patient))
         )
         closeEditModal() // Close the modal
-        setShowSuccessNotification(true)
-        setTimeout(() => setShowSuccessNotification(false), 5000)
+        setShowEditedNotification(true)
+        setTimeout(() => setShowEditedNotification(false), 5000)
       } catch (error) {
         console.error("Error updating patient:", error)
       }
@@ -438,6 +439,13 @@ export default function Patients() {
         <div className="animation-fade-in absolute bottom-16  right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
           <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
           <span className="clash-font text-sm  text-[#0F920F]">Deleted Successfully</span>
+        </div>
+      )}
+
+      {showEditedNotification && (
+        <div className="animation-fade-in absolute bottom-16  right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
+          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
+          <span className="clash-font text-sm  text-[#0F920F]">Updated Successfully</span>
         </div>
       )}
     </>

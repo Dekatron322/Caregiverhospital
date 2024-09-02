@@ -3,6 +3,7 @@ import styles from "./modal.module.css"
 import { Patients } from "app/(admin)/patients/page"
 import { IoChevronDownOutline } from "react-icons/io5"
 import Image from "next/image"
+import { LiaTimesSolid } from "react-icons/lia"
 
 interface HMO {
   id: string
@@ -50,9 +51,14 @@ const EditPatientModal: React.FC<EditPatientModalProps> = ({ isOpen, onClose, on
     <div className={styles.modalOverlay} data-aos="fade-up" data-aos-duration="1000" data-aos-delay="500">
       <div className={styles.modalContent}>
         <div className="p-4">
-          <h2 className="mb-4 text-xl font-bold">Edit Patient Details</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold">Edit Patient Details</h2>
+            <div className="border-black  hover:rounded-md hover:border">
+              <LiaTimesSolid className="m-1 cursor-pointer" onClick={onClose} />
+            </div>
+          </div>
           <form>
-            <div className="mb-3 grid grid-cols-3 gap-3 max-sm:grid-cols-2">
+            <div className="my-4 grid grid-cols-3 gap-3 max-sm:grid-cols-2">
               <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                 <input
                   type="text"
@@ -239,11 +245,8 @@ const EditPatientModal: React.FC<EditPatientModalProps> = ({ isOpen, onClose, on
 
             {/* Repeat for other fields: gender, dob, membership_no, etc. */}
           </form>
-          <div className="mt-4 flex justify-end">
-            <button onClick={onClose} className="mr-2">
-              Cancel
-            </button>
-            <button onClick={handleSave} className="rounded bg-green-500 px-4 py-2 text-white">
+          <div className="mt-4 flex w-full">
+            <button onClick={handleSave} className="button-primary h-[50px] w-full rounded px-4 py-2 ">
               Save Changes
             </button>
           </div>
