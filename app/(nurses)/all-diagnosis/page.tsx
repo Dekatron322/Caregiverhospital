@@ -107,11 +107,6 @@ export default function Patients() {
   const indexOfFirstDiagnosis = indexOfLastDiagnosis - diagnosisPerPage
   const currentDiagnosis = diagnosis.slice(indexOfFirstDiagnosis, indexOfLastDiagnosis)
 
-  const pageNumbers = []
-  for (let i = 1; i <= Math.ceil(diagnosis.length / diagnosisPerPage); i++) {
-    pageNumbers.push(i)
-  }
-
   const handleNextPage = () => {
     if (currentPage < pageNumbers.length) {
       setCurrentPage(currentPage + 1)
@@ -143,6 +138,17 @@ export default function Patients() {
       second: "2-digit",
     }
     return new Date(dateString).toLocaleDateString(undefined, options)
+  }
+
+  const pageNumbers = []
+  const totalPages = Math.ceil(diagnosis.length / diagnosisPerPage)
+  const maxPageNumbersToShow = 5
+
+  const startPage = Math.max(1, currentPage - Math.floor(maxPageNumbersToShow / 2))
+  const endPage = Math.min(totalPages, startPage + maxPageNumbersToShow - 1)
+
+  for (let i = startPage; i <= endPage; i++) {
+    pageNumbers.push(i)
   }
 
   return (
@@ -267,7 +273,7 @@ export default function Patients() {
                     <button
                       className="flex items-center"
                       onClick={handleNextPage}
-                      disabled={currentPage === pageNumbers.length}
+                      disabled={currentPage === totalPages}
                     >
                       <IoIosArrowForward />
                     </button>
@@ -275,7 +281,6 @@ export default function Patients() {
                 </ul>
               </div>
             )}
-
             <Footer />
           </div>
         </div>
