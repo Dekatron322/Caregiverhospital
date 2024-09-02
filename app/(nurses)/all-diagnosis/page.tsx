@@ -128,10 +128,11 @@ export default function Patients() {
     setCurrentPage(pageNumber)
   }
 
-  const filteredDiagnosis = currentDiagnosis.filter((diagnosis) =>
-    diagnosis.code.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredDiagnosis = currentDiagnosis.filter(
+    (diagnosis) =>
+      diagnosis.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      diagnosis.name.toLowerCase().includes(searchQuery.toLowerCase())
   )
-
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
       year: "numeric",
