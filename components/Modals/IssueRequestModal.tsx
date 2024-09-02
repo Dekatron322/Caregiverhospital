@@ -2,8 +2,7 @@ import React, { useState } from "react"
 import styles from "./modal.module.css"
 import { LiaTimesSolid } from "react-icons/lia"
 import { IoIosArrowDown } from "react-icons/io"
-import AOS from "aos"
-import "aos/dist/aos.css"
+
 import axios from "axios"
 
 interface Patient {
@@ -93,6 +92,8 @@ const IssueRequestModal: React.FC<PrescriptionModalProps> = ({
   prescription,
   procedureDetails,
 }) => {
+  console.log("Modal is rendering with isOpen:", isOpen)
+
   const [openSection, setOpenSection] = useState(0)
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -180,7 +181,7 @@ const IssueRequestModal: React.FC<PrescriptionModalProps> = ({
   }
 
   return (
-    <div className={styles.modalOverlay} data-aos="fade-up" data-aos-duration="1000" data-aos-delay="500">
+    <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>
         <div className="px-6 py-6">
           <div className="flex items-center justify-between">

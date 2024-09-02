@@ -117,7 +117,7 @@ export default function Patients() {
       try {
         const preprocessedData = preprocessPatientData(updatedPatientData)
 
-        const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${patientToEdit.id}/`, {
+        const response = await fetch(`https://api2.caregiverhospital.com/patient/edit/patient/${patientToEdit.id}/`, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",

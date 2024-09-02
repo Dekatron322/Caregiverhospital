@@ -26,7 +26,7 @@ export const fetchHmos = async (): Promise<HmoCategory[]> => {
 }
 
 export const fetchHmosByCategory = async (id: string) => {
-  const response = await fetch(`https://api.caregiverhospital.com/hmo-category/hmo_category/${id}`)
+  const response = await fetch(`https://api2.caregiverhospital.com/hmo-category/hmo_category/${id}`)
   if (!response.ok) {
     throw new Error("Failed to fetch HMOs")
   }

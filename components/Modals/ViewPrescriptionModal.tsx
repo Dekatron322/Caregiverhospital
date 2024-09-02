@@ -79,7 +79,7 @@ const ViewPrescriptionModal: React.FC<PrescriptionModalProps> = ({
   }
 
   return (
-    <div className={styles.modalOverlay} data-aos="fade-up" data-aos-duration="1000" data-aos-delay="500">
+    <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>
         <div className="my-2 w-full"></div>
         <div className="px-6 py-6">

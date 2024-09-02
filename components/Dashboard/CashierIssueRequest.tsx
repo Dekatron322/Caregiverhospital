@@ -117,9 +117,11 @@ const CashierIssueRequest = () => {
 
   const handleIconClick = (patient: Patient, prescription: Prescription) => {
     if (!prescription.issue_status) {
+      console.log("Opening IssueRequestModal")
       setSelectedPatient(patient)
       setSelectedPrescription(prescription)
       setIsModalOpen(true)
+      console.log("Modal state after setting:", isModalOpen)
     }
   }
 
@@ -142,6 +144,7 @@ const CashierIssueRequest = () => {
   }
 
   const handleRemoveRedEyeClick = (patient: Patient, prescription: Prescription) => {
+    console.log("Opening ViewPrescriptionModal")
     setSelectedPatient(patient)
     setSelectedPrescription(prescription)
     setIsPreModalOpen(true)
@@ -265,13 +268,15 @@ const CashierIssueRequest = () => {
       {activeTab === "issued" ? renderIssuedRequests() : null}
       {activeTab === "cancelled" ? renderCancelledRequests() : null}
 
-      <IssueRequestModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        patient={selectedPatient}
-        prescription={selectedPrescription}
-        procedureDetails={getProcedureDetails(selectedPrescription?.code || "")}
-      />
+      {isModalOpen && (
+        <IssueRequestModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          patient={selectedPatient}
+          prescription={selectedPrescription}
+          procedureDetails={getProcedureDetails(selectedPrescription?.code || "")}
+        />
+      )}
       {isPreModalOpen && (
         <ViewPrescriptionModal
           isOpen={isPreModalOpen}
