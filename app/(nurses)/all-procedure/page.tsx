@@ -110,8 +110,19 @@ export default function Patients() {
   const indexOfFirstProcedure = indexOfLastProcedure - procedurePerPage
   const currentProcedure = procedure.slice(indexOfFirstProcedure, indexOfLastProcedure)
 
+  // const pageNumbers = []
+  // for (let i = 1; i <= Math.ceil(procedure.length / procedurePerPage); i++) {
+  //   pageNumbers.push(i)
+  // }
+
   const pageNumbers = []
-  for (let i = 1; i <= Math.ceil(procedure.length / procedurePerPage); i++) {
+  const totalPages = Math.ceil(procedure.length / procedurePerPage)
+  const maxPageNumbersToShow = 5
+
+  const startPage = Math.max(1, currentPage - Math.floor(maxPageNumbersToShow / 2))
+  const endPage = Math.min(totalPages, startPage + maxPageNumbersToShow - 1)
+
+  for (let i = startPage; i <= endPage; i++) {
     pageNumbers.push(i)
   }
 
@@ -131,8 +142,10 @@ export default function Patients() {
     setCurrentPage(pageNumber)
   }
 
-  const filteredProcedure = currentProcedure.filter((procedure) =>
-    procedure.code.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredProcedure = currentProcedure.filter(
+    (procedure) =>
+      procedure.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      procedure.name.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   const formatDate = (dateString: string) => {
