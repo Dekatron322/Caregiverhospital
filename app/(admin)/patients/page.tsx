@@ -234,7 +234,10 @@ export default function Patients() {
   const patientsPerPage = 100
   const indexOfLastPatient = currentPage * patientsPerPage
   const indexOfFirstPatient = indexOfLastPatient - patientsPerPage
-  const currentPatients = patients.slice(indexOfFirstPatient, indexOfLastPatient)
+
+  const filteredPatients = patients.filter((p) => p.name.toLowerCase().includes(searchQuery.toLowerCase()))
+
+  const currentPatients = filteredPatients.slice(indexOfFirstPatient, indexOfLastPatient)
 
   const pageNumbers = []
   for (let i = 1; i <= Math.ceil(patients.length / patientsPerPage); i++) {
@@ -257,9 +260,10 @@ export default function Patients() {
     setCurrentPage(pageNumber)
   }
 
-  const filteredPatients = currentPatients.filter((patient) =>
-    patient.name.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value)
+    setCurrentPage(1) // Reset to first page on search
+  }
 
   return (
     <>
@@ -285,7 +289,7 @@ export default function Patients() {
                   className="w-full bg-transparent text-xs outline-none focus:outline-none"
                   style={{ width: "100%" }}
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={handleSearch}
                 />
               </div>
               <Link href="/patients/add" className="add-button">
@@ -317,7 +321,7 @@ export default function Patients() {
                   </div>
                 </div>
               ) : (
-                filteredPatients.map((patient) => (
+                currentPatients.map((patient) => (
                   <div
                     key={patient.id}
                     className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2 "
