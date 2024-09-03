@@ -11,7 +11,6 @@ import { GoPlus } from "react-icons/go"
 import { IoAddCircleSharp } from "react-icons/io5"
 import DeletePatientModal from "components/Modals/DeletePatientModal"
 import EditDiagnosisModal from "components/Modals/EditDiagnosisModal"
-
 import NursesNav from "components/Navbar/NursesNav"
 
 interface Diagnosis {
@@ -102,10 +101,17 @@ export default function Patients() {
     }
   }
 
-  const diagnosisPerPage = 7
+  const diagnosisPerPage = 20
   const indexOfLastDiagnosis = currentPage * diagnosisPerPage
   const indexOfFirstDiagnosis = indexOfLastDiagnosis - diagnosisPerPage
-  const currentDiagnosis = diagnosis.slice(indexOfFirstDiagnosis, indexOfLastDiagnosis)
+
+  const filteredDiagnosis = diagnosis.filter(
+    (d) =>
+      d.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      d.name.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
+  const currentDiagnosis = filteredDiagnosis.slice(indexOfFirstDiagnosis, indexOfLastDiagnosis)
 
   const handleNextPage = () => {
     if (currentPage < pageNumbers.length) {
@@ -123,11 +129,11 @@ export default function Patients() {
     setCurrentPage(pageNumber)
   }
 
-  const filteredDiagnosis = currentDiagnosis.filter(
-    (diagnosis) =>
-      diagnosis.code.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      diagnosis.name.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value)
+    setCurrentPage(1) // Reset to first page on search
+  }
+
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
       year: "numeric",
@@ -141,8 +147,8 @@ export default function Patients() {
   }
 
   const pageNumbers = []
-  const totalPages = Math.ceil(diagnosis.length / diagnosisPerPage)
-  const maxPageNumbersToShow = 5
+  const totalPages = Math.ceil(filteredDiagnosis.length / diagnosisPerPage)
+  const maxPageNumbersToShow = 7
 
   const startPage = Math.max(1, currentPage - Math.floor(maxPageNumbersToShow / 2))
   const endPage = Math.min(totalPages, startPage + maxPageNumbersToShow - 1)
@@ -175,7 +181,7 @@ export default function Patients() {
                   className="w-full bg-transparent text-xs outline-none focus:outline-none"
                   style={{ width: "100%" }}
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={handleSearch}
                 />
               </div>
               <Link href="/all-diagnosis/add" className="add-button">
@@ -207,7 +213,7 @@ export default function Patients() {
                   </div>
                 </div>
               ) : (
-                filteredDiagnosis.map((diagnosis) => (
+                currentDiagnosis.map((diagnosis) => (
                   <div
                     key={diagnosis.id}
                     className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
@@ -246,39 +252,39 @@ export default function Patients() {
                 ))
               )}
             </div>
+            {filteredDiagnosis.length > diagnosisPerPage && (
+              <div className="mt-4 flex items-center justify-end gap-3 px-16 pb-6 max-sm:px-3 md:mt-4">
+                <button
+                  className={`flex  ${currentPage === 1 ? "cursor-not-allowed opacity-50" : ""}`}
+                  onClick={handlePrevPage}
+                  disabled={currentPage === 1}
+                >
+                  <IoIosArrowBack />
+                </button>
 
-            {filteredDiagnosis.length > 0 && (
-              <div className="mb-4 flex items-center justify-end px-16 max-sm:px-3 md:mt-4">
-                <ul className="flex items-center gap-2">
-                  <li>
-                    <button className="flex items-center" onClick={handlePrevPage} disabled={currentPage === 1}>
-                      <IoIosArrowBack />
-                    </button>
-                  </li>
-                  {pageNumbers.map((number) => (
-                    <li key={number}>
-                      <button
-                        onClick={() => handlePageChange(number)}
-                        className={
-                          currentPage === number
-                            ? "h-6 w-6 rounded-full bg-[#131414] text-sm text-[#ffffff] shadow"
-                            : "h-6 w-6 rounded-full bg-[#F1FFF0] text-sm text-[#1E1E1E]"
-                        }
-                      >
-                        {number}
-                      </button>
-                    </li>
-                  ))}
-                  <li>
-                    <button
-                      className="flex items-center"
-                      onClick={handleNextPage}
-                      disabled={currentPage === totalPages}
-                    >
-                      <IoIosArrowForward />
-                    </button>
-                  </li>
-                </ul>
+                {pageNumbers.map((pageNumber) => (
+                  <button
+                    key={pageNumber}
+                    className={`flex h-6 w-6 items-center justify-center rounded-full  ${
+                      currentPage === pageNumber
+                        ? "  bg-[#131414] text-sm text-[#ffffff] shadow"
+                        : " bg-[#F1FFF0] text-sm text-[#1E1E1E]"
+                    }`}
+                    onClick={() => handlePageChange(pageNumber)}
+                  >
+                    {pageNumber}
+                  </button>
+                ))}
+
+                <button
+                  className={`flex items-center  font-bold   ${
+                    currentPage === totalPages ? "cursor-not-allowed opacity-50" : ""
+                  }`}
+                  onClick={handleNextPage}
+                  disabled={currentPage === totalPages}
+                >
+                  <IoIosArrowForward />
+                </button>
               </div>
             )}
             <Footer />

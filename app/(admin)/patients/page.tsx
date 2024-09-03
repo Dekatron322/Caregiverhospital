@@ -231,7 +231,7 @@ export default function Patients() {
     }
   }
 
-  const patientsPerPage = 7
+  const patientsPerPage = 100
   const indexOfLastPatient = currentPage * patientsPerPage
   const indexOfFirstPatient = indexOfLastPatient - patientsPerPage
   const currentPatients = patients.slice(indexOfFirstPatient, indexOfLastPatient)
