@@ -1,17 +1,16 @@
 "use client"
 import AddCategoryModal from "components/Modals/AddCategoryModal"
-import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
 import Image from "next/image"
-import Link from "next/link"
 import { GoPlus } from "react-icons/go"
 import { IoAddCircleSharp } from "react-icons/io5"
 import { IoIosArrowBack, IoIosArrowForward, IoMdSearch } from "react-icons/io"
 import { usePathname, useRouter } from "next/navigation"
 import { SetStateAction, useEffect, useState } from "react"
-
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
 import PharmacyNav from "components/Navbar/PharmacyNav"
-
+import BorderColorOutlinedIcon from "@mui/icons-material/BorderColorOutlined"
+import DeleteCategoryModal from "components/Modals/DeleteCategoryModal"
 // Define types
 interface Medicine {
   id: string
@@ -43,6 +42,8 @@ export default function MedicineCategories() {
   const [medicineCategories, setMedicineCategories] = useState<MedicineCategory[]>([])
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false)
+  const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null)
   const router = useRouter()
 
   useEffect(() => {
@@ -69,7 +70,18 @@ export default function MedicineCategories() {
     router.push(`/medicines/medicine-details/${medicineId}`)
   }
 
-  const patientsPerPage = 7
+  const openDeleteModal = (categoryId: string) => {
+    setCategoryToDelete(categoryId)
+    setIsDeleteModalOpen(true)
+  }
+
+  // Function to close delete modal
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false)
+    setCategoryToDelete(null)
+  }
+
+  const patientsPerPage = 100
   const indexOfLastPatient = currentPage * patientsPerPage
   const indexOfFirstPatient = indexOfLastPatient - patientsPerPage
   const currentPatients = medicineCategories.slice(indexOfFirstPatient, indexOfLastPatient)
@@ -108,6 +120,33 @@ export default function MedicineCategories() {
     setTimeout(() => setShowSuccessNotification(false), 5000)
     fetchCategories()
     setIsCategoryOpen(false)
+  }
+
+  const handleDeleteCategory = async () => {
+    if (!categoryToDelete) return
+
+    try {
+      const response = await fetch(
+        `https://api2.caregiverhospital.com/medicine-category/medicine_category/${categoryToDelete}/`,
+        {
+          method: "DELETE",
+        }
+      )
+
+      const responseBody = await response.text() // or response.json() if it's JSON
+
+      if (!response.ok) {
+        throw new Error(`Failed to delete category: ${response.status} - ${responseBody}`)
+      }
+
+      // Refresh categories after successful deletion
+      fetchCategories()
+    } catch (error) {
+      console.error("Error deleting category:", error)
+      setError("Failed to delete category")
+    } finally {
+      closeDeleteModal()
+    }
   }
 
   return (
@@ -187,10 +226,9 @@ export default function MedicineCategories() {
                       <small className="text-xs">No. of medicine</small>
                     </div>
 
-                    <div className="">
-                      <p className="w-full whitespace-nowrap px-2 py-[2px] text-center text-xs font-semibold">
-                        View Full Detail
-                      </p>
+                    <div className="flex gap-2">
+                      <BorderColorOutlinedIcon />
+                      <DeleteForeverIcon className="text-[#F2B8B5]" onClick={() => openDeleteModal(patient.id)} />
                     </div>
                   </div>
                 ))
@@ -241,6 +279,8 @@ export default function MedicineCategories() {
         onClose={closeCategoryModal}
         onSubmitSuccess={handleHmoSubmissionSuccess}
       />
+
+      <DeleteCategoryModal isOpen={isDeleteModalOpen} onClose={closeDeleteModal} onDelete={handleDeleteCategory} />
 
       {showSuccessNotification && (
         <div className="animation-fade-in absolute bottom-16  right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
