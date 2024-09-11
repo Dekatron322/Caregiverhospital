@@ -11,6 +11,7 @@ import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
 import PharmacyNav from "components/Navbar/PharmacyNav"
 import BorderColorOutlinedIcon from "@mui/icons-material/BorderColorOutlined"
 import DeleteCategoryModal from "components/Modals/DeleteCategoryModal"
+import EditCategoryModal from "components/Modals/EditCategoryModal"
 // Define types
 interface Medicine {
   id: string
@@ -45,6 +46,11 @@ export default function MedicineCategories() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false)
   const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null)
   const router = useRouter()
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false)
+
+  const [categoryToEdit, setCategoryToEdit] = useState<MedicineCategory | null>(null)
+
+  // Function to open the edit modal
 
   useEffect(() => {
     fetchCategories()
@@ -101,6 +107,17 @@ export default function MedicineCategories() {
 
   const handlePageChange = (pageNumber: SetStateAction<number>) => {
     setCurrentPage(pageNumber)
+  }
+
+  const openEditModal = (category: MedicineCategory) => {
+    setCategoryToEdit(category)
+    setIsEditModalOpen(true)
+  }
+
+  // Function to close edit modal
+  const closeEditModal = () => {
+    setIsEditModalOpen(false)
+    setCategoryToEdit(null)
   }
 
   const filteredPatients = currentPatients.filter((patient) =>
@@ -227,7 +244,7 @@ export default function MedicineCategories() {
                     </div>
 
                     <div className="flex gap-2">
-                      <BorderColorOutlinedIcon />
+                      <BorderColorOutlinedIcon onClick={() => openEditModal(patient)} />
                       <DeleteForeverIcon className="text-[#F2B8B5]" onClick={() => openDeleteModal(patient.id)} />
                     </div>
                   </div>
@@ -279,6 +296,15 @@ export default function MedicineCategories() {
         onClose={closeCategoryModal}
         onSubmitSuccess={handleHmoSubmissionSuccess}
       />
+
+      {isEditModalOpen && (
+        <EditCategoryModal
+          isOpen={isEditModalOpen}
+          onClose={closeEditModal}
+          category={categoryToEdit}
+          onSubmitSuccess={handleHmoSubmissionSuccess}
+        />
+      )}
 
       <DeleteCategoryModal isOpen={isDeleteModalOpen} onClose={closeDeleteModal} onDelete={handleDeleteCategory} />
 
