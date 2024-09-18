@@ -71,6 +71,11 @@ const Page: React.FC = () => {
 
   const handleSubmit = async () => {
     setLoading(true)
+
+    // Set default values if the input fields are empty
+    const defaultHowToUse = "No specific instructions provided"
+    const defaultSideEffects = "No known side effects"
+
     const newMedicine = {
       name,
       quantity,
@@ -78,8 +83,8 @@ const Page: React.FC = () => {
       category: selectedCategory,
       expiry_date: expiryDate,
       price,
-      how_to_use: howToUse,
-      side_effect: sideEffects,
+      how_to_use: howToUse || defaultHowToUse, // Default if empty
+      side_effect: sideEffects || defaultSideEffects, // Default if empty
       status: true,
       pub_date: new Date().toISOString(),
     }
