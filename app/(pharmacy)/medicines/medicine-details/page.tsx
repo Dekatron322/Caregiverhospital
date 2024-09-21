@@ -9,6 +9,7 @@ import RestockModal from "components/Modals/RestockModal"
 import { FaRegEdit } from "react-icons/fa"
 import DeleteMedicineModal from "components/Modals/DeleteMedicineModal"
 import Image from "next/image"
+import EditMedicineModal from "components/Modals/EditMedicineModal"
 
 import PharmacyNav from "components/Navbar/PharmacyNav"
 
@@ -39,38 +40,39 @@ export default function MedicineDetailPage({ params }: { params: { medicineId: s
   const [medicineDetail, setMedicineDetail] = useState<Medicine | null>(null)
   const [isAdmissionOpen, setIsAdmissionOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
+  const [isEditOpen, setIsEditOpen] = useState(false) // New state for edit modal
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const router = useRouter()
   const { medicineId } = params
 
-  useEffect(() => {
-    const fetchMedicineDetail = async () => {
-      const medicineId = localStorage.getItem("selectedMedicineId")
-      if (!medicineId) {
-        console.error("No patient ID found in localStorage")
-        return
-      }
-      try {
-        const response = await fetch(`https://api2.caregiverhospital.com/medicine/medicine/${medicineId}`)
-        if (!response.ok) {
-          throw new Error("Failed to fetch medicine details")
-        }
-        const data = (await response.json()) as Medicine
-        // Fetch category name
-        const categoryResponse = await fetch(
-          `https://api2.caregiverhospital.com/medicine-category/medicine_category/${data.category}`
-        )
-        if (!categoryResponse.ok) {
-          throw new Error("Failed to fetch category details")
-        }
-        const categoryData = (await categoryResponse.json()) as Category
-        // Replace category ID with category name
-        setMedicineDetail({ ...data, category: categoryData.name })
-      } catch (error) {
-        console.error("Error fetching medicine details:", error)
-      }
+  const fetchMedicineDetail = async () => {
+    const medicineId = localStorage.getItem("selectedMedicineId")
+    if (!medicineId) {
+      console.error("No patient ID found in localStorage")
+      return
     }
+    try {
+      const response = await fetch(`https://api2.caregiverhospital.com/medicine/medicine/${medicineId}`)
+      if (!response.ok) {
+        throw new Error("Failed to fetch medicine details")
+      }
+      const data = (await response.json()) as Medicine
+      // Fetch category name
+      const categoryResponse = await fetch(
+        `https://api2.caregiverhospital.com/medicine-category/medicine_category/${data.category}`
+      )
+      if (!categoryResponse.ok) {
+        throw new Error("Failed to fetch category details")
+      }
+      const categoryData = (await categoryResponse.json()) as Category
+      // Replace category ID with category name
+      setMedicineDetail({ ...data, category: categoryData.name })
+    } catch (error) {
+      console.error("Error fetching medicine details:", error)
+    }
+  }
 
+  useEffect(() => {
     fetchMedicineDetail()
   }, [medicineId])
 
@@ -94,9 +96,18 @@ export default function MedicineDetailPage({ params }: { params: { medicineId: s
     setIsDeleteOpen(false)
   }
 
-  const handleHmoSubmissionSuccess = () => {
+  const handleHmoSubmissionSuccess = async () => {
     setShowSuccessNotification(true)
+    await fetchMedicineDetail() // Re-fetch the updated medicine details
     setTimeout(() => setShowSuccessNotification(false), 5000)
+  }
+
+  const openEditModal = () => {
+    setIsEditOpen(true)
+  }
+
+  const closeEditModal = () => {
+    setIsEditOpen(false)
   }
 
   if (!medicineDetail) {
@@ -192,6 +203,13 @@ export default function MedicineDetailPage({ params }: { params: { medicineId: s
                 </div>
                 <div className="flex gap-3">
                   <div
+                    onClick={openEditModal} // Open edit modal on click
+                    className="mt-4 flex h-[50px] w-[150px] cursor-pointer content-center items-center justify-center gap-2 rounded bg-[#46FFA6] text-[#000000]"
+                  >
+                    <FaRegEdit />
+                    <p className="text-sm">Edit Medicine</p>
+                  </div>
+                  <div
                     onClick={openAdmissionModal}
                     className="mt-4 flex h-[50px] w-[150px] cursor-pointer  content-center items-center justify-center gap-2 rounded bg-[#46FFA6] text-[#000000]"
                   >
@@ -215,7 +233,7 @@ export default function MedicineDetailPage({ params }: { params: { medicineId: s
       {showSuccessNotification && (
         <div className="animation-fade-in absolute bottom-16  right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
           <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm  text-[#0F920F]">deleted Successfully</span>
+          <span className="clash-font text-sm  text-[#0F920F]">Successful</span>
         </div>
       )}
       <RestockModal
@@ -229,6 +247,13 @@ export default function MedicineDetailPage({ params }: { params: { medicineId: s
         onClose={closeDeleteModal}
         onSubmitSuccess={handleHmoSubmissionSuccess}
         medicineId={medicineId}
+      />
+
+      <EditMedicineModal
+        isOpen={isEditOpen}
+        onClose={closeEditModal}
+        onSubmitSuccess={handleHmoSubmissionSuccess} // Use the same success handler
+        medicine={medicineDetail} // Pass medicine details to the modal
       />
     </>
   )
