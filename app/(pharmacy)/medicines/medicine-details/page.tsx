@@ -45,6 +45,11 @@ export default function MedicineDetailPage({ params }: { params: { medicineId: s
 
   useEffect(() => {
     const fetchMedicineDetail = async () => {
+      const medicineId = localStorage.getItem("selectedMedicineId")
+      if (!medicineId) {
+        console.error("No patient ID found in localStorage")
+        return
+      }
       try {
         const response = await fetch(`https://api2.caregiverhospital.com/medicine/medicine/${medicineId}`)
         if (!response.ok) {

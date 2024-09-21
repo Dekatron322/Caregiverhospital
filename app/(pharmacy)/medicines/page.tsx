@@ -64,10 +64,11 @@ export default function Medicines() {
   }, [])
 
   const handlePatientClick = (medicineId: string) => {
-    router.push(`/medicines/medicine-details/${medicineId}`)
+    localStorage.setItem("selectedMedicineId", medicineId)
+    router.push(`/medicines/medicine-details`)
   }
 
-  const medicinesPerPage = 7
+  const medicinesPerPage = 100
   const indexOfLastMedicine = currentPage * medicinesPerPage
   const indexOfFirstMedicine = indexOfLastMedicine - medicinesPerPage
   const currentMedicines = medicines.slice(indexOfFirstMedicine, indexOfLastMedicine)
