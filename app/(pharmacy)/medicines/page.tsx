@@ -52,6 +52,10 @@ export default function Medicines() {
             category: category.name, // Assign category name to each medicine
           }))
         )
+
+        // Sort medicines alphabetically by name
+        extractedMedicines.sort((a, b) => a.name.localeCompare(b.name))
+
         setMedicines(extractedMedicines)
       } catch (error) {
         console.error("Error fetching medicines:", error)

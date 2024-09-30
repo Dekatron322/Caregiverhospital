@@ -246,7 +246,7 @@ export default function MedicineDetailPage({ params }: { params: { medicineId: s
         isOpen={isDeleteOpen}
         onClose={closeDeleteModal}
         onSubmitSuccess={handleHmoSubmissionSuccess}
-        medicineId={medicineId}
+        medicineId={medicineDetail?.id} // Ensure the correct ID is passed
       />
 
       <EditMedicineModal
