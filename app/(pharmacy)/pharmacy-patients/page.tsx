@@ -48,18 +48,6 @@ export default function Patients() {
   const [patientToDelete, setPatientToDelete] = useState<Patients | null>(null)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
 
-  const formatDate = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    }
-    return new Date(dateString).toLocaleDateString(undefined, options)
-  }
-
   const handlePatientClick = (patientId: string) => {
     localStorage.setItem("selectedPatientId", patientId)
     router.push(`/pharmacy-patients/patient`) // No need to pass the ID in the URL
@@ -79,25 +67,6 @@ export default function Patients() {
     setIsModalOpen(false)
   }
 
-  const confirmDelete = async () => {
-    if (patientToDelete) {
-      try {
-        const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${patientToDelete.id}/`, {
-          method: "DELETE",
-        })
-        if (!response.ok) {
-          throw new Error("Failed to delete patient")
-        }
-        setPatients(patients.filter((patient) => patient.id !== patientToDelete.id))
-        closeModal()
-        setShowSuccessNotification(true)
-        setTimeout(() => setShowSuccessNotification(false), 5000)
-      } catch (error) {
-        console.error("Error deleting patient:", error)
-      }
-    }
-  }
-
   const fetchPatients = async () => {
     try {
       const response = await fetch("https://api2.caregiverhospital.com/patient/patient/")
@@ -105,7 +74,10 @@ export default function Patients() {
         throw new Error("Failed to fetch patients")
       }
       const data = (await response.json()) as Patients[]
-      setPatients(data)
+
+      // Sort the patients alphabetically by name
+      const sortedData = data.sort((a, b) => a.name.localeCompare(b.name))
+      setPatients(sortedData)
       setLoading(false)
     } catch (error) {
       console.error("Error fetching Patients:", error)
@@ -139,7 +111,9 @@ export default function Patients() {
   const indexOfLastPatient = currentPage * patientsPerPage
   const indexOfFirstPatient = indexOfLastPatient - patientsPerPage
 
-  const filteredPatients = patients.filter((p) => p.name.toLowerCase().includes(searchQuery.toLowerCase()))
+  const filteredPatients = patients
+    .filter((p) => p.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    .sort((a, b) => a.name.localeCompare(b.name))
 
   const currentPatients = filteredPatients.slice(indexOfFirstPatient, indexOfLastPatient)
 
@@ -167,6 +141,20 @@ export default function Patients() {
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value)
     setCurrentPage(1) // Reset to first page on search
+  }
+
+  const calculateAge = (dobString: string) => {
+    const today = new Date()
+    const dob = new Date(dobString)
+    let age = today.getFullYear() - dob.getFullYear()
+    const monthDiff = today.getMonth() - dob.getMonth()
+
+    // Adjust age if birthday hasn't occurred yet this year
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+      age--
+    }
+
+    return age
   }
 
   return (
@@ -253,8 +241,8 @@ export default function Patients() {
                     </div>
 
                     <div className="w-full max-md:hidden">
-                      <p className="text-xs font-bold">{formatDate(patient.dob)}</p>
-                      <small className="text-xs">Date of Birth</small>
+                      <p className="text-xs font-bold">{calculateAge(patient.dob)}</p>
+                      <small className="text-xs">Age</small>
                     </div>
                     <div className="w-full max-md:hidden">
                       <div className="flex gap-1 text-sm font-bold">{patient.membership_no}</div>
