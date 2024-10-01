@@ -73,34 +73,47 @@ export default function Medicines() {
   }
 
   const medicinesPerPage = 100
+
+  // Filter the entire list of medicines based on the search query
+  const filteredMedicines = medicines.filter((medicine) =>
+    medicine.name.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+
+  // Apply pagination on the filtered list
   const indexOfLastMedicine = currentPage * medicinesPerPage
   const indexOfFirstMedicine = indexOfLastMedicine - medicinesPerPage
-  const currentMedicines = medicines.slice(indexOfFirstMedicine, indexOfLastMedicine)
+  const currentMedicines = filteredMedicines.slice(indexOfFirstMedicine, indexOfLastMedicine)
 
   const pageNumbers = []
-  for (let i = 1; i <= Math.ceil(medicines.length / medicinesPerPage); i++) {
+  for (let i = 1; i <= Math.ceil(filteredMedicines.length / medicinesPerPage); i++) {
     pageNumbers.push(i)
   }
 
   const handleNextPage = () => {
-    setCurrentPage(currentPage + 1)
+    if (currentPage < pageNumbers.length) {
+      setCurrentPage(currentPage + 1)
+    }
   }
 
   const handlePrevPage = () => {
-    setCurrentPage(currentPage - 1)
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1)
+    }
   }
 
   const handlePageChange = (pageNumber: SetStateAction<number>) => {
     setCurrentPage(pageNumber)
   }
 
-  const filteredMedicines = currentMedicines.filter((medicine) =>
-    medicine.name.toLowerCase().includes(searchQuery.toLowerCase())
-  )
+  // Reset current page to 1 when search query changes
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value)
+    setCurrentPage(1) // Reset page to 1 on search
+  }
 
   return (
-    <>
-      <section className="h-full ">
+    <section>
+      <div className="h-full ">
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
             <PharmacyNav />
@@ -111,7 +124,7 @@ export default function Medicines() {
               <p className="capitalize">List of Medicines</p>
             </div>
             {filteredMedicines.length === 0 ? (
-              <></>
+              <section></section>
             ) : (
               <div className="mb-6 mt-10 flex items-center justify-between px-16 max-md:px-3">
                 <div className="search-bg flex h-10 items-center justify-between gap-2 rounded border border-[#CFDBD5] px-3 py-1 max-sm:w-[180px] lg:w-[300px]">
@@ -123,7 +136,7 @@ export default function Medicines() {
                     className="w-full bg-transparent text-xs outline-none focus:outline-none"
                     style={{ width: "100%" }}
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onChange={handleSearchChange} // Use the new handler
                   />
                 </div>
                 <Link href="/medicines/add" className="add-button">
@@ -144,8 +157,8 @@ export default function Medicines() {
                 </div>
               ) : error ? (
                 <p>{error}</p>
-              ) : filteredMedicines.length === 0 ? (
-                <>
+              ) : currentMedicines.length === 0 ? (
+                <section>
                   <div className="mt-auto flex h-full w-full items-center justify-center">
                     <div>
                       <Image src="/undraw_medical_care_movn.svg" height={237} width={341} alt="pharmacy" />
@@ -159,9 +172,9 @@ export default function Medicines() {
                     </div>
                     <div></div>
                   </div>
-                </>
+                </section>
               ) : (
-                filteredMedicines.map((medicine) => (
+                currentMedicines.map((medicine) => (
                   <div
                     key={medicine.id}
                     className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
@@ -193,7 +206,7 @@ export default function Medicines() {
               )}
             </div>
             {filteredMedicines.length === 0 ? (
-              <></>
+              <section></section>
             ) : (
               <div className="mb-4 mt-4 flex items-center justify-end px-16 max-sm:px-3">
                 <ul className="flex items-center gap-2">
@@ -219,7 +232,7 @@ export default function Medicines() {
                   <li className="flex items-center">
                     <button
                       onClick={handleNextPage}
-                      disabled={currentPage === Math.ceil(medicines.length / medicinesPerPage)}
+                      disabled={currentPage === Math.ceil(filteredMedicines.length / medicinesPerPage)}
                     >
                       <IoIosArrowForward />
                     </button>
@@ -231,7 +244,7 @@ export default function Medicines() {
             <Footer />
           </div>
         </div>
-      </section>
-    </>
+      </div>
+    </section>
   )
 }

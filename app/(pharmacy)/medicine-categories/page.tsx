@@ -167,8 +167,8 @@ export default function MedicineCategories() {
   }
 
   return (
-    <>
-      <section className="h-full">
+    <section>
+      <div className="h-full">
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
             <PharmacyNav />
@@ -179,7 +179,7 @@ export default function MedicineCategories() {
               <p className="capitalize">List of {pathname.split("/").pop()}</p>
             </div>
             {filteredPatients.length === 0 ? (
-              <></>
+              <section></section>
             ) : (
               <div className="mb-6 mt-10 flex items-center justify-between px-16 max-sm:px-3">
                 <div className="search-bg flex h-10 items-center justify-between gap-2 rounded border border-[#CFDBD5] px-3 py-1 max-sm:w-[180px] lg:w-[300px]">
@@ -213,7 +213,7 @@ export default function MedicineCategories() {
               ) : error ? (
                 <p>{error}</p>
               ) : filteredPatients.length === 0 ? (
-                <>
+                <section>
                   <div className="mt-auto flex h-full w-full items-center justify-center">
                     <div>
                       <Image src="/undraw_medical_care_movn.svg" height={237} width={341} alt="pharmacy" />
@@ -227,7 +227,7 @@ export default function MedicineCategories() {
                     </div>
                     <div></div>
                   </div>
-                </>
+                </section>
               ) : (
                 filteredPatients.map((patient) => (
                   <div
@@ -252,7 +252,7 @@ export default function MedicineCategories() {
               )}
             </div>
             {filteredPatients.length === 0 ? (
-              <></>
+              <section></section>
             ) : (
               <div className="mb-4 mt-4 flex items-center justify-end px-16 max-sm:px-3">
                 <ul className="flex items-center gap-2">
@@ -290,7 +290,7 @@ export default function MedicineCategories() {
             <Footer />
           </div>
         </div>
-      </section>
+      </div>
       <AddCategoryModal
         isOpen={isCategoryOpen}
         onClose={closeCategoryModal}
@@ -314,6 +314,6 @@ export default function MedicineCategories() {
           <span className="clash-font text-sm  text-[#0F920F]">Category added successfully</span>
         </div>
       )}
-    </>
+    </section>
   )
 }
