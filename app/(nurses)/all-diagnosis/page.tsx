@@ -93,7 +93,11 @@ export default function Patients() {
         throw new Error("Failed to fetch diagnosis")
       }
       const data = (await response.json()) as Diagnosis[]
-      setDiagnosis(data)
+
+      // Sort the diagnosis alphabetically by name
+      const sortedData = data.sort((a, b) => a.name.localeCompare(b.name))
+
+      setDiagnosis(sortedData)
       setLoading(false)
     } catch (error) {
       console.error("Error fetching diagnosis:", error)
@@ -101,7 +105,7 @@ export default function Patients() {
     }
   }
 
-  const diagnosisPerPage = 20
+  const diagnosisPerPage = 100
   const indexOfLastDiagnosis = currentPage * diagnosisPerPage
   const indexOfFirstDiagnosis = indexOfLastDiagnosis - diagnosisPerPage
 
@@ -114,7 +118,7 @@ export default function Patients() {
   const currentDiagnosis = filteredDiagnosis.slice(indexOfFirstDiagnosis, indexOfLastDiagnosis)
 
   const handleNextPage = () => {
-    if (currentPage < pageNumbers.length) {
+    if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1)
     }
   }
@@ -146,17 +150,16 @@ export default function Patients() {
     return new Date(dateString).toLocaleDateString(undefined, options)
   }
 
-  const pageNumbers = []
   const totalPages = Math.ceil(filteredDiagnosis.length / diagnosisPerPage)
   const maxPageNumbersToShow = 7
 
   const startPage = Math.max(1, currentPage - Math.floor(maxPageNumbersToShow / 2))
   const endPage = Math.min(totalPages, startPage + maxPageNumbersToShow - 1)
 
+  const pageNumbers = []
   for (let i = startPage; i <= endPage; i++) {
     pageNumbers.push(i)
   }
-
   return (
     <>
       <section className="h-full">
