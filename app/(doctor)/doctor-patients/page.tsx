@@ -105,7 +105,10 @@ export default function Patients() {
         throw new Error("Failed to fetch patients")
       }
       const data = (await response.json()) as Patients[]
-      setPatients(data)
+
+      // Sort the patients alphabetically by name
+      const sortedData = data.sort((a, b) => a.name.localeCompare(b.name))
+      setPatients(sortedData)
       setLoading(false)
     } catch (error) {
       console.error("Error fetching Patients:", error)
@@ -139,8 +142,9 @@ export default function Patients() {
   const indexOfLastPatient = currentPage * patientsPerPage
   const indexOfFirstPatient = indexOfLastPatient - patientsPerPage
 
-  const filteredPatients = patients.filter((p) => p.name.toLowerCase().includes(searchQuery.toLowerCase()))
-
+  const filteredPatients = patients
+    .filter((p) => p.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    .sort((a, b) => a.name.localeCompare(b.name))
   const currentPatients = filteredPatients.slice(indexOfFirstPatient, indexOfLastPatient)
 
   const pageNumbers = []
@@ -169,9 +173,23 @@ export default function Patients() {
     setCurrentPage(1) // Reset to first page on search
   }
 
+  const calculateAge = (dobString: string) => {
+    const today = new Date()
+    const dob = new Date(dobString)
+    let age = today.getFullYear() - dob.getFullYear()
+    const monthDiff = today.getMonth() - dob.getMonth()
+
+    // Adjust age if birthday hasn't occurred yet this year
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+      age--
+    }
+
+    return age
+  }
+
   return (
-    <>
-      <section className="h-full ">
+    <section>
+      <div className="h-full ">
         <div className="flex min-h-screen ">
           <div className="flex w-screen flex-col ">
             <DashboardNav />
@@ -253,8 +271,8 @@ export default function Patients() {
                     </div>
 
                     <div className="w-full max-md:hidden">
-                      <p className="text-xs font-bold">{formatDate(patient.dob)}</p>
-                      <small className="text-xs">Date of Birth</small>
+                      <p className="text-xs font-bold">{calculateAge(patient.dob)}</p>
+                      <small className="text-xs">Age</small>
                     </div>
                     <div className="w-full max-md:hidden">
                       <div className="flex gap-1 text-sm font-bold">{patient.membership_no}</div>
@@ -325,7 +343,7 @@ export default function Patients() {
             <Footer />
           </div>
         </div>
-      </section>
+      </div>
 
       {/* <DeletePatientModal
         isOpen={isModalOpen}
@@ -340,6 +358,6 @@ export default function Patients() {
           <span className="clash-font text-sm  text-[#0F920F]">Deleted Successfully</span>
         </div>
       )}
-    </>
+    </section>
   )
 }

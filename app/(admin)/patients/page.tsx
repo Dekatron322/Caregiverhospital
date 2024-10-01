@@ -273,8 +273,8 @@ export default function Patients() {
   }
 
   return (
-    <>
-      <section className="h-full ">
+    <section>
+      <div className="h-full ">
         <div className="flex min-h-screen ">
           <div className="flex w-screen flex-col ">
             <DashboardNav />
@@ -428,7 +428,7 @@ export default function Patients() {
             <Footer />
           </div>
         </div>
-      </section>
+      </div>
 
       <DeletePatientModal
         isOpen={isModalOpen}
@@ -459,6 +459,6 @@ export default function Patients() {
           <span className="clash-font text-sm  text-[#0F920F]">Updated Successfully</span>
         </div>
       )}
-    </>
+    </section>
   )
 }
