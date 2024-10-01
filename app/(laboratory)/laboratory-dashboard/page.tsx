@@ -43,8 +43,8 @@ export default function PharmacyDashboard() {
   }, [])
 
   return (
-    <>
-      <section className="h-full">
+    <section>
+      <div className="h-full">
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
             <LaboratoryNav />
@@ -93,7 +93,7 @@ export default function PharmacyDashboard() {
             <Footer />
           </div>
         </div>
-      </section>
-    </>
+      </div>
+    </section>
   )
 }
