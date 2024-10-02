@@ -17,8 +17,8 @@ export default function Admission() {
   }
 
   return (
-    <>
-      <section className="h-full ">
+    <section>
+      <div className="h-full ">
         <div className=" flex min-h-screen ">
           <div className="flex  w-screen flex-col ">
             <DoctorNav />
@@ -41,7 +41,7 @@ export default function Admission() {
             <Footer />
           </div>
         </div>
-      </section>
-    </>
+      </div>
+    </section>
   )
 }
