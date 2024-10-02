@@ -138,8 +138,8 @@ export default function MedicineExpiring({ params }: MedicineExpiringProps) {
   }
 
   return (
-    <>
-      <section className="h-full">
+    <section>
+      <div className="h-full">
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
             <PharmacyNav />
@@ -151,7 +151,7 @@ export default function MedicineExpiring({ params }: MedicineExpiringProps) {
               </button>
             </div>
             {filteredPatients.length === 0 ? (
-              <></>
+              <section></section>
             ) : (
               <div className="mb-6 mt-10 flex items-center justify-between px-16 max-sm:px-3">
                 <h3 className="font-semibold">Drug Shortage</h3>
@@ -172,7 +172,7 @@ export default function MedicineExpiring({ params }: MedicineExpiringProps) {
 
             <div className="flex flex-col gap-2 px-16 max-sm:px-3">
               {filteredPatients.length === 0 ? (
-                <>
+                <section>
                   <div className="mt-auto flex h-full w-full items-center justify-center">
                     <div>
                       <Image src="/undraw_medical_care_movn.svg" height={237} width={341} alt="pharmacy" />
@@ -182,7 +182,7 @@ export default function MedicineExpiring({ params }: MedicineExpiringProps) {
                     </div>
                     <div></div>
                   </div>
-                </>
+                </section>
               ) : (
                 filteredPatients.map((shortage) => (
                   <div
@@ -217,7 +217,7 @@ export default function MedicineExpiring({ params }: MedicineExpiringProps) {
               )}
             </div>
             {filteredPatients.length === 0 ? (
-              <></>
+              <section></section>
             ) : (
               <div className="mb-4 mt-4 flex items-center justify-end px-16 max-sm:px-3">
                 <ul className="flex items-center gap-2">
@@ -255,13 +255,13 @@ export default function MedicineExpiring({ params }: MedicineExpiringProps) {
             <Footer />
           </div>
         </div>
-      </section>
+      </div>
       <TrashDrugModal
         isOpen={isDeleteOpen}
         onClose={closeDeleteModal}
         onSubmitSuccess={handleHmoSubmissionSuccess}
         medicineId={selectedMedicineId}
       />
-    </>
+    </section>
   )
 }

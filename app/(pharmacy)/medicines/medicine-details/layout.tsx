@@ -5,8 +5,8 @@ export const metadata = {
 
 export default function MedicineLayout({ children }: { children: React.ReactNode }) {
   return (
-    <>
+    <section>
       <main>{children}</main>
-    </>
+    </section>
   )
 }

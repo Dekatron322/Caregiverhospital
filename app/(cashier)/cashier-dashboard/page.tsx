@@ -9,8 +9,8 @@ import CashierIssueRequest from "components/Dashboard/CashierIssueRequest"
 export default function Dashboard() {
   const pathname = usePathname()
   return (
-    <>
-      <section className="h-full ">
+    <section>
+      <div className="h-full ">
         <div className=" flex min-h-screen ">
           <div className="flex  w-screen flex-col ">
             <PharmacyNav />
@@ -31,7 +31,7 @@ export default function Dashboard() {
             <Footer />
           </div>
         </div>
-      </section>
-    </>
+      </div>
+    </section>
   )
 }

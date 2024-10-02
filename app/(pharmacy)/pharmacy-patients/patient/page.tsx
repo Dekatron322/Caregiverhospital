@@ -174,8 +174,8 @@ export default function PatientDetailPage() {
   }
 
   return (
-    <>
-      <section className="h-full">
+    <section>
+      <div className="h-full">
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
             <DashboardNav />
@@ -306,7 +306,7 @@ export default function PatientDetailPage() {
             <Footer />
           </div>
         </div>
-      </section>
+      </div>
       <AdmissionModal
         isOpen={isAdmissionOpen}
         onClose={closeAdmissionModal}
@@ -336,6 +336,6 @@ export default function PatientDetailPage() {
           <span className="clash-font text-sm text-[#0F920F]">Successfully deleted</span>
         </div>
       )}
-    </>
+    </section>
   )
 }
