@@ -166,7 +166,7 @@ const UpdateVitalsModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubm
               <input
                 type="text"
                 id="bloodPressure"
-                placeholder="Blood Pressure (mg/dl)"
+                placeholder="Blood Pressure (mmHg)"
                 className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
                 value={bloodPressure}
                 onChange={(e) => setBloodPressure(e.target.value)}
@@ -177,7 +177,7 @@ const UpdateVitalsModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubm
               <input
                 type="text"
                 id="glucoseLevel"
-                placeholder="Glucose Level"
+                placeholder="Glucose Level (mg/dl)"
                 className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
                 value={glucoseLevel}
                 onChange={(e) => setGlucoseLevel(e.target.value)}
