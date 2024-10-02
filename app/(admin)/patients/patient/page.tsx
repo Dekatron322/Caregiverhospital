@@ -191,7 +191,7 @@ export default function PatientDetailPage() {
                     <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
                       <Image src="/pt-dashboard-01.svg" height={40} width={40} alt="" />
                       <h3 className="py-2 font-bold">Heart Rate</h3>
-                      <p>{patientDetail.heart_rate || "N/A"}</p>
+                      <p>{patientDetail.heart_rate || "N/A"} bpm</p>
                     </div>
                     <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
                       <Image src="/pt-dashboard-02.svg" height={40} width={40} alt="" />
@@ -203,12 +203,12 @@ export default function PatientDetailPage() {
                     <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
                       <Image src="/pt-dashboard-03.svg" height={40} width={40} alt="" />
                       <h3 className="py-2 font-bold">Glucose Level</h3>
-                      <p>{patientDetail.glucose_level || "N/A"}</p>
+                      <p>{patientDetail.glucose_level || "N/A"} mg/dl</p>
                     </div>
                     <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
                       <Image src="/pt-dashboard-04.svg" height={40} width={40} alt="" />
                       <h3 className="py-2 font-bold">Blood Pressure</h3>
-                      <p>{patientDetail.blood_pressure || "N/A"} mg/dl</p>
+                      <p>{patientDetail.blood_pressure || "N/A"} mmHg</p>
                     </div>
                   </div>
                   <div className="flex justify-between gap-2 max-md:flex-col">

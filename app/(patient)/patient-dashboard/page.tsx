@@ -80,7 +80,7 @@ const PatientDetailPage: React.FC = () => {
                       <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
                         <Image src="/pt-dashboard-01.svg" height={40} width={40} alt="" />
                         <h3 className="py-2 font-bold">Heart Rate</h3>
-                        <p>{patient.heart_rate || "N/A"}</p>
+                        <p>{patient.heart_rate || "N/A"} bpm</p>
                       </div>
                       <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
                         <Image src="/pt-dashboard-02.svg" height={40} width={40} alt="" />
@@ -92,12 +92,12 @@ const PatientDetailPage: React.FC = () => {
                       <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
                         <Image src="/pt-dashboard-03.svg" height={40} width={40} alt="" />
                         <h3 className="py-2 font-bold">Glucose Level</h3>
-                        <p>{patient.glucose_level || "N/A"}</p>
+                        <p>{patient.glucose_level || "N/A"} mg/dl</p>
                       </div>
                       <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
                         <Image src="/pt-dashboard-04.svg" height={40} width={40} alt="" />
                         <h3 className="py-2 font-bold">Blood Pressure</h3>
-                        <p>{patient.blood_pressure || "N/A"} mg/dl</p>
+                        <p>{patient.blood_pressure || "N/A"} mmHg</p>
                       </div>
                     </div>
                     <div className="flex justify-between gap-2 max-md:flex-col">
