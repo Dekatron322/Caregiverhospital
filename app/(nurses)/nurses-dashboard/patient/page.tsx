@@ -216,7 +216,7 @@ export default function PatientDetailPage() {
       <section className="h-full">
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
-            <DashboardNav />
+            <NursesNav />
 
             {patientDetail && (
               <div className="px-16 max-md:px-3 sm:py-10">
@@ -235,22 +235,24 @@ export default function PatientDetailPage() {
                     <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
                       <Image src="/pt-dashboard-01.svg" height={40} width={40} alt="" />
                       <h3 className="py-2 font-bold">Heart Rate</h3>
-                      <p>{patientDetail.heart_rate || "N/A"} </p>
+                      <p>{patientDetail.heart_rate || "N/A"} bpm</p>
                     </div>
                     <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
                       <Image src="/pt-dashboard-02.svg" height={40} width={40} alt="" />
                       <h3 className="py-2 font-bold">Body Temperature</h3>
-                      <p>{patientDetail.body_temperature || "N/A"}</p>
+                      <p>
+                        {patientDetail.body_temperature || "N/A"} <small>°C</small>
+                      </p>
                     </div>
                     <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
                       <Image src="/pt-dashboard-03.svg" height={40} width={40} alt="" />
                       <h3 className="py-2 font-bold">Glucose Level</h3>
-                      <p>{patientDetail.glucose_level || "N/A"} </p>
+                      <p>{patientDetail.glucose_level || "N/A"} mg/dl</p>
                     </div>
                     <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
                       <Image src="/pt-dashboard-04.svg" height={40} width={40} alt="" />
                       <h3 className="py-2 font-bold">Blood Pressure</h3>
-                      <p>{patientDetail.blood_pressure || "N/A"} </p>
+                      <p>{patientDetail.blood_pressure || "N/A"} mmHg</p>
                     </div>
                   </div>
                   <div className="flex justify-between gap-2 max-md:flex-col">

@@ -146,10 +146,10 @@ const LaboratoryNav: React.FC = () => {
   }
 
   return (
-    <>
+    <section>
       <nav className="hidden border-b px-16 py-4 md:block">
         <div className="flex items-center justify-between">
-          <h5 className="font-bold capitalize">Admin Dashboard</h5>
+          <h5 className="font-bold capitalize">Laboratory Dashboard</h5>
 
           <div className="flex items-center gap-2">
             <Search />
@@ -293,7 +293,7 @@ const LaboratoryNav: React.FC = () => {
       {isLogoutModalOpen && (
         <LogoutModal open={isLogoutModalOpen} handleClose={handleLogoutCancel} handleConfirm={handleLogoutConfirm} />
       )}
-    </>
+    </section>
   )
 }
 

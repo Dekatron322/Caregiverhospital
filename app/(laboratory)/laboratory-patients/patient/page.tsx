@@ -13,6 +13,7 @@ import { IoMdArrowBack } from "react-icons/io"
 import { MdLocationPin } from "react-icons/md"
 
 import PatientDetails from "components/Patient/PatientDetails"
+import LaboratoryNav from "components/Navbar/LaboratoryNav"
 
 interface PatientDetail {
   id: string
@@ -178,7 +179,7 @@ export default function PatientDetailPage() {
       <section className="h-full">
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
-            <DashboardNav />
+            <LaboratoryNav />
 
             {patientDetail && (
               <div className="px-16 max-md:px-3 sm:py-10">

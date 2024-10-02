@@ -12,6 +12,7 @@ import Link from "next/link"
 import { GoPlus } from "react-icons/go"
 import { IoAddCircleSharp } from "react-icons/io5"
 import DeletePatientModal from "components/Modals/DeletePatientModal"
+import LaboratoryNav from "components/Navbar/LaboratoryNav"
 
 interface Patients {
   id: string
@@ -180,7 +181,7 @@ export default function Patients() {
       <div className="h-full ">
         <div className="flex min-h-screen ">
           <div className="flex w-screen flex-col ">
-            <DashboardNav />
+            <LaboratoryNav />
 
             <div className="flex items-center gap-2 px-16 pt-4 max-md:px-3">
               <p className="font-bold">Admin Dashboard</p>
