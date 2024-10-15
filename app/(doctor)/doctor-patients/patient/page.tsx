@@ -13,6 +13,7 @@ import { IoMdArrowBack } from "react-icons/io"
 import { MdLocationPin } from "react-icons/md"
 
 import PatientDetails from "components/Patient/PatientDetails"
+import DoctorNav from "components/Navbar/DoctorNav"
 
 interface PatientDetail {
   id: string
@@ -148,7 +149,7 @@ export default function PatientDetailPage() {
       <section className="h-full">
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
-            <DashboardNav />
+            <DoctorNav />
             <div className="loading-text flex h-full items-center justify-center">
               {"loading...".split("").map((letter, index) => (
                 <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>
@@ -178,7 +179,7 @@ export default function PatientDetailPage() {
       <section className="h-full">
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
-            <DashboardNav />
+            <DoctorNav />
 
             {patientDetail && (
               <div className="px-16 max-md:px-3 sm:py-10">

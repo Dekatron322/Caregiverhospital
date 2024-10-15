@@ -149,7 +149,7 @@ export default function PatientDetailPage() {
       <section className="h-full">
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
-            <DashboardNav />
+            <LaboratoryNav />
             <div className="loading-text flex h-full items-center justify-center">
               {"loading...".split("").map((letter, index) => (
                 <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>

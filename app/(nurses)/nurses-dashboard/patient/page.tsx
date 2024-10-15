@@ -104,7 +104,9 @@ export default function PatientDetailPage() {
 
     const fetchPatientDetails = async () => {
       try {
-        const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${storedPatientId}/`)
+        const response = await fetch(
+          `https://api2.caregiverhospital.com/patient/patient/get/detail/${storedPatientId}/`
+        )
         if (!response.ok) {
           const errorDetails = await response.text()
           throw new Error(`Network response was not ok: ${errorDetails}`)
@@ -170,7 +172,7 @@ export default function PatientDetailPage() {
     }
 
     try {
-      const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${patientId}/`)
+      const response = await fetch(`hhttps://api2.caregiverhospital.com/patient/patient/get/detail/${patientId}/`)
       if (!response.ok) {
         throw new Error("Network response was not ok")
       }

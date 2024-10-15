@@ -13,6 +13,7 @@ import { GoPlus } from "react-icons/go"
 import { IoAddCircleSharp } from "react-icons/io5"
 import DeletePatientModal from "components/Modals/DeletePatientModal"
 import EditPatientModal from "components/Modals/EditPatientModal"
+import LaboratoryNav from "components/Navbar/LaboratoryNav"
 
 export interface Patients {
   id: string
@@ -146,7 +147,7 @@ export default function Patients() {
 
   const handlePatientClick = (patientId: string) => {
     localStorage.setItem("selectedPatientId", patientId)
-    router.push(`/laboratory-patient/patient`)
+    router.push(`/laboratory-patients/patient`)
   }
 
   const fetchPatients = async (page: number, query: string = "") => {
@@ -252,10 +253,10 @@ export default function Patients() {
       <div className="h-full ">
         <div className="flex min-h-screen ">
           <div className="flex w-screen flex-col ">
-            <DashboardNav />
+            <LaboratoryNav />
 
             <div className="flex items-center gap-2 px-16 pt-4 max-md:px-3">
-              <p className="font-bold">Admin Dashboard</p>
+              <p className="font-bold">Laboratory Dashboard</p>
               <IoIosArrowForward />
               <p className="capitalize">{pathname.split("/").pop()}</p>
             </div>
