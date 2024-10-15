@@ -1,4 +1,4 @@
-"use client"
+"use client" // Add this directive to ensure the code runs on the client-side
 
 import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
@@ -82,7 +82,7 @@ export default function PatientDetailPage() {
       }
 
       try {
-        const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${patientId}/`)
+        const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/get/detail/${patientId}/`)
         if (!response.ok) {
           const errorDetails = await response.text()
           throw new Error(`Network response was not ok: ${errorDetails}`)
@@ -132,7 +132,7 @@ export default function PatientDetailPage() {
     }
 
     try {
-      const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${patientId}/`)
+      const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/get/detail/${patientId}/`)
       if (!response.ok) {
         throw new Error("Network response was not ok")
       }
@@ -250,7 +250,7 @@ export default function PatientDetailPage() {
                             <p className="xl:text-sm">Policy ID</p>
                             <p className="xl:text-sm">{patientDetail.policy_id || "N/A"}</p>
                           </div>
-                          {/* <div className="mt-6 flex w-full gap-2">
+                          <div className="mt-6 flex w-full gap-2">
                             <button
                               onClick={openAppointmentModal}
                               className="button-primary h-[40px] w-[60%] whitespace-nowrap rounded-md max-sm:h-[40px] xl:text-sm"
@@ -263,7 +263,7 @@ export default function PatientDetailPage() {
                             >
                               Check In
                             </button>
-                          </div> */}
+                          </div>
                         </div>
                       </div>
 

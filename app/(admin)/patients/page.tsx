@@ -187,7 +187,7 @@ export default function Patients() {
 
   const fetchPatientDetails = async (patientId: string) => {
     try {
-      const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${patientId}/`)
+      const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/get/detail/${patientId}/`)
       if (!response.ok) {
         throw new Error("Failed to fetch patient details")
       }
