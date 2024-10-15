@@ -1,4 +1,4 @@
-"use client" // Add this directive to ensure the code runs on the client-side
+"use client"
 
 import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"

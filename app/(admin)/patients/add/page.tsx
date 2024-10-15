@@ -125,7 +125,7 @@ const Page = () => {
     }
 
     try {
-      const response = await fetch("https://api2.caregiverhospital.com/patient/patient/", {
+      const response = await fetch("https://api2.caregiverhospital.com/patient/patient/0/0/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -61,6 +61,7 @@ export default function Patients() {
   const [showEditedNotification, setShowEditedNotification] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [patientToEdit, setPatientToEdit] = useState<Patients | null>(null)
+  const [allPatients, setAllPatients] = useState<Patients[]>([])
 
   const patientsPerPage = 100
 
@@ -148,31 +149,54 @@ export default function Patients() {
     router.push(`/patients/patient`)
   }
 
-  const fetchPatients = async (page: number) => {
-    setLoading(true) // Set loading to true when fetching starts
-    const start = (page - 1) * patientsPerPage + 1 // Calculate start index (1-based)
-    const stop = page * patientsPerPage // Calculate stop index
+  const fetchPatients = async (page: number, query: string = "") => {
+    setLoading(true)
+    const start = (page - 1) * patientsPerPage + 1
+    const stop = page * patientsPerPage
 
     try {
-      const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${start}/${stop}`)
+      const response = await fetch(
+        `https://api2.caregiverhospital.com/patient/patient/${start}/${stop}?search=${query}`
+      )
       if (!response.ok) {
         throw new Error("Failed to fetch patients")
       }
       const data = (await response.json()) as Patients[]
 
-      // Sort the patients alphabetically by name
       const sortedData = data.sort((a, b) => a.name.localeCompare(b.name))
       setPatients(sortedData)
     } catch (error) {
       console.error("Error fetching Patients:", error)
     } finally {
-      setLoading(false) // Set loading to false after fetching completes
+      setLoading(false)
     }
   }
 
   useEffect(() => {
-    fetchPatients(currentPage) // Fetch patients for the current page
-  }, [currentPage]) // Re-fetch when currentPage changes
+    fetchPatients(currentPage, searchQuery)
+  }, [currentPage, searchQuery])
+
+  useEffect(() => {
+    const storedPatientId = localStorage.getItem("selectedPatientId")
+    if (storedPatientId) {
+      fetchPatientDetails(storedPatientId)
+    } else {
+      console.error("No patient ID found in localStorage")
+    }
+  }, [])
+
+  const fetchPatientDetails = async (patientId: string) => {
+    try {
+      const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${patientId}/`)
+      if (!response.ok) {
+        throw new Error("Failed to fetch patient details")
+      }
+      const data = await response.json()
+      // Handle the data here
+    } catch (error) {
+      console.error("Error fetching patient details:", error)
+    }
+  }
 
   const openModal = (patient: Patients) => {
     setPatientToDelete(patient)
@@ -280,13 +304,13 @@ export default function Patients() {
                 </div>
               ) : (
                 <div className="relative w-full overflow-hidden">
-                  <div className="overflow-x-auto">
+                  <div className="overflow-x- mb-2">
                     {patients
                       .filter((patient) => patient.name.toLowerCase().includes(searchQuery.toLowerCase()))
                       .map((patient) => (
                         <div
                           key={patient.id}
-                          className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2 "
+                          className="mb-2 flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
                         >
                           <div className="flex items-center gap-1 text-sm font-bold md:w-[20%]">
                             {/* {patient.image ? (
@@ -347,16 +371,16 @@ export default function Patients() {
                       ))}
                   </div>
 
-                  <div className="flex justify-between px-16 py-4 max-md:px-3">
+                  <div className="flex justify-between  py-4 max-md:px-3">
                     <button
                       onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                       disabled={currentPage === 1}
-                      className="rounded bg-gray-300 p-2 disabled:opacity-50"
+                      className="rounded bg-[#46ffac] p-2 disabled:opacity-50"
                     >
                       <IoIosArrowBack />
                     </button>
                     <p>Page {currentPage}</p>
-                    <button onClick={() => setCurrentPage((prev) => prev + 1)} className="rounded bg-gray-300 p-2">
+                    <button onClick={() => setCurrentPage((prev) => prev + 1)} className="rounded bg-[#46ffac] p-2">
                       <IoIosArrowForward />
                     </button>
                   </div>
