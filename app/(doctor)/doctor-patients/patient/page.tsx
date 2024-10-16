@@ -251,20 +251,6 @@ export default function PatientDetailPage() {
                             <p className="xl:text-sm">Policy ID</p>
                             <p className="xl:text-sm">{patientDetail.policy_id || "N/A"}</p>
                           </div>
-                          {/* <div className="mt-6 flex w-full gap-2">
-                            <button
-                              onClick={openAppointmentModal}
-                              className="button-primary h-[40px] w-[60%] whitespace-nowrap rounded-md max-sm:h-[40px] xl:text-sm"
-                            >
-                              Book Appointment
-                            </button>
-                            <button
-                              onClick={openAdmissionModal}
-                              className="button-primary h-[40px] w-[40%] whitespace-nowrap rounded-md max-sm:h-[40px] xl:text-sm"
-                            >
-                              Check In
-                            </button>
-                          </div> */}
                         </div>
                       </div>
 
