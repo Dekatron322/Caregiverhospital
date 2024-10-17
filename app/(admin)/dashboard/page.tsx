@@ -48,23 +48,45 @@ export default function Dashboard() {
   const [departmentCount, setDepartmentCount] = useState(0)
   const [staffCount, setStaffCount] = useState(0)
   const [recentCheckApps, setRecentCheckApps] = useState<PatientCheckApp[]>([])
+  const [patientCount, setPatientCount] = useState(0)
 
   useEffect(() => {
-    async function fetchPatients() {
-      try {
-        const response = await fetch("https://api2.caregiverhospital.com/patient/patient/")
-        if (!response.ok) {
-          throw new Error("Failed to fetch patients")
-        }
-        const data = (await response.json()) as Patient[]
-        setPatients(data)
+    async function fetchAllPatients() {
+      let allPatients: Patient[] = []
+      let start = 0
+      const stop = 10000 // Adjust as needed, based on the number of patients returned per request
 
-        // Filter patients with appointments
-        const patientsWithApps = data.filter((patient) => patient.appointments.length > 0)
+      try {
+        while (true) {
+          const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${start}/${stop}/`)
+          if (!response.ok) {
+            throw new Error("Failed to fetch patients")
+          }
+
+          const data = (await response.json()) as Patient[]
+
+          // If no more patients are returned, break the loop
+          if (data.length === 0) {
+            break
+          }
+
+          // Add the current batch of patients to the allPatients array
+          allPatients = [...allPatients, ...data]
+
+          // Move to the next batch
+          start += stop
+        }
+
+        // Set the total number of patients after fetching all
+        setPatients(allPatients)
+        setPatientCount(allPatients.length)
+
+        // Optionally, filter patients with appointments
+        const patientsWithApps = allPatients.filter((patient) => patient.appointments.length > 0)
         setPatientsWithAppointments(patientsWithApps)
 
         // Extract and sort check_apps by pub_date, then get the top 5
-        const allCheckApps = data.flatMap((patient) =>
+        const allCheckApps = allPatients.flatMap((patient) =>
           patient.check_apps.map((checkApp) => ({
             patientName: patient.name,
             checkApp,
@@ -79,7 +101,7 @@ export default function Dashboard() {
       }
     }
 
-    fetchPatients()
+    fetchAllPatients()
   }, [])
 
   useEffect(() => {
