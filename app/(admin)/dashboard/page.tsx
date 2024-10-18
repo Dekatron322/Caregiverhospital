@@ -49,59 +49,23 @@ export default function Dashboard() {
   const [staffCount, setStaffCount] = useState(0)
   const [recentCheckApps, setRecentCheckApps] = useState<PatientCheckApp[]>([])
   const [patientCount, setPatientCount] = useState(0)
+  const [totalPatients, setTotalPatients] = useState(0)
 
   useEffect(() => {
-    async function fetchAllPatients() {
-      let allPatients: Patient[] = []
-      let start = 0
-      const stop = 10000 // Adjust as needed, based on the number of patients returned per request
-
+    // Fetch the total patient count from the API
+    const fetchPatientCount = async () => {
       try {
-        while (true) {
-          const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${start}/${stop}/`)
-          if (!response.ok) {
-            throw new Error("Failed to fetch patients")
-          }
-
-          const data = (await response.json()) as Patient[]
-
-          // If no more patients are returned, break the loop
-          if (data.length === 0) {
-            break
-          }
-
-          // Add the current batch of patients to the allPatients array
-          allPatients = [...allPatients, ...data]
-
-          // Move to the next batch
-          start += stop
-        }
-
-        // Set the total number of patients after fetching all
-        setPatients(allPatients)
-        setPatientCount(allPatients.length)
-
-        // Optionally, filter patients with appointments
-        const patientsWithApps = allPatients.filter((patient) => patient.appointments.length > 0)
-        setPatientsWithAppointments(patientsWithApps)
-
-        // Extract and sort check_apps by pub_date, then get the top 5
-        const allCheckApps = allPatients.flatMap((patient) =>
-          patient.check_apps.map((checkApp) => ({
-            patientName: patient.name,
-            checkApp,
-          }))
+        const response = await fetch(
+          "https://api2.caregiverhospital.com/patient/patient/fetch/count/get-patient-count/"
         )
-        const sortedCheckApps = allCheckApps.sort(
-          (a, b) => new Date(b.checkApp.pub_date).getTime() - new Date(a.checkApp.pub_date).getTime()
-        )
-        setRecentCheckApps(sortedCheckApps.slice(0, 5))
+        const data = await response.json()
+        setTotalPatients(data.total) // Update state with the total count
       } catch (error) {
-        console.error("Error fetching patients:", error)
+        console.error("Error fetching patient count:", error)
       }
     }
 
-    fetchAllPatients()
+    fetchPatientCount()
   }, [])
 
   useEffect(() => {
@@ -195,7 +159,7 @@ export default function Dashboard() {
                   <Image src="/outpatient.svg" height={30} width={30} alt="pharmacy" />
                 </div>
                 <div className="flex justify-between">
-                  <h6 className="font-bold">{patients.length}</h6>
+                  <h6 className="font-bold">{totalPatients}</h6>
                   <Link href="/patients" className="rounded-full bg-[#46FFA6] px-2 py-1 text-xs text-[#000000]">
                     View
                   </Link>
