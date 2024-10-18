@@ -52,13 +52,18 @@ export default function Dashboard() {
   const [totalPatients, setTotalPatients] = useState(0)
 
   useEffect(() => {
+    // Define the expected shape of the response
+    interface PatientCountResponse {
+      total: number
+    }
+
     // Fetch the total patient count from the API
     const fetchPatientCount = async () => {
       try {
         const response = await fetch(
           "https://api2.caregiverhospital.com/patient/patient/fetch/count/get-patient-count/"
         )
-        const data = await response.json()
+        const data = (await response.json()) as PatientCountResponse // Explicitly cast the response
         setTotalPatients(data.total) // Update state with the total count
       } catch (error) {
         console.error("Error fetching patient count:", error)
