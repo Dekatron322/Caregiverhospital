@@ -157,14 +157,21 @@ export default function Patients() {
     const stop = page * patientsPerPage
 
     try {
-      const response = await fetch(
-        `https://api2.caregiverhospital.com/patient/patient/${start}/${stop}?search=${query}`
-      )
+      let response
+      // Use the search endpoint if a query is provided
+      if (query) {
+        response = await fetch(
+          `https://api2.caregiverhospital.com/patient/patient/search/search-patients/by-name/${query}/`
+        )
+      } else {
+        response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${start}/${stop}`)
+      }
+
       if (!response.ok) {
         throw new Error("Failed to fetch patients")
       }
-      const data = (await response.json()) as Patients[]
 
+      const data = (await response.json()) as Patients[]
       const sortedData = data.sort((a, b) => a.name.localeCompare(b.name))
       setPatients(sortedData)
     } catch (error) {
