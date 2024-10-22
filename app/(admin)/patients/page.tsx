@@ -218,9 +218,12 @@ export default function Patients() {
   const confirmDelete = async () => {
     if (patientToDelete) {
       try {
-        const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${patientToDelete.id}/`, {
-          method: "DELETE",
-        })
+        const response = await fetch(
+          `https://api2.caregiverhospital.com/patient/patient/get/detail/${patientToDelete.id}/`,
+          {
+            method: "DELETE",
+          }
+        )
         if (!response.ok) {
           throw new Error("Failed to delete patient")
         }

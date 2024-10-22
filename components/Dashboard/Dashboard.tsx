@@ -46,11 +46,14 @@ const Appointments = () => {
   const [activeTab, setActiveTab] = useState("all")
   const [patients, setPatients] = useState<Patient[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const start = 0
+  const stop = 20
 
   const fetchPatients = async () => {
     try {
-      const response = await fetch("https://api2.caregiverhospital.com/patient/patient/0/20/")
+      const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${start}/${stop}/`)
       const data = (await response.json()) as ApiResponse
+      // Filter patients with appointments only
       const patientsWithAppointments = data.filter((patient) => patient.appointments.length > 0)
       setPatients(patientsWithAppointments)
     } catch (error) {
@@ -101,22 +104,7 @@ const Appointments = () => {
 
     return (
       <div key={patient.id} className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2">
-        {/* <div className="flex w-[20%] flex-col max-md:hidden">
-          {lastAppointment && (
-            <div
-              className="my-4 flex content-center items-center gap-2"
-              onClick={() => toggleDone(patient.id, lastAppointment.id)}
-            >
-              {lastAppointment.status === "done" ? (
-                <Image src="/checkbox1.svg" width={14} height={14} alt="checkbox" />
-              ) : (
-                <Image src="/checkbox.svg" width={14} height={14} alt="checkbox" />
-              )}
-            </div>
-          )}
-        </div> */}
         <div className="flex w-full items-center gap-2">
-          {/* <Image src={patient.image} width={40} height={40} alt={`${patient.name}'s image`} className="rounded-full" /> */}
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46ffa6] max-md:hidden">
             <p className="capitalize text-[#000000]">{patient.name.charAt(0)}</p>
           </div>
@@ -125,10 +113,6 @@ const Appointments = () => {
             <p className="text-xs">Patient Name</p>
           </div>
         </div>
-        {/* <div className="flex w-full flex-col max-md:hidden">
-          <p className="text-sm font-bold">{patient.phone_no}</p>
-          <p className="text-xs">Phone Number</p>
-        </div> */}
         {lastAppointment && (
           <>
             <div className="flex w-full flex-col">
