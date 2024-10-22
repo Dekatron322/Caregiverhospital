@@ -172,7 +172,7 @@ export default function PatientDetailPage() {
     }
 
     try {
-      const response = await fetch(`hhttps://api2.caregiverhospital.com/patient/patient/get/detail/${patientId}/`)
+      const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/get/detail/${patientId}/`) // Fixed typo here
       if (!response.ok) {
         throw new Error("Network response was not ok")
       }
@@ -366,7 +366,7 @@ export default function PatientDetailPage() {
       <UpdateVitalsModal
         isOpen={isUpdateVitalsOpen}
         onClose={closeUpdateVitalsModal}
-        onSubmitSuccess={handleHmoSubmissionSuccess}
+        onSubmitSuccess={refreshPatientDetails}
         patientId={patientDetail.id}
       />
 

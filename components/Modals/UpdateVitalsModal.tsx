@@ -31,6 +31,7 @@ interface PatientData {
   blood_pressure: string
   status: boolean
   pub_date: string
+  discount_value: string
   hmo: {
     id: string
     name: string
@@ -57,21 +58,22 @@ const UpdateVitalsModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubm
     })
   }, [])
 
+  const fetchPatientData = async () => {
+    try {
+      const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/get/detail/${patientId}/`)
+      const data = (await response.json()) as PatientData
+      // Set state variables with the existing data
+      setHeartRate(data.heart_rate || "")
+      setBodyTemperature(data.body_temperature || "")
+      setGlucoseLevel(data.glucose_level || "")
+      setBloodPressure(data.blood_pressure || "")
+    } catch (error) {
+      console.error("Error fetching patient data", error)
+    }
+  }
+
   useEffect(() => {
     if (isOpen) {
-      const fetchPatientData = async () => {
-        try {
-          const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${patientId}/`)
-          const data = (await response.json()) as PatientData
-          // Set state variables with the existing data
-          setHeartRate(data.heart_rate || "")
-          setBodyTemperature(data.body_temperature || "")
-          setGlucoseLevel(data.glucose_level || "")
-          setBloodPressure(data.blood_pressure || "")
-        } catch (error) {
-          console.error("Error fetching patient data", error)
-        }
-      }
       fetchPatientData()
     }
   }, [isOpen, patientId])
@@ -83,7 +85,7 @@ const UpdateVitalsModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubm
     setLoading(true)
     try {
       // Fetch current patient data
-      const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${patientId}/`)
+      const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/get/detail/${patientId}/`)
       const patientData = (await response.json()) as PatientData
 
       // Create an object with all the required fields, using the existing values for the fields you don't want to change
@@ -96,10 +98,14 @@ const UpdateVitalsModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubm
         hmo: patientData.hmo.id, // Only include the HMO ID
       }
 
-      // Log the updatedData to check its structure
+      // Remove 'discount_value' if it's empty or invalid
+      if (!patientData.discount_value || patientData.discount_value.length === 0) {
+        delete updatedData.discount_value
+      }
+
       console.log("Payload to be sent:", updatedData)
 
-      const updateResponse = await fetch(`https://api2.caregiverhospital.com/patient/patient/${patientId}/`, {
+      const updateResponse = await fetch(`https://api2.caregiverhospital.com/patient/edit/patient/${patientId}/`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -108,8 +114,10 @@ const UpdateVitalsModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubm
       })
 
       if (updateResponse.ok) {
+        // Refetch the patient data to refresh the updated information
+        await fetchPatientData()
+
         onSubmitSuccess()
-        onClose()
         setShowSuccessNotification(true)
         setTimeout(() => setShowSuccessNotification(false), 5000)
       } else {
@@ -124,6 +132,7 @@ const UpdateVitalsModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubm
       setTimeout(() => setShowErrorNotification(false), 5000)
     } finally {
       setLoading(false)
+      onClose()
     }
   }
 
@@ -198,14 +207,14 @@ const UpdateVitalsModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubm
       </div>
       {showSuccessNotification && (
         <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
-          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm text-[#0F920F]">Vitals Updated successfully</span>
+          <Image src="/check-circle.svg" width={16} height={16} alt="Success" />
+          <span className="text-sm font-normal">Vitals Updated Successfully</span>
         </div>
       )}
       {showErrorNotification && (
-        <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#D14343] bg-[#FEE5E5] text-[#D14343] shadow-[#05420514]">
-          <Image src="/check-circle-failed.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm text-[#D14343]">Error updating vitals</span>
+        <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#CC0000] bg-[#FFF1F1] text-[#CC0000] shadow-[#cc000014]">
+          <Image src="/error-triangle.svg" width={16} height={16} alt="Error" />
+          <span className="text-sm font-normal">Error updating vitals</span>
         </div>
       )}
     </div>
