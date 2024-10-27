@@ -1,6 +1,5 @@
 "use client"
 import React, { useEffect, useState } from "react"
-import Image from "next/image"
 import { PiDotsThree } from "react-icons/pi"
 import { useRouter } from "next/navigation"
 
@@ -10,76 +9,45 @@ interface Appointment {
   detail: string
   pub_date: string
   status: string
-  doctor_assigned: string
-  doctor_image: string
+  patient_name: string // This is the name of the patient from the appointment
   time: string
   complain: string
 }
 
-interface Patient {
-  id: string
-  name: string
-  gender: string
-  dob: string
-  membership_no: string
-  policy_id: string
-  email_address: string
-  phone_no: string
-  address: string
-  nok_name: string
-  nok_phone_no: string
-  nok_address: string
-  allergies: string
-  heart_rate: string
-  body_temperature: string
-  glucose_level: string
-  blood_pressure: string
-  image: string
-  status: boolean
-  appointments: Appointment[]
-}
-
-type ApiResponse = Patient[]
-
 const Appointments = () => {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState("all")
-  const [patients, setPatients] = useState<Patient[]>([])
+  const [appointments, setAppointments] = useState<Appointment[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const start = 0
-  const stop = 20
 
-  const fetchPatients = async () => {
+  const fetchAppointments = async () => {
     try {
-      const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${start}/${stop}/`)
-      const data = (await response.json()) as ApiResponse
-      // Filter patients with appointments only
-      const patientsWithAppointments = data.filter((patient) => patient.appointments.length > 0)
-      setPatients(patientsWithAppointments)
+      const response = await fetch(`https://api2.caregiverhospital.com/appointment/all/0/100/`)
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      const data = (await response.json()) as Appointment[]
+
+      console.log("API Response Data:", data) // Log the response to check its structure
+
+      setAppointments(data)
     } catch (error) {
-      console.error("Error fetching patients:", error)
+      console.error("Error fetching appointments:", error)
     } finally {
       setIsLoading(false)
     }
   }
 
   useEffect(() => {
-    fetchPatients()
+    fetchAppointments()
   }, [])
 
-  const toggleDone = (patientId: string, appointmentId: number) => {
-    setPatients((prevPatients) =>
-      prevPatients.map((patient) =>
-        patient.id === patientId
-          ? {
-              ...patient,
-              appointments: patient.appointments.map((appointment) =>
-                appointment.id === appointmentId
-                  ? { ...appointment, status: appointment.status === "done" ? "pending" : "done" }
-                  : appointment
-              ),
-            }
-          : patient
+  const toggleDone = (appointmentId: number) => {
+    setAppointments((prevAppointments) =>
+      prevAppointments.map((appointment) =>
+        appointment.id === appointmentId
+          ? { ...appointment, status: appointment.status === "done" ? "pending" : "done" }
+          : appointment
       )
     )
   }
@@ -96,41 +64,39 @@ const Appointments = () => {
     return new Date(dateString).toLocaleDateString(undefined, options)
   }
 
-  const renderPatientDetails = (patient: Patient) => {
-    const sortedAppointments = patient.appointments.sort(
-      (a, b) => new Date(b.pub_date).getTime() - new Date(a.pub_date).getTime()
-    )
-    const lastAppointment = sortedAppointments[0]
+  const renderAppointmentDetails = (appointment: Appointment) => {
+    const displayName =
+      appointment.patient_name && appointment.patient_name.trim() ? appointment.patient_name : "Unknown Patient"
+    const initialLetter = displayName !== "Unknown Patient" ? displayName.charAt(0) : "?"
 
     return (
-      <div key={patient.id} className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2">
+      <div
+        key={appointment.id}
+        className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
+      >
         <div className="flex w-full items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46ffa6] max-md:hidden">
-            <p className="capitalize text-[#000000]">{patient.name.charAt(0)}</p>
+            <p className="capitalize text-[#000000]">{initialLetter}</p>
           </div>
           <div>
-            <p className="text-sm font-bold">{patient.name}</p>
+            <p className="text-sm font-bold">{displayName}</p>
             <p className="text-xs">Patient Name</p>
           </div>
         </div>
-        {lastAppointment && (
-          <>
-            <div className="flex w-full flex-col">
-              <p className="text-sm font-bold">{lastAppointment.doctor}</p>
-              <p className="text-xs">Doctor Assigned</p>
-            </div>
-            <div className="flex w-full flex-col max-md:hidden">
-              <p className="text-sm font-bold">{formatDate(lastAppointment.pub_date)}</p>
-              <p className="text-xs">Last Appointment</p>
-            </div>
-            <div className="md:flex md:w-full md:flex-col md:items-center">
-              <p className="rounded bg-[#46FFA6] px-2 py-[2px] text-center text-xs font-bold text-black">
-                {lastAppointment.detail}
-              </p>
-              <p className="text-xs">Complain</p>
-            </div>
-          </>
-        )}
+        <div className="flex w-full flex-col">
+          <p className="text-sm font-bold">{appointment.doctor}</p>
+          <p className="text-xs">Doctor Assigned</p>
+        </div>
+        <div className="flex w-full flex-col max-md:hidden">
+          <p className="text-sm font-bold">{formatDate(appointment.pub_date)}</p>
+          <p className="text-xs">Last Appointment</p>
+        </div>
+        <div className="md:flex md:w-full md:flex-col md:items-center">
+          <p className="rounded bg-[#46FFA6] px-2 py-[2px] text-center text-xs font-bold text-black">
+            {appointment.detail}
+          </p>
+          <p className="text-xs">Complain</p>
+        </div>
         <div className="max-md:hidden">
           <PiDotsThree />
         </div>
@@ -138,23 +104,25 @@ const Appointments = () => {
     )
   }
 
-  const renderAllPatients = () => (
-    <div className="flex flex-col gap-2">{patients.map((patient) => renderPatientDetails(patient))}</div>
-  )
-
-  const renderPendingPatients = () => (
+  const renderAllAppointments = () => (
     <div className="flex flex-col gap-2">
-      {patients
-        .filter((patient) => patient.appointments.some((appointment) => appointment.status !== "done"))
-        .map((patient) => renderPatientDetails(patient))}
+      {appointments.map((appointment) => renderAppointmentDetails(appointment))}
     </div>
   )
 
-  const renderDonePatients = () => (
+  const renderPendingAppointments = () => (
     <div className="flex flex-col gap-2">
-      {patients
-        .filter((patient) => patient.appointments.every((appointment) => appointment.status === "done"))
-        .map((patient) => renderPatientDetails(patient))}
+      {appointments
+        .filter((appointment) => appointment.status !== "done")
+        .map((appointment) => renderAppointmentDetails(appointment))}
+    </div>
+  )
+
+  const renderDoneAppointments = () => (
+    <div className="flex flex-col gap-2">
+      {appointments
+        .filter((appointment) => appointment.status === "done")
+        .map((appointment) => renderAppointmentDetails(appointment))}
     </div>
   )
 
@@ -191,9 +159,9 @@ const Appointments = () => {
             </button>
           </div>
 
-          {activeTab === "all" && renderAllPatients()}
-          {activeTab === "pending" && renderPendingPatients()}
-          {activeTab === "done" && renderDonePatients()}
+          {activeTab === "all" && renderAllAppointments()}
+          {activeTab === "pending" && renderPendingAppointments()}
+          {activeTab === "done" && renderDoneAppointments()}
         </>
       )}
     </div>

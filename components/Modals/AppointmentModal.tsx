@@ -139,7 +139,9 @@ const AppointmentModal: React.FC<ReviewModalProps> = ({
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            doctor: doctors.find((doc) => doc.id === doctor)?.name || "", // Submitting the doctor's name
+            patient_id: patientId, // Include patient_id
+            patient_name: patientDetail.name, // Include patient_name
+            doctor: doctors.find((doc) => doc.id === doctor)?.name || "", // Doctor's name
             detail,
           }),
         }
@@ -174,7 +176,7 @@ const AppointmentModal: React.FC<ReviewModalProps> = ({
               <LiaTimesSolid className="m-1 cursor-pointer" onClick={onClose} />
             </div>
           </div>
-          <p>Books an appointment for {Patient.find((patient) => patient.id === patientId)?.name}</p>
+          <p>Books an appointment for {patientDetail.name}</p>
 
           <div className="relative mt-6">
             <p className="mb-1 text-sm">Doctor</p>
