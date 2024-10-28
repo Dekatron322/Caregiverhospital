@@ -31,7 +31,7 @@ interface PatientData {
   blood_pressure: string
   status: boolean
   pub_date: string
-  discount_value: string
+  discount_value?: string
   hmo: {
     id: string
     name: string
