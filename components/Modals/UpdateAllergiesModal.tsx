@@ -61,7 +61,7 @@ const UpdateAllergiesModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onS
     if (isOpen) {
       const fetchPatientData = async () => {
         try {
-          const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${patientId}/`)
+          const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/get/detail/${patientId}/`)
           if (!response.ok) {
             throw new Error("Failed to fetch patient data")
           }
@@ -82,7 +82,7 @@ const UpdateAllergiesModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onS
     setLoading(true)
     try {
       // Fetch the current patient data
-      const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${patientId}/`)
+      const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/get/detail/${patientId}/`)
       if (!response.ok) {
         throw new Error("Failed to fetch patient data")
       }
@@ -105,7 +105,7 @@ const UpdateAllergiesModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onS
       }
 
       // Send the update request with the full data object
-      const updateResponse = await fetch(`https://api2.caregiverhospital.com/patient/patient/${patientId}/`, {
+      const updateResponse = await fetch(`https://api2.caregiverhospital.com/patient/edit/patient/${patientId}/`, {
         method: "PUT", // Using PUT method
         headers: {
           "Content-Type": "application/json",
