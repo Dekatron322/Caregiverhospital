@@ -4,11 +4,12 @@ import { PiDotsThree } from "react-icons/pi"
 import { useRouter } from "next/navigation"
 
 interface Appointment {
-  id: number
+  id: any
   doctor: string
   detail: string
   pub_date: string
   status: string
+  patient_id: any
   patient_name: string
   time: string
   complain: string
@@ -47,6 +48,28 @@ const DoctorsAppointments = () => {
     fetchAppointments()
   }, [])
 
+  useEffect(() => {
+    const storedPatientId = localStorage.getItem("selectedAppointmentId")
+    if (storedPatientId) {
+      fetchPatientDetails(storedPatientId)
+    } else {
+      console.error("No patient ID found in localStorage")
+    }
+  }, [])
+
+  const fetchPatientDetails = async (patientId: string) => {
+    try {
+      const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/get/detail/${patientId}/`)
+      if (!response.ok) {
+        throw new Error("Failed to fetch patient details")
+      }
+      const data = await response.json()
+      // Handle the data here
+    } catch (error) {
+      console.error("Error fetching patient details:", error)
+    }
+  }
+
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
       year: "numeric",
@@ -60,7 +83,11 @@ const DoctorsAppointments = () => {
   }
 
   const renderAppointmentDetails = (appointment: Appointment) => (
-    <div key={appointment.id} className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2">
+    <div
+      key={appointment.id}
+      className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
+      onClick={() => handleAppointmentClick(appointment.patient_id)}
+    >
       <div className="flex w-full items-center gap-2">
         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46ffa6] max-md:hidden">
           <p className="capitalize text-[#000000]">{appointment.patient_name.charAt(0)}</p>
@@ -86,7 +113,7 @@ const DoctorsAppointments = () => {
         <p className="text-xs">Complain</p>
       </div>
 
-      <div className="max-md:hidden" onClick={() => handleAppointmentClick(appointment.id)}>
+      <div className="max-md:hidden">
         <PiDotsThree />
       </div>
     </div>

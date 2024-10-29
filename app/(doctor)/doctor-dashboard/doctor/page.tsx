@@ -15,7 +15,7 @@ import DoctorNav from "components/Navbar/DoctorNav"
 import NoteModal from "components/Modals/NoteModal"
 
 interface Patient {
-  id: string
+  id: any
   name: string
   heart_rate?: string
   body_temperature?: string
@@ -56,7 +56,7 @@ interface Patient {
     discount_value: string
   }[]
   medicals: {
-    id: string
+    id: any
     name: string
     doctor_image: string
     test: string
@@ -87,7 +87,7 @@ interface Patient {
 }
 
 interface AddPrescription {
-  id: string
+  id: any
   name: string
 }
 
@@ -117,7 +117,7 @@ export default function PatientDetailPage() {
 
   const fetchPatientDetails = async () => {
     try {
-      const patientId = localStorage.getItem("selectedPatientId")
+      const patientId = localStorage.getItem("selectedAppointmentId")
       if (!patientId) {
         console.error("No appointment ID found in localStorage.")
         return
