@@ -156,20 +156,30 @@ export default function Patients() {
 
     try {
       let response
-      // Use the search endpoint if a query is provided
+      let data: Patients[] = []
+
       if (query) {
-        response = await fetch(
-          `https://api2.caregiverhospital.com/patient/patient/search/search-patients/by-name/${query}/`
-        )
+        // Split query into parts for each word in the name
+        const queryParts = query.split(" ")
+        for (const part of queryParts) {
+          const encodedQueryPart = encodeURIComponent(part)
+          const searchResponse = await fetch(
+            `https://api2.caregiverhospital.com/patient/patient/search/search-patients/by-name/${encodedQueryPart}/`
+          )
+
+          if (searchResponse.ok) {
+            const partData = (await searchResponse.json()) as Patients[]
+            data = [...data, ...partData] // Append results for each part of the query
+          }
+        }
+        // Remove duplicates from merged results, if any
+        data = Array.from(new Set(data.map((p) => p.id))).map((id) => data.find((p) => p.id === id)!)
       } else {
         response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${start}/${stop}`)
+        if (!response.ok) throw new Error("Failed to fetch patients")
+        data = (await response.json()) as Patients[]
       }
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch patients")
-      }
-
-      const data = (await response.json()) as Patients[]
       const sortedData = data.sort((a, b) => a.name.localeCompare(b.name))
       setPatients(sortedData)
     } catch (error) {
