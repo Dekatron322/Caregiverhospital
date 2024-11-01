@@ -90,17 +90,17 @@ const PaymentModal: React.FC<ModalProps> = ({ results, onClose }) => {
     fetchTestPrice(results.test_type)
   }, [results.diagnosis_code, results.test_type])
 
-  const fetchDiagnosisInfo = async (diagnosisCode: string) => {
+  const fetchDiagnosisInfo = async (diagnosisName: string) => {
     try {
-      const response = await axios.get(
-        `https://api2.caregiverhospital.com/diagnosis/diagnosis/?code=${encodeURIComponent(diagnosisCode)}`
-      )
+      const response = await axios.get("https://api2.caregiverhospital.com/diagnosis/diagnosis/")
       const data = response.data
-      if (data.length > 0) {
-        const diagnosis = data[0]
+
+      // Find the diagnosis object that matches the provided name
+      const diagnosis = data.find((item: Diagnosis) => item.name === diagnosisName)
+
+      if (diagnosis) {
         setDiagnosisInfo(diagnosis)
       } else {
-        console.log("Diagnosis not found or API response format unexpected.")
         setDiagnosisInfo(null)
       }
     } catch (error) {
