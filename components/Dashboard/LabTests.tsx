@@ -73,7 +73,7 @@ const LabTests = () => {
 
       try {
         // Fetch lab test results with pagination
-        const labTestResponse = await axios.get(`https://api2.caregiverhospital.com/patient/patient/${start}/${stop}/`)
+        const labTestResponse = await axios.get(`https://api2.caregiverhospital.com/patient/patient/0/100/`)
         const patientData = labTestResponse.data
 
         // Fetch diagnosis data
