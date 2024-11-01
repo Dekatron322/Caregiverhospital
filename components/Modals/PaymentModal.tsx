@@ -90,10 +90,10 @@ const PaymentModal: React.FC<ModalProps> = ({ results, onClose }) => {
     fetchTestPrice(results.test_type)
   }, [results.diagnosis_code, results.test_type])
 
-  const fetchDiagnosisInfo = async (diagnosisName: string) => {
+  const fetchDiagnosisInfo = async (diagnosisCode: string) => {
     try {
       const response = await axios.get(
-        `https://api2.caregiverhospital.com/diagnosis/diagnosis/?name=${encodeURIComponent(diagnosisName)}`
+        `https://api2.caregiverhospital.com/diagnosis/diagnosis/?code=${encodeURIComponent(diagnosisCode)}`
       )
       const data = response.data
       if (data.length > 0) {
