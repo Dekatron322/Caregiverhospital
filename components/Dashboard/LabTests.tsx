@@ -29,6 +29,7 @@ interface LabTestResult {
   discount_value: string
   name: string
   hmo?: HMO
+  test_price?: string
 }
 
 interface Diagnosis {
@@ -67,9 +68,12 @@ const LabTests = () => {
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true)
+      const start = (currentPage - 1) * resultsPerPage
+      const stop = start + resultsPerPage
+
       try {
-        // Fetch lab test results
-        const labTestResponse = await axios.get("https://api2.caregiverhospital.com/patient/patient/")
+        // Fetch lab test results with pagination
+        const labTestResponse = await axios.get(`https://api2.caregiverhospital.com/patient/patient/${start}/${stop}/`)
         const patientData = labTestResponse.data
 
         // Fetch diagnosis data
@@ -77,10 +81,19 @@ const LabTests = () => {
         const fetchedDiagnosisData = diagnosisResponse.data
         setDiagnosisData(fetchedDiagnosisData)
 
+        const testPriceResponse = await axios.get("https://api2.caregiverhospital.com/testt/testt/")
+        const testPriceData = testPriceResponse.data
+
         if (Array.isArray(patientData)) {
           const tests = patientData.flatMap((patient: any) => {
             return patient.lab_tests.map((test: any) => {
               const diagnosis = fetchedDiagnosisData.find((diag: any) => diag.code === test.diagnosis_code)
+
+              const testPriceInfo = testPriceData.find(
+                (priceTest: { title: any }) => priceTest.title === test.test_type
+              )
+              const testPrice = testPriceInfo ? testPriceInfo.test_price : null
+
               return {
                 ...test,
                 patient_name: patient.name,
@@ -88,6 +101,7 @@ const LabTests = () => {
                 policy_id: patient.policy_id,
                 diagnosis,
                 hmo: patient.hmo, // Include HMO details here
+                test_price: testPrice,
               }
             })
           })
@@ -104,7 +118,7 @@ const LabTests = () => {
     }
 
     fetchData()
-  }, [refresh])
+  }, [currentPage, refresh])
 
   const handleCardClick = (results: LabTestResult) => {
     setClickedCard(results)
@@ -206,7 +220,9 @@ const LabTests = () => {
                   <div>
                     <p className="text-sm">Patient: {results.patient_name}</p>
                     <p className="text-sm">Doctor: {results.doctor_name}</p>
-                    <p className="text-xs">Test Type: {results.test_type || "N/A"}</p>
+                    <p className="text-xs">
+                      Test Type: {results.test_type || "N/A"} (₦{results.test_price || "N/A"})
+                    </p>
                   </div>
                 </div>
               </div>

@@ -6,6 +6,7 @@ import AOS from "aos"
 import "aos/dist/aos.css"
 import Image from "next/image"
 import CustomDropdown from "components/Patient/CustomDropdown"
+import CustomDropdownTest from "../Patient/CustomDropdownTest"
 
 interface RequestTest {
   id: string
@@ -33,30 +34,15 @@ interface Diagnosis {
   name: string
 }
 
-const testOptions = [
-  { id: "1", name: "Postrate Specific Antigen (PSA)" },
-  { id: "2", name: "Estradiol" },
-  { id: "3", name: "Progesterone" },
-  { id: "4", name: "Testosterone" },
-  { id: "5", name: "FSH" },
-  { id: "6", name: "2HPP" },
-  { id: "7", name: "FBS" },
-  { id: "8", name: "Electrolyte/Urea/Creatinine" },
-  { id: "9", name: "Liver Function Test" },
-  { id: "10", name: "Lipid Profile" },
-  { id: "11", name: "RBS" },
-  { id: "12", name: "Full Blood Count" },
-  { id: "13", name: "LH" },
-  { id: "14", name: "Thyriod Function Test" },
-  { id: "15", name: "Anti Microbial Susceptibility Test" },
-  { id: "16", name: "HVS M/C/S" },
-  { id: "17", name: "Malaria Parasite" },
-  { id: "18", name: "Salmonella" },
-  { id: "19", name: "Urinalysis" },
-  { id: "20", name: "Urine Microscopy" },
-  { id: "21", name: "SCSH_Stool Analysis" },
-  { id: "22", name: "OGTT" },
-]
+interface TestOption {
+  id: string
+  title: string
+  detail: string
+  test_range: string
+  test_price: string
+  status: boolean
+  pub_date: string
+}
 
 const LabTestModal: React.FC<ModalProps> = ({ results, onClose, userId }) => {
   const [mounted, setMounted] = useState(false)
@@ -71,6 +57,7 @@ const LabTestModal: React.FC<ModalProps> = ({ results, onClose, userId }) => {
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const [showErrorNotification, setShowErrorNotification] = useState(false)
   const [diagnosisData, setDiagnosisData] = useState<Diagnosis[]>([])
+  const [testOptions, setTestOptions] = useState<TestOption[]>([])
 
   useEffect(() => {
     AOS.init({
@@ -83,6 +70,7 @@ const LabTestModal: React.FC<ModalProps> = ({ results, onClose, userId }) => {
     setMounted(true)
     fetchUserDetails()
     fetchDiagnosis()
+    fetchTestOptions()
   }, [])
 
   const fetchUserDetails = async () => {
@@ -121,13 +109,26 @@ const LabTestModal: React.FC<ModalProps> = ({ results, onClose, userId }) => {
     }
   }
 
+  const fetchTestOptions = async () => {
+    try {
+      const response = await fetch(`https://api2.caregiverhospital.com/testt/testt/`)
+      if (!response.ok) {
+        throw new Error("Failed to fetch test options")
+      }
+      const data = (await response.json()) as TestOption[]
+      setTestOptions(data)
+    } catch (error) {
+      console.error("Error fetching test options:", error)
+    }
+  }
+
   const handleAddPrescription = async () => {
     if (userDetails) {
       setDoctorName(userDetails.username)
     }
 
     const selectedTestOption = testOptions.find((option) => option.id === test)
-    const testName = selectedTestOption ? selectedTestOption.name : ""
+    const testName = selectedTestOption ? selectedTestOption.title : ""
 
     const selectedDiagnosis = diagnosisData.find((dia) => dia.id === diagnosis)
     const diagnosisName = selectedDiagnosis ? selectedDiagnosis.name : ""
@@ -186,7 +187,7 @@ const LabTestModal: React.FC<ModalProps> = ({ results, onClose, userId }) => {
           <div className="flex w-full gap-2">
             <div className="my-2 w-full">
               <div className="search-bg mt-1 flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
-                <CustomDropdown
+                <CustomDropdownTest
                   options={testOptions}
                   selectedOption={test}
                   onChange={setTest}
@@ -231,12 +232,6 @@ const LabTestModal: React.FC<ModalProps> = ({ results, onClose, userId }) => {
           <span className="clash-font text-sm text-[#0F920F]">Sent Successfully</span>
         </div>
       )}
-      {/* {showErrorNotification && (
-        <div className="animation-fade-in 0 absolute bottom-16 m-5 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#D14343] bg-[#FEE5E5] text-[#D14343] shadow-[#05420514] md:right-16">
-          <Image src="/check-circle-failed.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm text-[#D14343]">Failed to add prescription</span>
-        </div>
-      )} */}
     </div>
   )
 }

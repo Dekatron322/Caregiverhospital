@@ -38,6 +38,16 @@ interface Diagnosis {
   pub_date: any
 }
 
+interface TestDetail {
+  id: string
+  title: string
+  detail: string
+  test_range: string
+  test_price: string
+  status: boolean
+  pub_date: string
+}
+
 interface ModalProps {
   results: LabTestResult
   onClose: (isSuccess: boolean) => void
@@ -63,6 +73,7 @@ const PaymentModal: React.FC<ModalProps> = ({ results, onClose }) => {
   const [openSection, setOpenSection] = useState(0)
   const [diagnosisInfo, setDiagnosisInfo] = useState<Diagnosis | null>(null) // State to hold diagnosis info
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [testPrice, setTestPrice] = useState<string | null>(null)
 
   useEffect(() => {
     AOS.init({
@@ -74,7 +85,10 @@ const PaymentModal: React.FC<ModalProps> = ({ results, onClose }) => {
     if (results.diagnosis_code) {
       fetchDiagnosisInfo(results.diagnosis_code)
     }
-  }, [results.diagnosis_code])
+
+    // Fetch test price based on test_type
+    fetchTestPrice(results.test_type)
+  }, [results.diagnosis_code, results.test_type])
 
   const fetchDiagnosisInfo = async (diagnosisName: string) => {
     try {
@@ -87,11 +101,28 @@ const PaymentModal: React.FC<ModalProps> = ({ results, onClose }) => {
         setDiagnosisInfo(diagnosis)
       } else {
         console.log("Diagnosis not found or API response format unexpected.")
-        setDiagnosisInfo(null) // Clear diagnosis info if not found
+        setDiagnosisInfo(null)
       }
     } catch (error) {
       console.error("Error fetching diagnosis data:", error)
-      setDiagnosisInfo(null) // Clear diagnosis info on error
+      setDiagnosisInfo(null)
+    }
+  }
+
+  const fetchTestPrice = async (testType: string) => {
+    try {
+      const response = await axios.get("https://api2.caregiverhospital.com/testt/testt/")
+      const data: TestDetail[] = response.data
+      const testDetail = data.find((test) => test.title === testType)
+      if (testDetail) {
+        setTestPrice(testDetail.test_price)
+      } else {
+        console.log("Test type not found.")
+        setTestPrice(null)
+      }
+    } catch (error) {
+      console.error("Error fetching test data:", error)
+      setTestPrice(null)
     }
   }
 
@@ -101,8 +132,11 @@ const PaymentModal: React.FC<ModalProps> = ({ results, onClose }) => {
 
   const calculateTotal = () => {
     if (diagnosisInfo?.price) {
-      const unitPrice = Number(diagnosisInfo.price)
+      const diagnosisPrice = diagnosisInfo?.price ? Number(diagnosisInfo.price) : 0
+      const testPriceAmount = testPrice ? Number(testPrice) : 0
+      const unitPrice = diagnosisPrice + testPriceAmount
       const discountValue = results.discount_value ? parseFloat(results.discount_value) : 0
+
       const discountAmount = unitPrice * (discountValue / 100)
       const finalPrice = unitPrice - discountAmount
 
@@ -218,6 +252,13 @@ const PaymentModal: React.FC<ModalProps> = ({ results, onClose }) => {
                       ? Number(diagnosisInfo.price).toLocaleString("en-US", { minimumFractionDigits: 2 })
                       : "N/A"}{" "}
                     * 1
+                  </p>
+                </div>
+                <div className="flex items-center justify-between pb-4">
+                  <p className="text-sm">Test Price</p>
+                  <p className="py-2">
+                    {" "}
+                    ₦{Number(testPrice).toLocaleString("en-US", { minimumFractionDigits: 2 }) || "N/A"}
                   </p>
                 </div>
                 <div className="flex items-center justify-between pb-2">
