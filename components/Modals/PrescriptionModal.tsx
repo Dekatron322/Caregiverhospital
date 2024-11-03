@@ -6,11 +6,48 @@ import CustomDropdown from "components/Patient/CustomDropdown"
 import AOS from "aos"
 import "aos/dist/aos.css"
 import Image from "next/image"
+import Select from "react-select"
 
 interface AddPrescription {
   id: string
   name: string
 }
+
+type OptionType = {
+  value: string
+  label: string
+}
+
+// Options for multi-select
+const options: OptionType[] = [
+  { value: "1", label: "Abdominal Pain" },
+  { value: "2", label: "Chest Pain" },
+  { value: "3", label: "Joint Pain" },
+  { value: "4", label: "Waist Pain" },
+  { value: "5", label: "Eye Discharge" },
+  { value: "6", label: "Nose Discharge" },
+  { value: "7", label: "Vagina Discharge" },
+  { value: "8", label: "Penial Discharge" },
+  { value: "9", label: "Weakness" },
+  { value: "10", label: "Vomiting" },
+  { value: "11", label: "Cough" },
+  { value: "12", label: "Catarrh" },
+  { value: "13", label: "Stooling" },
+  { value: "14", label: "Poor Appetite" },
+  { value: "15", label: "Poor Sleep" },
+  { value: "16", label: "Rashes" },
+  { value: "17", label: "Sore throat" },
+  { value: "18", label: "Fever" },
+  { value: "19", label: "Eye Itching" },
+  { value: "20", label: "Body Itching" },
+  { value: "21", label: "Ear Itching" },
+  { value: "22", label: "Perineal Itching" },
+  { value: "23", label: "Swollen Eye" },
+  { value: "24", label: "Swollen Ear" },
+  { value: "25", label: "Swollen Nose" },
+  { value: "26", label: "Swollen Perineal" },
+  { value: "27", label: "Swollen Penial" },
+]
 
 interface ModalProps {
   results: AddPrescription
@@ -75,6 +112,14 @@ const PrescriptionModal: React.FC<ModalProps> = ({ results, onClose, userId }) =
   const [showErrorNotification, setShowErrorNotification] = useState(false)
   const [procedureData, setProcedureData] = useState<Procedure[]>([])
   const [procedure, setProcedure] = useState<string>("")
+  const [selectedOptions, setSelectedOptions] = useState<OptionType[]>([])
+
+  // Handle form submission
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    // Log selected options on submit
+    console.log("Selected options:", selectedOptions)
+  }
 
   useEffect(() => {
     AOS.init({
@@ -163,11 +208,13 @@ const PrescriptionModal: React.FC<ModalProps> = ({ results, onClose, userId }) =
     const selectedProceduce = procedureData.find((pro) => pro.id === procedure)
     const procedureName = selectedProceduce ? selectedProceduce.name : ""
 
+    const selectedComplaints = selectedOptions.map((option) => option.label).join(", ")
+
     const prescriptionData = {
       doctor_name: doctorName,
       category: selectedCategory ? selectedCategory.name : "",
       name: selectedMedicine ? selectedMedicine.name : "",
-      complain: selectedComplain ? selectedComplain.name : "",
+      complain: selectedComplaints,
       code: procedureName,
       unit,
       dosage,
@@ -333,15 +380,15 @@ const PrescriptionModal: React.FC<ModalProps> = ({ results, onClose, userId }) =
               </div>
             </div>
           </div>
-          <div className="my-2 w-full">
-            <div className="search-bg mt-1 flex h-[50px] w-[100%] items-center justify-between gap-3 rounded  py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
-              <CustomDropdown
-                options={complaintsOptions.map((comp) => ({ id: comp.id, name: comp.name }))}
-                selectedOption={complain}
-                onChange={(selected) => setComplain(selected)}
-                placeholder="Select Complain"
-              />
-            </div>
+          <div className=" my-2 w-full">
+            <Select
+              options={options}
+              isMulti
+              className=" bg-transparent text-xs"
+              value={selectedOptions}
+              onChange={(selected) => setSelectedOptions(selected as OptionType[])}
+              placeholder="Select Complaints"
+            />
           </div>
 
           <div className="my-2 w-full">
