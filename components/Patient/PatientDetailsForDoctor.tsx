@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import Image from "next/image"
 import { PiDotsThree } from "react-icons/pi"
 import { useRouter } from "next/navigation"
@@ -11,6 +11,7 @@ import AddTestDiscountModal from "components/Modals/AddTestDiscountModal"
 import styles from "../Modals/modal.module.css"
 import AddMedicalDiscountModal from "components/Modals/AddMedicalDiscountModal"
 import { LiaTimesSolid } from "react-icons/lia"
+import { FiTrash2 } from "react-icons/fi"
 
 interface Appointment {
   id: number
@@ -129,13 +130,9 @@ const PatientDetailsForDoctor: React.FC<PatientDetailsProps> = ({ patient }) => 
   const [newDiscountModalVisible, setNewDiscountModalVisible] = useState(false)
   const [selectedPrescription, setSelectedPrescription] = useState<Prescription | null>(null)
 
-  const toggleDone = () => {
-    setIsDone(!isDone)
-  }
-
-  const handleGoBack = () => {
-    router.back()
-  }
+  useEffect(() => {
+    setPatientDetail(patient)
+  }, [patient])
 
   if (!patient) {
     return (
@@ -253,6 +250,32 @@ const PatientDetailsForDoctor: React.FC<PatientDetailsProps> = ({ patient }) => 
     }
   }
 
+  const handleDeletePrescription = async (id: string) => {
+    try {
+      const response = await fetch(`https://api2.caregiverhospital.com/prescription/prescription/${id}/`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+
+      if (response.ok) {
+        setPatientDetail((prevDetail) => {
+          if (!prevDetail) return prevDetail
+
+          const updatedPrescriptions = prevDetail.prescriptions.filter((prescription) => prescription.id !== id)
+
+          return { ...prevDetail, prescriptions: updatedPrescriptions }
+        })
+        alert("Prescription deleted successfully.")
+      } else {
+        alert("Failed to delete prescription.")
+      }
+    } catch (error) {
+      console.error("Error deleting prescription:", error)
+    }
+  }
+
   const renderAllAppointments = () => (
     <div className="flex flex-col gap-2">
       {filteredList.map((appointment) => (
@@ -298,42 +321,45 @@ const PatientDetailsForDoctor: React.FC<PatientDetailsProps> = ({ patient }) => 
             <small className="text-xm ">doctor</small>
           </div> */}
           <div className="w-full">
-            <p className="text-sm font-bold">{formatDateTime(prescription.pub_date)}</p>
-            <small className="text-xm ">Prescription date</small>
+            <p className="text-xs font-semibold">{formatDateTime(prescription.pub_date)}</p>
+            <small className="text-xs ">Prescription date</small>
           </div>
           <div className="w-full">
-            <p className="text-sm font-bold">{prescription.name}</p>
-            <small className="text-xm ">Prescription</small>
+            <p className="text-xs font-semibold">{prescription.name}</p>
+            <small className="text-xs ">Prescription</small>
           </div>
           {/* <div className="w-full">
-            <p className="text-sm font-bold">{prescription.complain}</p>
+            <p className="text-xs font-semibold">{prescription.complain}</p>
             <small className="text-xm ">Complain</small>
           </div> */}
           <div className="w-full">
-            <p className="text-sm font-bold">{prescription.usage}</p>
-            <small className="text-xm ">Usage</small>
+            <p className="text-xs font-semibold">{prescription.usage}</p>
+            <small className="text-xs ">Usage</small>
           </div>
           <div className="w-full">
-            <p className="text-sm font-bold">{prescription.dosage}</p>
-            <small className="text-xm ">Dosage</small>
+            <p className="text-xs font-semibold">{prescription.complain}</p>
+            <small className="text-xs ">Complaint</small>
           </div>
           <div className="w-full">
-            <p className="text-sm font-bold">{prescription.rate}</p>
+            <p className="text-xs font-semibold">{prescription.rate}</p>
             <small className="text-xm ">Rate</small>
           </div>
           <div className="w-full ">
-            <p className="text-sm font-bold">{prescription.unit}</p>
-            <small className="text-xm ">Unit</small>
+            <p className="text-xs font-semibold">{prescription.unit}</p>
+            <small className="text-xs ">Unit</small>
           </div>
           <div className="w-full ">
-            <p className="text-sm font-bold">{prescription.discount_value}</p>
-            <small className="text-xm ">Discount Value</small>
+            <p className="text-xs font-semibold">{prescription.discount_value}</p>
+            <small className="text-xs ">Discount Value</small>
           </div>
           <div>
             <button className="rounded-full p-1 text-blue-500" onClick={() => handleAddDiscountClick(prescription)}>
               <CiDiscount1 size={20} />
             </button>
           </div>
+          <button className="rounded-full p-1 text-red-500" onClick={() => handleDeletePrescription(prescription.id)}>
+            <FiTrash2 />
+          </button>
         </div>
       ))}
     </div>
@@ -343,26 +369,26 @@ const PatientDetailsForDoctor: React.FC<PatientDetailsProps> = ({ patient }) => 
     <div className="flex flex-col gap-2">
       {filteredMedicalRecords.map((medical) => (
         <div key={medical.id} className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2">
-          <div className="flex w-full items-center gap-1 text-sm font-bold">
+          <div className="flex w-full items-center gap-1 text-sm font-semibold">
             <div>
               <p>{medical.test_type}</p>
               <small className="text-xm ">Test Type</small>
             </div>
           </div>
-          <div className="flex w-full items-center gap-1 text-sm font-bold">
+          <div className="flex w-full items-center gap-1 text-sm font-semibold">
             <div>
               <p>{medical.result}</p>
               <small className="text-xm ">Result</small>
             </div>
           </div>
-          <div className="flex w-full items-center gap-1 text-sm font-bold">
+          <div className="flex w-full items-center gap-1 text-sm font-semibold">
             <div>
               <p>{medical.status_note}</p>
               <small className="text-xm ">Status</small>
             </div>
           </div>
           <div className="md:flex md:w-full md:flex-col md:items-center">
-            <p className="rounded bg-[#46FFA6] px-2 py-[2px] text-center text-xs font-bold text-black">
+            <p className="rounded bg-[#46FFA6] px-2 py-[2px] text-center text-xs font-semibold text-black">
               {medical.discount_value ? `Discount: ${medical.discount_value}` : "No Discount"}
             </p>
           </div>
