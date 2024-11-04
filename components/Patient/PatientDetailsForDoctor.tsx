@@ -260,11 +260,14 @@ const PatientDetailsForDoctor: React.FC<PatientDetailsProps> = ({ patient }) => 
       })
 
       if (response.ok) {
+        // Immediately update the state to reflect the deletion
         setPatientDetail((prevDetail) => {
           if (!prevDetail) return prevDetail
 
+          // Filter out the deleted prescription
           const updatedPrescriptions = prevDetail.prescriptions.filter((prescription) => prescription.id !== id)
 
+          // Return the updated patient details with the updated prescriptions
           return { ...prevDetail, prescriptions: updatedPrescriptions }
         })
         alert("Prescription deleted successfully.")

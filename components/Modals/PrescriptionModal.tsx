@@ -204,7 +204,7 @@ const PrescriptionModal: React.FC<ModalProps> = ({ results, onClose, userId }) =
 
     const selectedCategory = categories.find((cat) => cat.id === category)
     const selectedMedicine = medicines.find((med) => med.id === name)
-    const selectedComplain = complaintsOptions.find((comp) => comp.id === complain)
+
     const selectedProceduce = procedureData.find((pro) => pro.id === procedure)
     const procedureName = selectedProceduce ? selectedProceduce.name : ""
 
@@ -254,36 +254,6 @@ const PrescriptionModal: React.FC<ModalProps> = ({ results, onClose, userId }) =
       setTimeout(() => setShowErrorNotification(false), 5000)
     }
   }
-
-  const complaintsOptions = [
-    { id: "1", name: "Abdominal Pain" },
-    { id: "2", name: "Chest Pain" },
-    { id: "3", name: "Joint Pain" },
-    { id: "4", name: "Waist Pain" },
-    { id: "5", name: "Eye Discharge" },
-    { id: "6", name: "Nose Discharge" },
-    { id: "7", name: "Vagina Discharge" },
-    { id: "8", name: "Penial Discharge" },
-    { id: "9", name: "Weakness" },
-    { id: "10", name: "Vomiting" },
-    { id: "11", name: "Cough" },
-    { id: "12", name: "Catarrh" },
-    { id: "13", name: "Stooling" },
-    { id: "14", name: "Poor Appetite" },
-    { id: "15", name: "Poor Sleep" },
-    { id: "16", name: "Rashes" },
-    { id: "17", name: "Sore throat" },
-    { id: "18", name: "Fever" },
-    { id: "19", name: "Eye Itching" },
-    { id: "20", name: "Body Itching" },
-    { id: "21", name: "Ear Itching" },
-    { id: "22", name: "Perineal Itching" },
-    { id: "23", name: "Swollen Eye" },
-    { id: "24", name: "Swollen Ear" },
-    { id: "25", name: "Swollen Nose" },
-    { id: "26", name: "Swollen Perineal" },
-    { id: "27", name: "Swollen Penial" },
-  ]
 
   return (
     <div className={styles.modalOverlay} data-aos="fade-up" data-aos-duration="1000" data-aos-delay="500">
@@ -338,7 +308,7 @@ const PrescriptionModal: React.FC<ModalProps> = ({ results, onClose, userId }) =
                 />
               </div>
             </div>
-            <div className="w-full">
+            <div className="hidden w-full">
               <div className="search-bg mt-1 flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                 <input
                   type="number"
