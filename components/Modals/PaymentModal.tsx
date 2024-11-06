@@ -215,7 +215,9 @@ const PaymentModal: React.FC<ModalProps> = ({ results, onClose }) => {
               </div>
               <div>
                 <h5>{results.patient_name}</h5>
-                <p className="text-xs">HMO ID: {results.policy_id}</p>
+                <p className="text-xs">
+                  HMO NAME/ID: {results.hmo?.name || "N/A"} ({results.policy_id || "N/A"})
+                </p>
               </div>
             </div>
             <div>
