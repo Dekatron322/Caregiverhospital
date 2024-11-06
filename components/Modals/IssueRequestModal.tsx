@@ -201,7 +201,9 @@ const IssueRequestModal: React.FC<PrescriptionModalProps> = ({
                 </div>
                 <div>
                   <h5>{patient.name}</h5>
-                  <p className="text-xs">HMO ID: {patient.policy_id}</p>
+                  <p className="text-xs">
+                    HMO Name/ID: {patient.hmo?.name || "N/A"} ( {patient?.policy_id || "N/A"})
+                  </p>
                 </div>
               </div>
               <div>
