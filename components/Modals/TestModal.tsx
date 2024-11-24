@@ -1,138 +1,111 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import styles from "./modal.module.css"
-import { LiaTimesSolid } from "react-icons/lia"
-import AOS from "aos"
+import Image from "next/image"
+import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined"
 import axios from "axios"
-import "aos/dist/aos.css"
+
+interface LabParameter {
+  id: string
+  param_title: string
+  param_unit: string
+  param_range: string
+  param_result: string
+}
 
 interface LabTestResult {
-  id: string
-  name: string
+  patient_name: string
+  doctor_name: string
   test_type: string
-}
-
-interface ModalProps {
-  results: LabTestResult
-  onClose: (isSuccess: boolean) => void
-}
-
-interface TestDetail {
+  diagnosis_code: string
+  discount_value: string
   id: string
-  title: string
-  detail: string
-  test_range: string
-  test_price: string
-  status: boolean
-  pub_date: string
+  lab_parameters: LabParameter[]
 }
 
-const TestModal: React.FC<ModalProps> = ({ results, onClose }) => {
-  const [test, setTest] = useState<string>(results.test_type)
-  const [result, setResult] = useState<string>("")
-  const [statusNote, setStatusNote] = useState<string>("Approved")
-  const [isLoading, setIsLoading] = useState(false)
-  const [testDetail, setTestDetail] = useState<TestDetail | null>(null)
+interface TestModalProps {
+  results: LabTestResult
+  onClose: () => void
+}
 
-  useEffect(() => {
-    AOS.init({
-      duration: 1000,
-      once: true,
-    })
+const TestModal: React.FC<TestModalProps> = ({ results, onClose }) => {
+  const [parameters, setParameters] = useState(results.lab_parameters)
 
-    const fetchTestDetail = async () => {
-      try {
-        const response = await axios.get("https://api2.caregiverhospital.com/testt/testt/")
-        const matchedTest = response.data.find((test: TestDetail) => test.title === results.test_type)
-        if (matchedTest) {
-          setTestDetail(matchedTest)
-        }
-      } catch (error) {
-        console.error("Error fetching test details:", error)
-      }
-    }
+  const handleResultChange = (id: string, value: string) => {
+    setParameters((prev) => prev.map((param) => (param.id === id ? { ...param, param_result: value } : param)))
+  }
 
-    fetchTestDetail()
-  }, [results.test_type])
+  const saveResult = async (id: string) => {
+    const parameter = parameters.find((param) => param.id === id)
+    if (!parameter) return
 
-  const handleSubmit = async () => {
-    setIsLoading(true)
     try {
-      const response = await axios.put(`https://api2.caregiverhospital.com/lab-test/lab-test/${results.id}/`, {
-        test: test,
-        result: result,
-        status_note: statusNote,
+      const response = await axios.put(`https://api2.caregiverhospital.com/lab-test/add-result-to-parameter/${id}/`, {
+        param_result: parameter.param_result,
       })
-      console.log(response.data)
-      onClose(true)
+      console.log("Result saved successfully:", response.data)
+      alert("Result updated successfully!")
     } catch (error) {
-      console.error("Error updating lab test result:", error)
-      onClose(false)
-    } finally {
-      setIsLoading(false)
+      console.error("Error updating result:", error)
+      alert("Failed to update result. Please try again.")
     }
   }
 
   return (
-    <div className={styles.modalOverlay} data-aos="fade-up" data-aos-duration="1000" data-aos-delay="500">
-      <div className={styles.modalContent}>
-        <div className="px-6 py-6">
-          <div className="flex items-center justify-between">
-            <p className="text-lg font-semibold">Enter test result</p>
-            <div className="hover:rounded-md hover:border">
-              <LiaTimesSolid className="m-1 cursor-pointer" onClick={() => onClose(false)} />
-            </div>
-          </div>
-
-          <p>Test Type: {results.test_type}</p>
-
-          {/* Display additional test details if available */}
-          {testDetail && (
-            <div className="my-4">
-              <p className="text-center font-bold">Text Info</p>
-              <div className="my-3 border-b"></div>
-              <div className="flex justify-between">
-                <p>Title: </p>
-                <p className="font-semibold">{testDetail.title}</p>
-              </div>
-              <div className="my-3 border-b"></div>
-              <div className="flex justify-between">
-                <p>Unit of measurement: </p>
-                <p className="font-semibold">{testDetail.detail}</p>
-              </div>
-              <div className="my-3 border-b"></div>
-              <div className="flex justify-between">
-                <p>Test Range: </p>
-                <p className="font-semibold">{testDetail.test_range}</p>
-              </div>
-              <div className="my-3 border-b"></div>
-            </div>
-          )}
-
-          <div className="flex w-full gap-2">
-            <div className="my-4 w-full">
-              <p className="text-sm">Result</p>
-              <div className="search-bg mt-1 flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
-                <input
-                  type="text"
-                  id="result"
-                  placeholder="Enter Result"
-                  className="h-[45px] w-full bg-transparent outline-none focus:outline-none"
-                  value={result}
-                  onChange={(e) => setResult(e.target.value)}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-4 flex w-full gap-6">
-            <button
-              className="button-primary h-[50px] w-full rounded-sm text-[#FFFFFF] max-sm:h-[45px]"
-              onClick={handleSubmit}
-              disabled={isLoading}
-            >
-              {isLoading ? "Submitting..." : "Submit Result"}
+    <div className={styles.modalContainers}>
+      <div className={styles.modalBodys}>
+        <div className="p-4">
+          <div className="mb-4 flex items-center justify-between">
+            <Image src="/ic_logo.svg" width={115} height={43} alt="dekalo" />
+            <button onClick={onClose}>
+              <CloseOutlinedIcon />
             </button>
           </div>
+          <h2 className="text-center font-bold">Lab Test Details</h2>
+          <p>
+            Patient: <span className="text-semibold">{results.patient_name}</span>
+          </p>
+          <p>
+            Doctor: <span className="text-semibold">{results.doctor_name}</span>
+          </p>
+          <p>
+            Test Type: <span className="text-semibold">{results.test_type}</span>
+          </p>
+          <p>
+            Diagnosis Code: <span className="text-semibold">{results.diagnosis_code}</span>
+          </p>
+          <p>Discount: {results.id}</p>
+
+          {parameters.length > 0 ? (
+            <div className="my-3 w-full border bg-[#e5e7eb]">
+              <h3 className="pt-3 text-center font-bold">Test Parameters</h3>
+              {parameters.map((param) => (
+                <>
+                  <div className=" w-full p-4">
+                    <p className="">Parameter: {param.param_title}</p>
+                    <p className="">Range: {param.param_range}</p>
+                    <p className="">Unit: {param.param_unit || "-"}</p>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={param.param_result}
+                        onChange={(e) => handleResultChange(param.id, e.target.value)}
+                        className="w-full gap-3 border p-1"
+                      />
+                      <button onClick={() => saveResult(param.id)} className="rounded bg-blue-500 px-2 py-1 text-white">
+                        Save
+                      </button>
+                    </div>
+                  </div>
+                </>
+              ))}
+            </div>
+          ) : (
+            <p>No parameters available.</p>
+          )}
+
+          <button onClick={onClose} className="mt-4 rounded bg-gray-500 px-4 py-2 text-white">
+            Close
+          </button>
         </div>
       </div>
     </div>

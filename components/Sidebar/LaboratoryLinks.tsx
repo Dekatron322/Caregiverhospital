@@ -2,7 +2,7 @@
 import clsx from "clsx"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { DashboardIcon, Departments, Patients } from "./Icons"
+import { DashboardIcon, Departments, Patients, Admissions } from "./Icons"
 import { useState } from "react"
 
 const links = [
@@ -13,6 +13,8 @@ const links = [
     icon: Departments,
   },
   { name: "Patients", href: "/laboratory-patients", icon: Patients },
+  { name: "Test Lists", href: "/test-list", icon: Admissions },
+  { name: "Test Parameters", href: "/test-parameters", icon: Admissions },
 ]
 
 interface LinksProps {

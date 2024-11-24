@@ -47,6 +47,13 @@ interface MedicalRecord {
   pub_date: string
   status_note: string
   discount_value: string
+  lab_parameters?: {
+    id: string
+    param_title: string
+    param_result: string
+    param_unit: string
+    param_range: string
+  }[]
 }
 
 interface Patient {
@@ -99,6 +106,19 @@ interface Patient {
     pub_date: string
     status_note: string
     discount_value: string
+    lab_parameters: {
+      id: string
+      param_title: string
+      param_result: string
+      param_unit: string
+      param_range: string
+    }[]
+  }[]
+  testt: {
+    id: string
+    title: string
+    detail: string
+    test_range: string
   }[]
 }
 
@@ -163,7 +183,12 @@ const PatientDetailsForDoctor: React.FC<PatientDetailsProps> = ({ patient }) => 
   }
 
   const handleViewClick = (record: MedicalRecord) => {
-    const recordWithPatientName = { ...record, patient_name: patient?.name }
+    const recordWithPatientName = {
+      ...record,
+      patient_name: patient?.name,
+      patient_id: patient?.id,
+      lab_parameters: record.lab_parameters,
+    }
     setSelectedRecord(recordWithPatientName)
     setModalVisible(true)
   }
@@ -279,6 +304,18 @@ const PatientDetailsForDoctor: React.FC<PatientDetailsProps> = ({ patient }) => 
     }
   }
 
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }
+    return new Date(dateString).toLocaleDateString(undefined, options)
+  }
+
   const renderAllAppointments = () => (
     <div className="flex flex-col gap-2">
       {filteredList.map((appointment) => (
@@ -384,6 +421,12 @@ const PatientDetailsForDoctor: React.FC<PatientDetailsProps> = ({ patient }) => 
               <small className="text-xm ">Result</small>
             </div>
           </div>
+          {/* <div className="flex w-full items-center gap-1 text-sm font-semibold">
+            <div>
+              <p>{formatDate(medical.pub_date)}</p>
+              <small className="text-xm ">Date</small>
+            </div>
+          </div> */}
           <div className="flex w-full items-center gap-1 text-sm font-semibold">
             <div>
               <p>{medical.status_note}</p>

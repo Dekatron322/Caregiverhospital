@@ -1,4 +1,3 @@
-// components/Modal.tsx
 import React, { useRef } from "react"
 import dynamic from "next/dynamic"
 import styles from "./modal.module.css"
@@ -6,9 +5,7 @@ import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined"
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined"
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined"
 import AssignmentIndOutlinedIcon from "@mui/icons-material/AssignmentIndOutlined"
-import InboxOutlinedIcon from "@mui/icons-material/InboxOutlined"
-import MilitaryTechOutlinedIcon from "@mui/icons-material/MilitaryTechOutlined"
-import KeyboardArrowLeftOutlinedIcon from "@mui/icons-material/KeyboardArrowLeftOutlined"
+
 import LocalPrintshopOutlinedIcon from "@mui/icons-material/LocalPrintshopOutlined"
 import FileDownloadOutlinedIcon from "@mui/icons-material/FileDownloadOutlined"
 import Image from "next/image"
@@ -17,6 +14,12 @@ import Image from "next/image"
 const loadHtml2pdf = async () => {
   const html2pdf = (await import("html2pdf.js")).default
   return html2pdf
+}
+type LabParameter = {
+  name: string
+  param_title: string
+  param_unit: string
+  param_range: string
 }
 
 type ModalProps = {
@@ -87,51 +90,30 @@ const PrintRecordModal: React.FC<ModalProps> = ({ show, onClose, record }) => {
 
           <div className="mb-3 flex items-center gap-2">
             <AssignmentIndOutlinedIcon className="text-black" />
-            <p className="flex items-center gap-1 text-sm text-black">Issued to: {record.patient_name}</p>
+            <p className="flex items-center gap-1 text-sm text-black">
+              Issued to: {record.patient_name} {record.patient_id}
+            </p>
           </div>
 
           <h2 className="mb-3 text-lg font-bold text-black">Test Result</h2>
           <div className="result_area  h-full w-full rounded-lg p-4">
-            <div className=" w-full items-center justify-between">
-              <p className="mb-2 text-sm font-bold text-black">Test type: {record.test_type}</p>
-              <div className="flex items-center gap-2">
-                <InboxOutlinedIcon className="text-lg font-bold text-black" />{" "}
-                <p className="text-sm font-bold text-black">Result: {record.result}</p>
+            {record.lab_parameters && record.lab_parameters.length > 0 && (
+              <div className="mt-4">
+                <h2 className="mb-3 text-lg font-bold text-black">Lab Parameters</h2>
+                {record.lab_parameters.map((param: any, index: any) => (
+                  <div key={index} className="mb-3">
+                    <p className="text-sm text-black">Value: {param.id}</p>
+                    <p className="text-sm text-black">Value: {param.param_title}</p>
+                    <p className="text-sm text-black">Unit: {param.param_unit}</p>
+                    <p className="text-sm text-black">Reference Range: {param.param_range}</p>
+                    <p className="text-bas text-black">Result: {param.param_result}</p>
+                  </div>
+                ))}
               </div>
-            </div>
-            <div className="mt-3">
-              <p className="mb-3 font-bold text-black">Reference Range</p>
-              <div className="mb-3 flex items-center gap-2">
-                <p className="text-sm font-bold text-black">
-                  Men{" "}
-                  <span>
-                    <KeyboardArrowLeftOutlinedIcon className="text-black" />
-                  </span>{" "}
-                  <span className="font-regular text-black">62 pg/mL</span>
-                </p>
-              </div>
-              <p className="text-sm font-bold text-black">Female</p>
-              <div className="my-3 flex items-center gap-2">
-                <p className="text-sm text-black">
-                  Folicular phase <span className="font-regular text-black"> 18 - 147 pg/mL</span>
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <p className="text-sm text-black">
-                  Pre-ovulatory peak <span className="font-regular text-black"> 93 - 575 pg/mL</span>
-                </p>
-              </div>
-              <div className="mt-3 flex items-center gap-2">
-                <p className="text-sm text-black">
-                  Menopause{" "}
-                  <span>
-                    <KeyboardArrowLeftOutlinedIcon className="text-black" />
-                  </span>{" "}
-                  <span className="font-regular text-black">58 pg/mL</span>
-                </p>
-              </div>
-            </div>
+            )}
           </div>
+
+          {/* Lab Parameters Section */}
 
           <div className="mt-4 flex items-end justify-between">
             <div className="flex cursor-pointer items-center gap-2" onClick={handlePrint}>

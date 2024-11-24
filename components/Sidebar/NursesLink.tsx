@@ -11,7 +11,6 @@ const links = [
   { name: "Admissions", href: "/all-admissions", icon: Admissions },
   { name: "Diagnosis", href: "/all-diagnosis", icon: Diagnosis },
   { name: "Proceduces", href: "/all-procedure", icon: ProcedureIcon },
-  { name: "Test", href: "/all-test", icon: Admissions },
 ]
 
 interface LinksProps {

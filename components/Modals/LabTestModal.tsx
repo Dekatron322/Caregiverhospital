@@ -136,6 +136,7 @@ const LabTestModal: React.FC<ModalProps> = ({ results, onClose, userId }) => {
     const prescriptionData = {
       doctor_name: doctorName,
       test_type: testName,
+      test: testName,
       diagnosis_code: diagnosisName,
       note,
       status_note: status,
@@ -183,7 +184,7 @@ const LabTestModal: React.FC<ModalProps> = ({ results, onClose, userId }) => {
             </div>
           </div>
 
-          <p>Enter test result for {results.name}</p>
+          <p>Request Lab Test for {results.name}</p>
           <div className="flex w-full gap-2">
             <div className="my-2 w-full">
               <div className="search-bg mt-1 flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">

@@ -30,6 +30,7 @@ interface LabTestResult {
   name: string
   hmo?: HMO
   test_price?: string
+  lab_parameters: { param_title: string; id: string; param_unit: string; param_range: string; param_result: string }[]
 }
 
 interface Diagnosis {
@@ -63,7 +64,7 @@ const LabTests = () => {
   const [refresh, setRefresh] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [searchQuery, setSearchQuery] = useState("")
-  const resultsPerPage = 7
+  const resultsPerPage = 20
 
   useEffect(() => {
     const fetchData = async () => {
@@ -131,14 +132,9 @@ const LabTests = () => {
     setPaymentCard(resultWithDiagnosis)
     setIsPaymentModalOpen(true)
   }
-
-  const handleModalClose = (isSuccess: boolean) => {
-    if (isSuccess) {
-      setShowSuccessNotification(true)
-      setRefresh(!refresh) // Trigger a refresh
-      setTimeout(() => setShowSuccessNotification(false), 5000)
-    }
+  const handleModalClose = () => {
     setIsModalOpen(false)
+    setClickedCard(null)
   }
 
   const handlePaymentModalClose = (isSuccess: boolean) => {
@@ -250,7 +246,7 @@ const LabTests = () => {
                 </p>
               </div>
               <div className="w-full max-sm:hidden">
-                <p className="text-sm font-bold">{formatDate(diagnosis?.pub_date)}</p>
+                <p className="text-sm font-bold">{formatDate(results?.pub_date)}</p>
                 <p className="text-xs font-bold">Date Requested</p>
               </div>
               <div className="flex gap-2">

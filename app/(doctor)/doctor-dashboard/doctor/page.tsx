@@ -74,6 +74,19 @@ interface Patient {
     pub_date: string
     status_note: string
     discount_value: string
+    lab_parameters: {
+      id: string
+      param_title: string
+      param_result: string
+      param_unit: string
+      param_range: string
+    }[]
+  }[]
+  testt: {
+    id: string
+    title: string
+    detail: string
+    test_range: string
   }[]
   notes: [
     {
