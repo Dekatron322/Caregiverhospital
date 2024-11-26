@@ -354,7 +354,7 @@ const PrescriptionModal: React.FC<ModalProps> = ({ results, onClose, userId }) =
             <Select
               options={options}
               isMulti
-              className=" bg-transparent text-xs"
+              className="search-bg text-xs text-black"
               value={selectedOptions}
               onChange={(selected) => setSelectedOptions(selected as OptionType[])}
               placeholder="Select Complaints"
