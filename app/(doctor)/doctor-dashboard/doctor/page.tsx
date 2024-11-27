@@ -187,6 +187,12 @@ export default function PatientDetailPage() {
     }
     return new Date(dateString).toLocaleDateString(undefined, options)
   }
+
+  const refreshPatientDetails = async () => {
+    setLoading(true) // Optionally show a loading spinner
+    await fetchPatientDetails()
+  }
+
   return (
     <>
       <section className="h-full">
@@ -342,10 +348,20 @@ export default function PatientDetailPage() {
         </div>
       </section>
       {isModalOpen && clickedCard && (
-        <PrescriptionModal results={clickedCard} onClose={() => setIsModalOpen(false)} userId={""} />
+        <PrescriptionModal
+          results={clickedCard}
+          onClose={() => setIsModalOpen(false)}
+          userId={""}
+          onPrescriptionSubmit={refreshPatientDetails}
+        />
       )}
       {isRequestModalOpen && clickedRequestCard && (
-        <LabTestModal results={clickedRequestCard} onClose={() => setIsRequestModalOpen(false)} userId={""} />
+        <LabTestModal
+          results={clickedRequestCard}
+          onClose={() => setIsRequestModalOpen(false)}
+          userId={""}
+          onPrescriptionSubmit={refreshPatientDetails}
+        />
       )}
 
       {isNoteModalOpen && clickedNoteCard && (

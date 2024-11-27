@@ -18,6 +18,7 @@ interface ModalProps {
   results: RequestTest
   onClose: () => void
   userId: string
+  onPrescriptionSubmit: () => void
 }
 
 interface UserDetails {
@@ -44,7 +45,7 @@ interface TestOption {
   pub_date: string
 }
 
-const LabTestModal: React.FC<ModalProps> = ({ results, onClose, userId }) => {
+const LabTestModal: React.FC<ModalProps> = ({ results, onClose, userId, onPrescriptionSubmit }) => {
   const [mounted, setMounted] = useState(false)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -123,27 +124,32 @@ const LabTestModal: React.FC<ModalProps> = ({ results, onClose, userId }) => {
   }
 
   const handleAddPrescription = async () => {
-    if (userDetails) {
-      setDoctorName(userDetails.username)
-    }
-
-    const selectedTestOption = testOptions.find((option) => option.id === test)
-    const testName = selectedTestOption ? selectedTestOption.title : ""
-
-    const selectedDiagnosis = diagnosisData.find((dia) => dia.id === diagnosis)
-    const diagnosisName = selectedDiagnosis ? selectedDiagnosis.name : ""
-
-    const prescriptionData = {
-      doctor_name: doctorName,
-      test_type: testName,
-      test: testName,
-      diagnosis_code: diagnosisName,
-      note,
-      status_note: status,
-      pub_date: new Date().toISOString(),
-    }
-
     try {
+      if (!userDetails) {
+        console.error("User details are not available.")
+        setShowErrorNotification(true)
+        setTimeout(() => setShowErrorNotification(false), 5000)
+        return
+      }
+
+      const doctorName = userDetails.username // Capture the doctor's name synchronously
+
+      const selectedTestOption = testOptions.find((option) => option.id === test)
+      const testName = selectedTestOption ? selectedTestOption.title : ""
+
+      const selectedDiagnosis = diagnosisData.find((dia) => dia.id === diagnosis)
+      const diagnosisName = selectedDiagnosis ? selectedDiagnosis.name : ""
+
+      const prescriptionData = {
+        doctor_name: doctorName, // Use the captured value
+        test_type: testName,
+        test: testName,
+        diagnosis_code: diagnosisName,
+        note,
+        status_note: status,
+        pub_date: new Date().toISOString(),
+      }
+
       console.log("Prescription data being sent:", prescriptionData)
 
       const response = await fetch(
@@ -166,6 +172,7 @@ const LabTestModal: React.FC<ModalProps> = ({ results, onClose, userId }) => {
       setShowSuccessNotification(true)
       setTimeout(() => setShowSuccessNotification(false), 5000)
       onClose()
+      onPrescriptionSubmit()
     } catch (error) {
       console.error("Error adding prescription:", error)
       setShowErrorNotification(true)

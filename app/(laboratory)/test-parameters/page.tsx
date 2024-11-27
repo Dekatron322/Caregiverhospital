@@ -10,6 +10,7 @@ import { GoPlus } from "react-icons/go"
 import { IoAddCircleSharp } from "react-icons/io5"
 import PharmacyNav from "components/Navbar/PharmacyNav"
 import LaboratoryNav from "components/Navbar/LaboratoryNav"
+import { FaEdit } from "react-icons/fa"
 
 interface Medicine {
   id: string
@@ -176,30 +177,29 @@ export default function Medicines() {
                   <div
                     key={medicine.id}
                     className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
-                    onClick={() => handlePatientClick(medicine.id)}
                   >
                     <div className="w-full">
                       <p className="text-sm font-bold">{medicine.param_title}</p>
                       <small className="text-xs">Parameter Name</small>
                     </div>
                     <div className="w-full max-sm:hidden">
-                      <p className="text-sm font-bold">{medicine.param_unit}</p>
+                      <p className="text-sm font-bold">{medicine.param_unit || "N/A"}</p>
                       <small className="text-xs">Param Unit</small>
                     </div>
                     <div className="w-full max-sm:hidden">
-                      <p className="text-sm font-bold">{medicine.param_range}</p>
+                      <p className="text-sm font-bold">{medicine.param_range || "N/A"}</p>
                       <small className="text-xs">Param Range</small>
                     </div>
-                    <div className="">
+                    <div className="w-full">
                       <div className="flex gap-1 whitespace-nowrap text-sm font-bold">{medicine.category}</div>
                       <small className="text-xs">Test</small>
                     </div>
 
-                    {/* <div className="">
+                    <div className="">
                       <button className="w-full whitespace-nowrap px-2 py-[2px] text-center text-xs font-semibold">
-                        View Full Detail
+                        <FaEdit className="text-xl" />
                       </button>
-                    </div> */}
+                    </div>
                   </div>
                 ))
               )}

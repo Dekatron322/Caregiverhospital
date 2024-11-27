@@ -53,6 +53,7 @@ interface ModalProps {
   results: AddPrescription
   onClose: () => void
   userId: string
+  onPrescriptionSubmit: () => void
 }
 
 interface Medicine {
@@ -90,7 +91,7 @@ interface Procedure {
   name: string
 }
 
-const PrescriptionModal: React.FC<ModalProps> = ({ results, onClose, userId }) => {
+const PrescriptionModal: React.FC<ModalProps> = ({ results, onClose, userId, onPrescriptionSubmit }) => {
   const [category, setCategory] = useState<string>("")
   const [name, setName] = useState<string>("")
   const [code, setCode] = useState<string>("")
@@ -248,6 +249,7 @@ const PrescriptionModal: React.FC<ModalProps> = ({ results, onClose, userId }) =
       setShowSuccessNotification(true)
       setTimeout(() => setShowSuccessNotification(false), 5000)
       onClose()
+      onPrescriptionSubmit()
     } catch (error) {
       console.error("Error adding prescription:", error)
       setShowErrorNotification(true)
