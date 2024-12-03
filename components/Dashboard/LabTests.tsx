@@ -69,54 +69,29 @@ const LabTests = () => {
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true)
-      let allPatients: any[] = []
-      let start = 0
-      const limit = 100
-
       try {
-        // Fetch data in parallel
-        const [diagnosisResponse, testPriceResponse] = await Promise.all([
-          axios.get("https://api2.caregiverhospital.com/diagnosis/diagnosis/"),
-          axios.get("https://api2.caregiverhospital.com/testt/testt/"),
-        ])
+        // Fetch lab test results
+        const labTestResponse = await axios.get("https://api2.caregiverhospital.com/lab-test/lab-test/")
+        const labTestData = labTestResponse.data
 
+        // Fetch diagnosis data
+        const diagnosisResponse = await axios.get("https://api2.caregiverhospital.com/diagnosis/diagnosis/")
         const fetchedDiagnosisData = diagnosisResponse.data
-        const testPriceData = testPriceResponse.data
+        setDiagnosisData(fetchedDiagnosisData)
 
-        // Paginate and fetch patient data
-        while (true) {
-          const response = await axios.get(
-            `https://api2.caregiverhospital.com/patient/patient/${start}/${start + limit}/`
-          )
-          const patientData = response.data
-
-          if (!Array.isArray(patientData) || patientData.length === 0) {
-            break // No more data
-          }
-
-          allPatients = [...allPatients, ...patientData]
-          start += limit
-        }
-
-        const tests = allPatients.flatMap((patient) =>
-          patient.lab_tests.map((test: any) => {
+        if (Array.isArray(labTestData)) {
+          const tests = labTestData.map((test: any) => {
             const diagnosis = fetchedDiagnosisData.find((diag: any) => diag.code === test.diagnosis_code)
-            const testPriceInfo = testPriceData.find((priceTest: { title: any }) => priceTest.title === test.test_type)
-            const testPrice = testPriceInfo ? testPriceInfo.test_price : null
-
             return {
               ...test,
-              patient_name: patient.name,
-              patient_id: patient.id,
-              policy_id: patient.policy_id,
               diagnosis,
-              hmo: patient.hmo,
-              test_price: testPrice,
             }
           })
-        )
 
-        setLabTestResults(tests)
+          setLabTestResults(tests)
+        } else {
+          console.error("Unexpected response format for lab test results")
+        }
       } catch (error) {
         console.error("Error fetching data:", error)
       } finally {
@@ -125,7 +100,7 @@ const LabTests = () => {
     }
 
     fetchData()
-  }, [currentPage, refresh])
+  }, [refresh])
 
   const handleCardClick = (results: LabTestResult) => {
     setClickedCard(results)
@@ -222,9 +197,7 @@ const LabTests = () => {
                   <div>
                     <p className="text-sm">Patient: {results.patient_name}</p>
                     <p className="text-sm">Doctor: {results.doctor_name}</p>
-                    <p className="text-xs">
-                      Test Type: {results.test_type || "N/A"} (₦{results.test_price || "N/A"})
-                    </p>
+                    <p className="text-xs">Test Type: {results.test_type || "N/A"}</p>
                   </div>
                 </div>
               </div>

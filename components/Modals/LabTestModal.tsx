@@ -141,6 +141,8 @@ const LabTestModal: React.FC<ModalProps> = ({ results, onClose, userId, onPrescr
       const diagnosisName = selectedDiagnosis ? selectedDiagnosis.name : ""
 
       const prescriptionData = {
+        patient_id: results.id, // Patient ID
+        patient_name: results.name, // Patient Name
         doctor_name: doctorName, // Use the captured value
         test_type: testName,
         test: testName,
