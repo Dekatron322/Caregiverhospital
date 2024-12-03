@@ -382,3 +382,30 @@ body {
   font-weight: bold;
   animation: blur-text 5.5s infinite;
 }
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(208, 208, 208, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+[data-theme="dark"] .modalOverlay {
+  background: rgba(23, 23, 23, 0.98);
+}
+
+.modalContent {
+  background: #fff;
+  color: #1e1e1e;
+  border-radius: 5px;
+  max-width: 550px;
+  width: 100%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  margin-right: 16px;
+  margin-left: 16px;
+}

@@ -11,6 +11,7 @@ import { IoAddCircleSharp } from "react-icons/io5"
 import PharmacyNav from "components/Navbar/PharmacyNav"
 import LaboratoryNav from "components/Navbar/LaboratoryNav"
 import { FaEdit } from "react-icons/fa"
+import { LiaTimesSolid } from "react-icons/lia"
 
 interface Medicine {
   id: string
@@ -36,6 +37,8 @@ export default function Medicines() {
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
+  const [selectedMedicine, setSelectedMedicine] = useState<Medicine | null>(null)
 
   useEffect(() => {
     const fetchMedicines = async () => {
@@ -65,11 +68,6 @@ export default function Medicines() {
 
     fetchMedicines()
   }, [])
-
-  const handlePatientClick = (medicineId: string) => {
-    localStorage.setItem("selectedMedicineId", medicineId)
-    router.push(`/medicines/medicine-details`)
-  }
 
   const medicinesPerPage = 100
 
@@ -108,6 +106,57 @@ export default function Medicines() {
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value)
     setCurrentPage(1) // Reset page to 1 on search
+  }
+
+  const handleEditClick = (medicine: Medicine) => {
+    setSelectedMedicine(medicine)
+    setIsModalOpen(true)
+  }
+
+  const handleModalClose = () => {
+    setIsModalOpen(false)
+    setSelectedMedicine(null)
+  }
+
+  const handleFormSubmit = async (event: React.FormEvent) => {
+    event.preventDefault()
+    if (!selectedMedicine) return
+
+    setLoading(true) // Set loading to true before starting the request
+
+    try {
+      const response = await fetch(`https://api2.caregiverhospital.com/testt/parameter/${selectedMedicine.id}/`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(selectedMedicine),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to update parameter")
+      }
+
+      // Update state to reflect changes
+      const updatedMedicines = medicines.map((medicine) =>
+        medicine.id === selectedMedicine.id ? selectedMedicine : medicine
+      )
+      setMedicines(updatedMedicines)
+      handleModalClose()
+    } catch (error) {
+      console.error("Error updating parameter:", error)
+    } finally {
+      setLoading(false) // Set loading to false after the request is complete
+    }
+  }
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    if (selectedMedicine) {
+      setSelectedMedicine({
+        ...selectedMedicine,
+        [event.target.name]: event.target.value,
+      })
+    }
   }
 
   return (
@@ -196,7 +245,10 @@ export default function Medicines() {
                     </div>
 
                     <div className="">
-                      <button className="w-full whitespace-nowrap px-2 py-[2px] text-center text-xs font-semibold">
+                      <button
+                        onClick={() => handleEditClick(medicine)}
+                        className="w-full whitespace-nowrap px-2 py-[2px] text-center text-xs font-semibold"
+                      >
                         <FaEdit className="text-xl" />
                       </button>
                     </div>
@@ -237,6 +289,67 @@ export default function Medicines() {
                     </button>
                   </li>
                 </ul>
+              </div>
+            )}
+
+            {isModalOpen && selectedMedicine && (
+              <div className="modalOverlay">
+                <div className="modalContent">
+                  <div className="px-6 py-6">
+                    <div className="flex items-center justify-between">
+                      <p className="text-lg font-semibold">Edit Parameter</p>
+                      <div className="hover:rounded-md hover:border">
+                        <LiaTimesSolid className="m-1 cursor-pointer" onClick={handleModalClose} />
+                      </div>
+                    </div>
+                    <form onSubmit={handleFormSubmit}>
+                      <div className="my-4">
+                        <p className="text-sm">Parameter Name</p>
+                        <div className="search-bg mt-1 flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+                          <input
+                            type="text"
+                            name="param_title"
+                            value={selectedMedicine.param_title}
+                            onChange={handleInputChange}
+                            className="h-[45px] w-full bg-transparent text-xs outline-none focus:outline-none"
+                          />
+                        </div>
+                      </div>
+
+                      <div className="my-4">
+                        <p className="text-sm">Parameter Unit</p>
+                        <div className="search-bg mt-1 flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+                          <input
+                            type="text"
+                            name="param_unit"
+                            value={selectedMedicine.param_unit}
+                            onChange={handleInputChange}
+                            className="h-[45px] w-full bg-transparent text-xs outline-none focus:outline-none"
+                          />
+                        </div>
+                      </div>
+                      <div className="my-4">
+                        <p className="text-sm">Parameter Range</p>
+                        <div className="search-bg mt-1 flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+                          <input
+                            type="text"
+                            name="param_range"
+                            value={selectedMedicine.param_range}
+                            onChange={handleInputChange}
+                            className="h-[45px] w-full bg-transparent text-xs outline-none focus:outline-none"
+                          />
+                        </div>
+                      </div>
+                      <button
+                        type="submit"
+                        className="button-primary h-[50px] w-full rounded-sm text-[#FFFFFF] max-sm:h-[45px]"
+                        disabled={loading}
+                      >
+                        {loading ? "Updating..." : "Update Parameter"}
+                      </button>
+                    </form>
+                  </div>
+                </div>
               </div>
             )}
 

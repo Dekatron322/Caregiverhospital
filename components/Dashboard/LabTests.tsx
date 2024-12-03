@@ -69,48 +69,54 @@ const LabTests = () => {
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true)
-      const start = (currentPage - 1) * resultsPerPage
-      const stop = start + resultsPerPage
+      let allPatients: any[] = []
+      let start = 0
+      const limit = 100
 
       try {
-        // Fetch lab test results with pagination
-        const labTestResponse = await axios.get(`https://api2.caregiverhospital.com/patient/patient/0/100/`)
-        const patientData = labTestResponse.data
+        // Fetch data in parallel
+        const [diagnosisResponse, testPriceResponse] = await Promise.all([
+          axios.get("https://api2.caregiverhospital.com/diagnosis/diagnosis/"),
+          axios.get("https://api2.caregiverhospital.com/testt/testt/"),
+        ])
 
-        // Fetch diagnosis data
-        const diagnosisResponse = await axios.get("https://api2.caregiverhospital.com/diagnosis/diagnosis/")
         const fetchedDiagnosisData = diagnosisResponse.data
-        setDiagnosisData(fetchedDiagnosisData)
-
-        const testPriceResponse = await axios.get("https://api2.caregiverhospital.com/testt/testt/")
         const testPriceData = testPriceResponse.data
 
-        if (Array.isArray(patientData)) {
-          const tests = patientData.flatMap((patient: any) => {
-            return patient.lab_tests.map((test: any) => {
-              const diagnosis = fetchedDiagnosisData.find((diag: any) => diag.code === test.diagnosis_code)
+        // Paginate and fetch patient data
+        while (true) {
+          const response = await axios.get(
+            `https://api2.caregiverhospital.com/patient/patient/${start}/${start + limit}/`
+          )
+          const patientData = response.data
 
-              const testPriceInfo = testPriceData.find(
-                (priceTest: { title: any }) => priceTest.title === test.test_type
-              )
-              const testPrice = testPriceInfo ? testPriceInfo.test_price : null
+          if (!Array.isArray(patientData) || patientData.length === 0) {
+            break // No more data
+          }
 
-              return {
-                ...test,
-                patient_name: patient.name,
-                patient_id: patient.id, // Include patient ID here
-                policy_id: patient.policy_id,
-                diagnosis,
-                hmo: patient.hmo, // Include HMO details here
-                test_price: testPrice,
-              }
-            })
-          })
-
-          setLabTestResults(tests)
-        } else {
-          console.error("Unexpected response format for lab test results")
+          allPatients = [...allPatients, ...patientData]
+          start += limit
         }
+
+        const tests = allPatients.flatMap((patient) =>
+          patient.lab_tests.map((test: any) => {
+            const diagnosis = fetchedDiagnosisData.find((diag: any) => diag.code === test.diagnosis_code)
+            const testPriceInfo = testPriceData.find((priceTest: { title: any }) => priceTest.title === test.test_type)
+            const testPrice = testPriceInfo ? testPriceInfo.test_price : null
+
+            return {
+              ...test,
+              patient_name: patient.name,
+              patient_id: patient.id,
+              policy_id: patient.policy_id,
+              diagnosis,
+              hmo: patient.hmo,
+              test_price: testPrice,
+            }
+          })
+        )
+
+        setLabTestResults(tests)
       } catch (error) {
         console.error("Error fetching data:", error)
       } finally {
