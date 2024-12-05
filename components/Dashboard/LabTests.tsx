@@ -6,6 +6,8 @@ import Image from "next/image"
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye"
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet"
 import PaymentModal from "components/Modals/PaymentModal"
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
+import DeleteTestModal from "components/Modals/DeleteTestModal"
 
 interface HMO {
   id: string
@@ -64,6 +66,8 @@ const LabTests = () => {
   const [refresh, setRefresh] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [searchQuery, setSearchQuery] = useState("")
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [selectedLabTestId, setSelectedLabTestId] = useState<string | null>(null)
   const resultsPerPage = 20
 
   useEffect(() => {
@@ -177,6 +181,26 @@ const LabTests = () => {
 
   const totalPages = Math.ceil(filteredResults.length / resultsPerPage)
 
+  const handleDeleteClick = (id: string) => {
+    setSelectedLabTestId(id)
+    setIsDeleteModalOpen(true)
+  }
+
+  const deleteLabTest = async () => {
+    if (!selectedLabTestId) return
+
+    try {
+      await axios.delete(`https://api2.caregiverhospital.com/lab-test/lab-test/${selectedLabTestId}/`)
+      setShowSuccessNotification(true)
+      setRefresh(!refresh) // Refresh the data after deletion
+      setTimeout(() => setShowSuccessNotification(false), 5000)
+      setIsDeleteModalOpen(false)
+    } catch (error) {
+      console.error("Error deleting lab test:", error)
+      alert("Failed to delete lab test.")
+    }
+  }
+
   const renderResults = (filter: (results: LabTestResult) => boolean) => {
     return (
       <div className="flex flex-col gap-2">
@@ -231,6 +255,7 @@ const LabTests = () => {
               <div className="flex gap-2">
                 <RemoveRedEyeIcon className="text-[#46FFA6]" onClick={() => handleCardClick(results)} />
                 <AccountBalanceWalletIcon onClick={() => handlePaymentClick(results)} />
+                <DeleteForeverIcon className="text-[#F2B8B5]" onClick={() => handleDeleteClick(results.id)} />
               </div>
             </div>
           )
@@ -290,14 +315,14 @@ const LabTests = () => {
                 Not Approved
               </button>
 
-              <button
+              {/* <button
                 className={`${
                   activeTab === "discarded" ? "active-tab whitespace-nowrap" : "inactive-tab whitespace-nowrap"
                 }`}
                 onClick={() => setActiveTab("discarded")}
               >
                 Discarded
-              </button>
+              </button> */}
             </div>
             <div className="search-bg mb-4 flex h-10 items-center justify-between gap-2 rounded border border-[#CFDBD5] px-3 py-1 max-md:w-[180px] lg:w-[300px]">
               <Image className="icon-style" src="/icons.svg" width={16} height={16} alt="dekalo" />
@@ -322,7 +347,14 @@ const LabTests = () => {
 
       {isModalOpen && clickedCard && <TestModal results={clickedCard} onClose={handleModalClose} />}
       {isPaymentModalOpen && paymentCard && <PaymentModal results={paymentCard} onClose={handlePaymentModalClose} />}
-
+      {isDeleteModalOpen && (
+        <DeleteTestModal
+          title="Confirm Deletion"
+          description="Are you sure you want to discard this lab test? This action cannot be undone."
+          onConfirm={deleteLabTest}
+          onCancel={() => setIsDeleteModalOpen(false)}
+        />
+      )}
       {showSuccessNotification && (
         <div className="animation-fade-in absolute bottom-16 m-5  flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514] md:right-16">
           <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
