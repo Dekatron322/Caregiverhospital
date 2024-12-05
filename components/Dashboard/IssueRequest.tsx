@@ -91,10 +91,7 @@ const IssueRequest = () => {
           start += limit // Move to the next batch
         }
       }
-
-      const patientsWithAppointments = allPatients.filter((patient) => patient.prescriptions.length > 0)
-      console.log("Fetched Patients:", JSON.stringify(patientsWithAppointments, null, 2))
-      setPatients(patientsWithAppointments)
+      setPatients(allPatients) // Just set patients; prescriptions fetched separately
     } catch (error) {
       console.error("Error fetching patients:", error)
     } finally {

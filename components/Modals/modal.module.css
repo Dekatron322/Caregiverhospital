@@ -30,6 +30,10 @@
   justify-content: end;
 }
 
+[data-theme="dark"] .modalContainer {
+  background: rgba(23, 23, 23, 0.98);
+}
+
 .modalContainers {
   position: fixed;
   top: 0;
@@ -51,6 +55,19 @@
   overflow-y: auto;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   padding: 16px;
+}
+
+[data-theme="dark"] .modalBodys {
+  background: black;
+  color: #fbfafc;
+  border-width: 1px;
+  border-color: #ffffff;
+  border-radius: 5px;
+  max-width: 695px;
+  width: 100%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  margin-right: 16px;
+  margin-left: 16px;
 }
 
 .modalBodys::-webkit-scrollbar {

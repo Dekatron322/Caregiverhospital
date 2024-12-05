@@ -55,7 +55,12 @@ const TestModal: React.FC<TestModalProps> = ({ results, onClose }) => {
       <div className={styles.modalBodys}>
         <div className="p-4">
           <div className="mb-4 flex items-center justify-between">
-            <Image src="/ic_logo.svg" width={115} height={43} alt="dekalo" />
+            <div className="icon-style content-center">
+              <Image src="/ic_logo.svg" width={150} height={43} alt="dekalo" />
+            </div>
+            <div className="dark-icon-style content-center">
+              <Image src="/dark_logo.svg" width={150} height={43} alt="dekalo" />
+            </div>
             <button onClick={onClose}>
               <CloseOutlinedIcon />
             </button>
@@ -73,10 +78,10 @@ const TestModal: React.FC<TestModalProps> = ({ results, onClose }) => {
           <p>
             Diagnosis Code: <span className="text-semibold">{results.diagnosis_code}</span>
           </p>
-          <p>Discount: {results.id}</p>
+          <p>Discount: {results.discount_value || "N/A"}</p>
 
           {parameters.length > 0 ? (
-            <div className="my-3 w-full border bg-[#e5e7eb]">
+            <div className="my-3 w-full border ">
               <h3 className="pt-3 text-center font-bold">Test Parameters</h3>
               {parameters.map((param) => (
                 <>

@@ -409,3 +409,20 @@ body {
   margin-right: 16px;
   margin-left: 16px;
 }
+
+[data-theme="dark"] .modalOverlay {
+  background: rgba(23, 23, 23, 0.98);
+}
+
+[data-theme="dark"] .modalContent {
+  background: transparent;
+  color: #fbfafc;
+  border-width: 1px;
+  border-color: #ffffff;
+  border-radius: 5px;
+  max-width: 695px;
+  width: 100%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  margin-right: 16px;
+  margin-left: 16px;
+}
