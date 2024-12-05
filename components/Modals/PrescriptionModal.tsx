@@ -144,6 +144,7 @@ const PrescriptionModal: React.FC<ModalProps> = ({ results, onClose, userId, onP
         )
         if (response.data) {
           setUserDetails(response.data)
+          setDoctorName(response.data.username) // Set doctorName here
         } else {
           console.log("User details not found.")
         }

@@ -91,7 +91,10 @@ const TestModal: React.FC<TestModalProps> = ({ results, onClose }) => {
                         onChange={(e) => handleResultChange(param.id, e.target.value)}
                         className="w-full gap-3 border p-1"
                       />
-                      <button onClick={() => saveResult(param.id)} className="rounded bg-blue-500 px-2 py-1 text-white">
+                      <button
+                        onClick={() => saveResult(param.id)}
+                        className="button-primary rounded  px-2 py-1 text-white"
+                      >
                         Save
                       </button>
                     </div>
@@ -102,10 +105,6 @@ const TestModal: React.FC<TestModalProps> = ({ results, onClose }) => {
           ) : (
             <p>No parameters available.</p>
           )}
-
-          <button onClick={onClose} className="mt-4 rounded bg-gray-500 px-4 py-2 text-white">
-            Close
-          </button>
         </div>
       </div>
     </div>
