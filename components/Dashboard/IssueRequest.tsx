@@ -73,10 +73,27 @@ const IssueRequest = () => {
   const [selectedPrescription, setSelectedPrescription] = useState<Prescription | null>(null)
 
   const fetchPatients = async () => {
+    let allPatients: Patient[] = []
+    let start = 0
+    const limit = 100
+    let hasMore = true
+
+    setIsLoading(true)
     try {
-      const response = await fetch("https://api2.caregiverhospital.com/patient/patient/0/100/")
-      const data = (await response.json()) as ApiResponse
-      const patientsWithAppointments = data.filter((patient) => patient.prescriptions.length > 0)
+      while (hasMore) {
+        const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${start}/${start + limit}/`)
+        const data = (await response.json()) as ApiResponse
+
+        if (data.length === 0) {
+          hasMore = false // Stop the loop when no more data is returned
+        } else {
+          allPatients = [...allPatients, ...data]
+          start += limit // Move to the next batch
+        }
+      }
+
+      const patientsWithAppointments = allPatients.filter((patient) => patient.prescriptions.length > 0)
+      console.log("Fetched Patients:", JSON.stringify(patientsWithAppointments, null, 2))
       setPatients(patientsWithAppointments)
     } catch (error) {
       console.error("Error fetching patients:", error)
