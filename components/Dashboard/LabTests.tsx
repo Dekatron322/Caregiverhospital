@@ -292,7 +292,7 @@ const LabTests = () => {
           </div>
         ) : (
           <>
-            <div className="tab-bg mb-4 flex items-center gap-3 rounded-lg p-1 md:w-[358px] md:border">
+            <div className="tab-bg mb-4 flex items-center gap-3 rounded-lg p-1 md:w-[260px] md:border">
               <button
                 className={`${activeTab === "all" ? "active-tab" : "inactive-tab"}`}
                 onClick={() => setActiveTab("all")}
