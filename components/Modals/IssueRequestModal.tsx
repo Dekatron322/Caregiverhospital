@@ -108,8 +108,8 @@ const IssueRequestModal: React.FC<PrescriptionModalProps> = ({
   const calculateTotal = () => {
     if (procedureDetails?.price && prescription.unit) {
       const unitPrice = Number(procedureDetails.price)
-      const quantity = Number(prescription.unit)
-      const totalPrice = unitPrice * quantity
+      const quantity = Number(prescription.dosage)
+      const totalPrice = unitPrice + quantity
 
       // Check if there is a discount value
       const discountValue = prescription.discount_value ? parseFloat(prescription.discount_value) : 0
@@ -128,8 +128,8 @@ const IssueRequestModal: React.FC<PrescriptionModalProps> = ({
     setErrorMessage(null) // Clear previous error message
     try {
       const unitPrice = procedureDetails?.price ? Number(procedureDetails.price) : 0
-      const quantity = prescription.unit ? Number(prescription.unit) : 0
-      const totalPrice = unitPrice * quantity
+      const quantity = prescription.dosage ? Number(prescription.dosage) : 0
+      const totalPrice = unitPrice + quantity
 
       const discountValue = prescription.discount_value ? parseFloat(prescription.discount_value) : 0
       const discountAmount = totalPrice * (discountValue / 100)
@@ -229,13 +229,7 @@ const IssueRequestModal: React.FC<PrescriptionModalProps> = ({
                   </div>
                   <div className="flex items-center justify-between pb-4">
                     <p className="text-sm">Procedure Price</p>
-                    <p className="text-sm">
-                      ₦
-                      {procedureDetails?.price
-                        ? Number(procedureDetails.price).toLocaleString("en-US", { minimumFractionDigits: 2 })
-                        : "N/A"}{" "}
-                      * {prescription.unit}
-                    </p>
+                    <p className="text-sm">₦{procedureDetails?.price}</p>
                   </div>
                   <div className="flex items-center justify-between pb-2">
                     <p className="text-sm">Medicine Price</p>
