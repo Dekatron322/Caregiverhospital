@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react"
+import axios from "axios"
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet"
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye"
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline"
 import IssueRequestModal from "components/Modals/IssueRequestModal"
-import PrescriptionModal from "components/Modals/PrescriptionModal" // Import the new modal component
 import ViewPrescriptionModal from "components/Modals/ViewPrescriptionModal"
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
+import DeleteTestModal from "components/Modals/DeleteTestModal"
+import Image from "next/image"
 
 interface Prescription {
   id: string
@@ -71,6 +74,30 @@ const IssueRequest = () => {
   const [isPreModalOpen, setIsPreModalOpen] = useState(false)
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null)
   const [selectedPrescription, setSelectedPrescription] = useState<Prescription | null>(null)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [selectedPrescriptionId, setSelectedPrescriptionId] = useState<string | null>(null)
+  const [showSuccessNotification, setShowSuccessNotification] = useState(false)
+  const [refresh, setRefresh] = useState(false)
+
+  const handleDeleteClick = (id: string) => {
+    setSelectedPrescriptionId(id)
+    setIsDeleteModalOpen(true)
+  }
+
+  const deletePrescription = async () => {
+    if (!selectedPrescriptionId) return
+
+    try {
+      await axios.delete(`https://api2.caregiverhospital.com/prescription/prescription/${selectedPrescriptionId}/`)
+      setShowSuccessNotification(true)
+      setRefresh(!refresh) // Refresh the data after deletion
+      setTimeout(() => setShowSuccessNotification(false), 5000)
+      setIsDeleteModalOpen(false)
+    } catch (error) {
+      console.error("Error deleting lab test:", error)
+      alert("Failed to delete lab test.")
+    }
+  }
 
   const fetchPatients = async () => {
     let allPatients: Patient[] = []
@@ -81,7 +108,9 @@ const IssueRequest = () => {
     setIsLoading(true)
     try {
       while (hasMore) {
-        const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${start}/${start + limit}/`)
+        const response = await fetch(
+          `https://api2.caregiverhospital.com/patient/patient-with-prescription/${start}/${start + limit}/prescription/`
+        )
         const data = (await response.json()) as ApiResponse
 
         if (data.length === 0) {
@@ -113,7 +142,7 @@ const IssueRequest = () => {
   useEffect(() => {
     fetchPatients()
     fetchProcedures()
-  }, [])
+  }, [refresh])
 
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
@@ -164,43 +193,43 @@ const IssueRequest = () => {
   const renderPrescriptionDetails = (patient: Patient, prescription: Prescription) => {
     const procedureDetails = getProcedureDetails(prescription.code)
     return (
-      <div key={prescription.id} className="mb-2 flex w-full items-center justify-between rounded-lg border p-2">
+      <div key={prescription.id} className="mb-2 flex w-full items-center justify-between gap-3 rounded-lg border p-2">
         <div className="flex w-full items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46ffa6] max-md:hidden">
             <p className="capitalize text-[#000000]">{patient.name.charAt(0)}</p>
           </div>
           <div>
-            <p className="text-sm font-bold">{patient.name}</p>
+            <p className="text-xs font-bold">{patient.name}</p>
             <p className="text-xs">Doctor: {prescription.doctor_name}</p>
             <p className="text-xs">HMO ID: {patient.policy_id}</p>
           </div>
         </div>
-        <div className="w-full max-sm:hidden">
-          <p className="text-sm font-bold">Procedure: {procedureDetails?.name}</p>
+        <div className="flex w-full flex-col max-sm:hidden">
+          <p className="text-xs font-bold">Procedure: {procedureDetails?.name}</p>
           <p className="text-xs font-medium">Price: ₦{procedureDetails?.price}</p>
           <p className="text-xs font-medium">Code: {procedureDetails?.code}</p>
         </div>
         <div className="w-full">
-          <p className="text-sm font-bold">{prescription.name}</p>
+          <p className="text-xs font-bold">{prescription.name}</p>
           <small className="text-xs">Medicine Name</small>
         </div>
 
         <div className="w-full max-sm:hidden">
-          <div className="flex gap-1 text-sm font-bold">{prescription.category}</div>
+          <div className="flex gap-1 text-xs font-bold">{prescription.category}</div>
           <small className="text-xs">Category Name</small>
         </div>
 
         <div className="w-full max-sm:hidden">
-          <div className="flex gap-1 text-sm font-bold">{prescription.unit}</div>
+          <div className="flex gap-1 text-xs font-bold">{prescription.unit}</div>
           <small className="text-xs">Unit</small>
         </div>
 
         <div className="w-full max-sm:hidden">
-          <p className="text-sm font-bold">{formatDate(procedureDetails?.pub_date || "")}</p>
+          <p className="text-xs font-bold">{formatDate(procedureDetails?.pub_date || "")}</p>
           <small className="text-xs">Date and Time</small>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex w-full justify-end gap-2">
           {prescription.issue_status ? (
             <CheckCircleOutlineIcon className="text-gray-400" />
           ) : (
@@ -211,6 +240,7 @@ const IssueRequest = () => {
                 className="text-[#46FFA6]"
                 onClick={() => handleRemoveRedEyeClick(patient, prescription)}
               />
+              <DeleteForeverIcon className="text-[#F2B8B5]" onClick={() => handleDeleteClick(prescription.id)} />
             </>
           )}
         </div>
@@ -293,24 +323,22 @@ const IssueRequest = () => {
           // onUpdateStatus={updateIssueStatus}
         />
       )}
+      {isDeleteModalOpen && (
+        <DeleteTestModal
+          title="Confirm Deletion"
+          description="Are you sure you want to discard this prescription? This action cannot be undone."
+          onConfirm={deletePrescription}
+          onCancel={() => setIsDeleteModalOpen(false)}
+        />
+      )}
+      {showSuccessNotification && (
+        <div className="animation-fade-in absolute bottom-16 m-5  flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514] md:right-16">
+          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
+          <span className="clash-font text-sm  text-[#0F920F]">Prescription Discarded</span>
+        </div>
+      )}
     </div>
   )
 }
 
 export default IssueRequest
-
-{
-  /* <div className="flex gap-2">
-          <AccountBalanceWalletIcon onClick={() => handleIconClick(patient, prescription)} />
-          {prescription.issue_status ? (
-            <CheckCircleOutlineIcon className="text-gray-400" />
-          ) : (
-            <>
-              <RemoveRedEyeIcon
-                className="text-[#46FFA6]"
-                onClick={() => handleRemoveRedEyeClick(patient, prescription)}
-              />
-            </>
-          )}
-        </div> */
-}

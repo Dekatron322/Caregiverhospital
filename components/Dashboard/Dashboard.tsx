@@ -1,7 +1,10 @@
 "use client"
 import React, { useEffect, useState } from "react"
-import { PiDotsThree } from "react-icons/pi"
+import axios from "axios"
+
 import { useRouter } from "next/navigation"
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
+import DeleteTestModal from "components/Modals/DeleteTestModal"
 
 interface Appointment {
   id: number
@@ -19,6 +22,11 @@ const Appointments = () => {
   const [activeTab, setActiveTab] = useState("all")
   const [appointments, setAppointments] = useState<Appointment[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [refresh, setRefresh] = useState(false)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [selectedLabTestId, setSelectedLabTestId] = useState<string | null>(null)
+  const [showSuccessNotification, setShowSuccessNotification] = useState(false)
+  const [showPaymentSuccessNotification, setShowPaymentSuccessNotification] = useState(false)
 
   const fetchAppointments = async () => {
     try {
@@ -64,6 +72,26 @@ const Appointments = () => {
     return new Date(dateString).toLocaleDateString(undefined, options)
   }
 
+  const handleDeleteClick = (id: string) => {
+    setSelectedLabTestId(id)
+    setIsDeleteModalOpen(true)
+  }
+
+  const deleteLabTest = async () => {
+    if (!selectedLabTestId) return
+
+    try {
+      await axios.delete(`https://api2.caregiverhospital.com/lab-test/lab-test/${selectedLabTestId}/`)
+      setShowSuccessNotification(true)
+      setRefresh(!refresh) // Refresh the data after deletion
+      setTimeout(() => setShowSuccessNotification(false), 5000)
+      setIsDeleteModalOpen(false)
+    } catch (error) {
+      console.error("Error deleting lab test:", error)
+      alert("Failed to delete lab test.")
+    }
+  }
+
   const renderAppointmentDetails = (appointment: Appointment) => {
     const displayName =
       appointment.patient_name && appointment.patient_name.trim() ? appointment.patient_name : "Unknown Patient"
@@ -97,8 +125,8 @@ const Appointments = () => {
           </p>
           <p className="text-xs">Complain</p>
         </div>
-        <div className="max-md:hidden">
-          <PiDotsThree />
+        <div className="flex gap-2">
+          <DeleteForeverIcon className="text-[#F2B8B5]" />
         </div>
       </div>
     )
