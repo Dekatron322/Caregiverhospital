@@ -211,6 +211,7 @@ const IssueRequest = () => {
         </div>
         <div className="w-full">
           <p className="text-xs font-bold">{prescription.name}</p>
+          <p className="text-xs">₦{prescription.dosage}</p>
           <small className="text-xs">Medicine Name</small>
         </div>
 

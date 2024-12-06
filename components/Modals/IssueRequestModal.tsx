@@ -238,6 +238,10 @@ const IssueRequestModal: React.FC<PrescriptionModalProps> = ({
                     </p>
                   </div>
                   <div className="flex items-center justify-between pb-2">
+                    <p className="text-sm">Medicine Price</p>
+                    <p className="text-sm">₦{prescription.dosage}</p>
+                  </div>
+                  <div className="flex items-center justify-between pb-2">
                     <p className="text-sm">Discount %</p>
                     <p className="text-sm">{prescription.discount_value || "N/A"}</p>
                   </div>

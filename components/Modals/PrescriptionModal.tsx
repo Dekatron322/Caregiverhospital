@@ -96,7 +96,7 @@ const PrescriptionModal: React.FC<ModalProps> = ({ results, onClose, userId, onP
   const [name, setName] = useState<string>("")
   const [code, setCode] = useState<string>("")
   const [unit, setUnit] = useState<number>(1)
-  const [dosage, setDosage] = useState<number>(1)
+  const [dosage, setDosage] = useState<string>("")
   const [rate, setRate] = useState<string>("")
   const [usage, setUsage] = useState<string>("")
   const [note, setNote] = useState<string>("")
@@ -216,10 +216,11 @@ const PrescriptionModal: React.FC<ModalProps> = ({ results, onClose, userId, onP
       doctor_name: doctorName,
       category: selectedCategory ? selectedCategory.name : "",
       name: selectedMedicine ? selectedMedicine.name : "",
+      dosage: selectedMedicine ? selectedMedicine.price : "",
       complain: selectedComplaints,
       code: procedureName,
       unit,
-      dosage,
+
       rate,
       usage,
       note,
@@ -314,13 +315,13 @@ const PrescriptionModal: React.FC<ModalProps> = ({ results, onClose, userId, onP
             <div className="hidden w-full">
               <div className="search-bg mt-1 flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                 <input
-                  type="number"
+                  type="text"
                   id="dosage"
                   placeholder="Dosage"
                   className="h-[45px] w-full bg-transparent text-xs outline-none focus:outline-none"
                   style={{ width: "100%", height: "45px" }}
                   value={dosage}
-                  onChange={(e) => setDosage(parseInt(e.target.value))}
+                  onChange={(e) => setDosage(e.target.value)}
                 />
               </div>
             </div>
