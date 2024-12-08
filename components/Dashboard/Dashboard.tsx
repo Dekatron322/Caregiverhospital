@@ -1,13 +1,12 @@
 "use client"
 import React, { useEffect, useState } from "react"
 import axios from "axios"
-
 import { useRouter } from "next/navigation"
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
 import DeleteTestModal from "components/Modals/DeleteTestModal"
 
 interface Appointment {
-  id: number
+  id: any
   doctor: string
   detail: string
   pub_date: string
@@ -48,7 +47,7 @@ const Appointments = () => {
 
   useEffect(() => {
     fetchAppointments()
-  }, [])
+  }, [refresh])
 
   const toggleDone = (appointmentId: number) => {
     setAppointments((prevAppointments) =>
@@ -81,7 +80,7 @@ const Appointments = () => {
     if (!selectedLabTestId) return
 
     try {
-      await axios.delete(`https://api2.caregiverhospital.com/lab-test/lab-test/${selectedLabTestId}/`)
+      await axios.delete(`https://api2.caregiverhospital.com/appointment/appointment/${selectedLabTestId}/`)
       setShowSuccessNotification(true)
       setRefresh(!refresh) // Refresh the data after deletion
       setTimeout(() => setShowSuccessNotification(false), 5000)
@@ -126,7 +125,7 @@ const Appointments = () => {
           <p className="text-xs">Complain</p>
         </div>
         <div className="flex gap-2">
-          <DeleteForeverIcon className="text-[#F2B8B5]" />
+          <DeleteForeverIcon className="text-[#F2B8B5]" onClick={() => handleDeleteClick(appointment.id)} />
         </div>
       </div>
     )
@@ -191,6 +190,14 @@ const Appointments = () => {
           {activeTab === "pending" && renderPendingAppointments()}
           {activeTab === "done" && renderDoneAppointments()}
         </>
+      )}
+      {isDeleteModalOpen && (
+        <DeleteTestModal
+          title="Confirm Delete"
+          description="Are you sure you want to discard this Appointment? This action cannot be undone."
+          onConfirm={deleteLabTest}
+          onCancel={() => setIsDeleteModalOpen(false)}
+        />
       )}
     </div>
   )

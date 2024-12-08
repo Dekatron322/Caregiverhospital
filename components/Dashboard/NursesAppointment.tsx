@@ -1,7 +1,10 @@
 "use client"
 import React, { useEffect, useState } from "react"
-import { PiDotsThree } from "react-icons/pi"
+import axios from "axios"
+import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye"
 import { useRouter } from "next/navigation"
+import DeleteTestModal from "components/Modals/DeleteTestModal"
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
 
 interface Appointment {
   id: any
@@ -20,6 +23,11 @@ const NursesAppointments = () => {
   const [activeTab, setActiveTab] = useState("all")
   const [appointments, setAppointments] = useState<Appointment[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
+  const [selectedLabTestId, setSelectedLabTestId] = useState<string | null>(null)
+  const [showSuccessNotification, setShowSuccessNotification] = useState(false)
+  const [showPaymentSuccessNotification, setShowPaymentSuccessNotification] = useState(false)
+  const [refresh, setRefresh] = useState(false)
 
   const handleAppointmentClick = (appointmentId: number) => {
     localStorage.setItem("selectedAppointmentId", appointmentId.toString())
@@ -46,7 +54,7 @@ const NursesAppointments = () => {
 
   useEffect(() => {
     fetchAppointments()
-  }, [])
+  }, [refresh])
 
   useEffect(() => {
     const storedPatientId = localStorage.getItem("selectedAppointmentId")
@@ -70,6 +78,26 @@ const NursesAppointments = () => {
     }
   }
 
+  const handleDeleteClick = (id: string) => {
+    setSelectedLabTestId(id)
+    setIsDeleteModalOpen(true)
+  }
+
+  const deleteLabTest = async () => {
+    if (!selectedLabTestId) return
+
+    try {
+      await axios.delete(`https://api2.caregiverhospital.com/appointment/appointment/${selectedLabTestId}/`)
+      setShowSuccessNotification(true)
+      setRefresh(!refresh) // Refresh the data after deletion
+      setTimeout(() => setShowSuccessNotification(false), 5000)
+      setIsDeleteModalOpen(false)
+    } catch (error) {
+      console.error("Error deleting lab test:", error)
+      alert("Failed to delete lab test.")
+    }
+  }
+
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
       year: "numeric",
@@ -83,11 +111,7 @@ const NursesAppointments = () => {
   }
 
   const renderAppointmentDetails = (appointment: Appointment) => (
-    <div
-      key={appointment.id}
-      className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
-      onClick={() => handleAppointmentClick(appointment.patient_id)}
-    >
+    <div key={appointment.id} className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2">
       <div className="flex w-full items-center gap-2">
         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46ffa6] max-md:hidden">
           <p className="capitalize text-[#000000]">{appointment.patient_name.charAt(0)}</p>
@@ -113,8 +137,9 @@ const NursesAppointments = () => {
         <p className="text-xs">Complain</p>
       </div>
 
-      <div className="max-md:hidden">
-        <PiDotsThree />
+      <div className="flex gap-2 max-md:hidden">
+        <RemoveRedEyeIcon className="text-[#46FFA6]" onClick={() => handleAppointmentClick(appointment.patient_id)} />
+        <DeleteForeverIcon className="text-[#F2B8B5]" onClick={() => handleDeleteClick(appointment.id)} />
       </div>
     </div>
   )
@@ -178,6 +203,14 @@ const NursesAppointments = () => {
           {activeTab === "pending" && renderPendingAppointments()}
           {activeTab === "done" && renderDoneAppointments()}
         </>
+      )}
+      {isDeleteModalOpen && (
+        <DeleteTestModal
+          title="Confirm Delete"
+          description="Are you sure you want to discard this Appointment? This action cannot be undone."
+          onConfirm={deleteLabTest}
+          onCancel={() => setIsDeleteModalOpen(false)}
+        />
       )}
     </div>
   )
