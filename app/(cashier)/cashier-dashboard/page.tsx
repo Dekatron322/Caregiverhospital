@@ -5,6 +5,7 @@ import { IoIosArrowForward } from "react-icons/io"
 import { usePathname, useRouter } from "next/navigation"
 import PharmacyNav from "components/Navbar/PharmacyNav"
 import CashierIssueRequest from "components/Dashboard/CashierIssueRequest"
+import CashierNav from "components/Navbar/CashierNav"
 
 export default function Dashboard() {
   const pathname = usePathname()
@@ -13,7 +14,7 @@ export default function Dashboard() {
       <div className="h-full ">
         <div className=" flex min-h-screen ">
           <div className="flex  w-screen flex-col ">
-            <PharmacyNav />
+            <CashierNav />
 
             <div className="flex items-center gap-2 px-16 max-sm:px-3  md:py-6">
               <p className="font-bold">Cashier</p>
