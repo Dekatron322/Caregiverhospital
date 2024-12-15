@@ -45,6 +45,7 @@ interface MedicalRecord {
   test_type: string
   result: string
   pub_date: string
+
   status_note: string
   discount_value: string
   lab_parameters?: {
@@ -104,6 +105,7 @@ interface Patient {
     test_type: string
     result: string
     pub_date: string
+    payment_status?: string
     status_note: string
     discount_value: string
     lab_parameters: {
@@ -415,12 +417,12 @@ const PatientDetailsForDoctor: React.FC<PatientDetailsProps> = ({ patient }) => 
               <small className="text-xm ">Test Type</small>
             </div>
           </div>
-          <div className="flex w-full items-center gap-1 text-sm font-semibold">
+          {/* <div className="flex w-full items-center gap-1 text-sm font-semibold">
             <div>
               <p>{medical.result}</p>
               <small className="text-xm ">Result</small>
             </div>
-          </div>
+          </div> */}
           {/* <div className="flex w-full items-center gap-1 text-sm font-semibold">
             <div>
               <p>{formatDate(medical.pub_date)}</p>
@@ -429,8 +431,12 @@ const PatientDetailsForDoctor: React.FC<PatientDetailsProps> = ({ patient }) => 
           </div> */}
           <div className="flex w-full items-center gap-1 text-sm font-semibold">
             <div>
-              <p>{medical.status_note}</p>
               <small className="text-xm ">Status</small>
+              {medical.payment_status ? (
+                <p className="w-32 rounded bg-[#000000] px-2 py-[6px] text-center text-xs text-[#46FFA6]">Approved</p>
+              ) : (
+                <p className="w-32 rounded bg-[#F2B8B5] px-2 py-[6px] text-center text-xs">Not Approved</p>
+              )}
             </div>
           </div>
           <div className="md:flex md:w-full md:flex-col md:items-center">
