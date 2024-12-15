@@ -8,6 +8,7 @@ import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet"
 import PaymentModal from "components/Modals/PaymentModal"
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
 import DeleteTestModal from "components/Modals/DeleteTestModal"
+import LabPaymentModal from "components/Modals/LabPaymentModal"
 
 interface HMO {
   id: string
@@ -32,6 +33,7 @@ interface LabTestResult {
   name: string
   hmo?: HMO
   test_price?: string
+  payment_status?: string
   lab_parameters: { param_title: string; id: string; param_unit: string; param_range: string; param_result: string }[]
 }
 
@@ -240,20 +242,22 @@ const LabTests = () => {
                 <p className="text-xs font-bold">Discount</p>
               </div>
               <div className="w-full">
-                <p
-                  className={`w-32 rounded ${getStatusColor(
-                    results.status_note
-                  )} px-2 py-[6px] text-center text-xs text-[#000000]`}
-                >
-                  {results.status_note}
-                </p>
+                {results.payment_status ? (
+                  <p className="w-32 rounded bg-[#000000] px-2 py-[6px] text-center text-xs text-[#46FFA6]">Paid</p>
+                ) : (
+                  <p className="w-32 rounded bg-[#F2B8B5] px-2 py-[6px] text-center text-xs">Not Paid</p>
+                )}
               </div>
               <div className="w-full max-sm:hidden">
                 <p className="text-sm font-bold">{formatDate(results?.pub_date)}</p>
                 <p className="text-xs font-bold">Date Requested</p>
               </div>
               <div className="flex gap-2">
-                <RemoveRedEyeIcon className="text-[#46FFA6]" onClick={() => handleCardClick(results)} />
+                {results.payment_status ? (
+                  <RemoveRedEyeIcon className="text-[#46FFA6]" onClick={() => handleCardClick(results)} />
+                ) : (
+                  <p>-</p>
+                )}
                 <AccountBalanceWalletIcon onClick={() => handlePaymentClick(results)} />
                 <DeleteForeverIcon className="text-[#F2B8B5]" onClick={() => handleDeleteClick(results.id)} />
               </div>
@@ -346,7 +350,7 @@ const LabTests = () => {
       </div>
 
       {isModalOpen && clickedCard && <TestModal results={clickedCard} onClose={handleModalClose} />}
-      {isPaymentModalOpen && paymentCard && <PaymentModal results={paymentCard} onClose={handlePaymentModalClose} />}
+      {isPaymentModalOpen && paymentCard && <LabPaymentModal results={paymentCard} onClose={handlePaymentModalClose} />}
       {isDeleteModalOpen && (
         <DeleteTestModal
           title="Confirm Deletion"
