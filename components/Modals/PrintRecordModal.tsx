@@ -68,32 +68,41 @@ const PrintRecordModal: React.FC<ModalProps> = ({ show, onClose, record }) => {
       <div className={styles.modalBodys}>
         <div className="p-4" ref={modalContentRef}>
           <div className="mb-4 flex items-center justify-between">
-            <Image src="/ic_logo.svg" width={115} height={43} alt="dekalo" />
+            <Image className="icon-style content-center" src="/ic_logo.svg" width={150} height={43} alt="dekalo" />
+
+            <Image
+              className="dark-icon-style content-center"
+              src="/dark_logo.svg"
+              width={150}
+              height={43}
+              alt="dekalo"
+            />
+
             <button onClick={onClose}>
               <CloseOutlinedIcon />
             </button>
           </div>
 
           <div className="mb-4 flex items-center justify-center">
-            <p className=" text-lg font-bold text-black">Medical Record Details</p>
+            <p className=" text-lg font-bold ">Medical Record Details</p>
           </div>
 
           <div className="mb-3 flex items-center gap-2">
-            <CalendarMonthOutlinedIcon className="text-black" />
-            <p className="flex items-center gap-1 text-sm text-black">Time: {formatDateTime(record.pub_date)}</p>
+            <CalendarMonthOutlinedIcon className="" />
+            <p className="flex items-center gap-1 text-sm ">Time: {formatDateTime(record.pub_date)}</p>
           </div>
 
           <div className="mb-3 flex items-center gap-2">
-            <ReceiptLongOutlinedIcon className="text-black" />
-            <p className="flex items-center gap-1 text-sm text-black">Issuer: {record.doctor_name}</p>
+            <ReceiptLongOutlinedIcon className="" />
+            <p className="flex items-center gap-1 text-sm ">Issuer: {record.doctor_name}</p>
           </div>
 
           <div className="mb-3 flex items-center gap-2">
-            <AssignmentIndOutlinedIcon className="text-black" />
-            <p className="flex items-center gap-1 text-sm text-black">Issued to: {record.patient_name}</p>
+            <AssignmentIndOutlinedIcon className="" />
+            <p className="flex items-center gap-1 text-sm ">Issued to: {record.patient_name}</p>
           </div>
 
-          <h2 className="mb-3 text-lg font-bold text-black">Test Result</h2>
+          <h2 className="mb-3 text-lg font-bold">Test Result</h2>
           <div className="result_area  h-full w-full rounded-lg p-4">
             {record.lab_parameters && record.lab_parameters.length > 0 && (
               <div className="mt-4">
