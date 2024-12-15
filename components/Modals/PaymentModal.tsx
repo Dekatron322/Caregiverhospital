@@ -17,6 +17,8 @@ interface HMO {
 }
 
 interface LabTestResult {
+  hmo_id?: string
+  hmo_name?: string
   id: string
   name: string
   test_type: string
@@ -26,6 +28,8 @@ interface LabTestResult {
   diagnosis_code: string
   patient_id: string
   discount_value: string
+  status_note: string
+  payment_status?: string
   hmo?: HMO
 }
 
@@ -74,6 +78,7 @@ const PaymentModal: React.FC<ModalProps> = ({ results, onClose }) => {
   const [diagnosisInfo, setDiagnosisInfo] = useState<Diagnosis | null>(null) // State to hold diagnosis info
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [testPrice, setTestPrice] = useState<string | null>(null)
+  const [paymentComplete, setPaymentComplete] = useState(false)
 
   useEffect(() => {
     AOS.init({
@@ -149,10 +154,13 @@ const PaymentModal: React.FC<ModalProps> = ({ results, onClose }) => {
 
   const handleSubmit = async () => {
     setIsLoading(true)
-    setErrorMessage(null) // Clear previous error message
+    setErrorMessage(null)
     try {
-      const unitPrice = diagnosisInfo?.price ? Number(diagnosisInfo.price) : 0
+      const diagnosisPrice = diagnosisInfo?.price ? Number(diagnosisInfo.price) : 0
+      const testPriceAmount = testPrice ? Number(testPrice) : 0
+      const unitPrice = diagnosisPrice + testPriceAmount
       const discountValue = results.discount_value ? parseFloat(results.discount_value) : 0
+
       const discountAmount = unitPrice * (discountValue / 100)
       const finalPrice = unitPrice - discountAmount
 
@@ -163,29 +171,38 @@ const PaymentModal: React.FC<ModalProps> = ({ results, onClose }) => {
         procedure_code: "null",
         diagnosis_code: diagnosisInfo?.code || "N/A",
         charge_amount: finalPrice.toFixed(2),
+        status_note: "approved",
         units: "1",
-        status: true,
+        payment_status: true,
         pub_date: new Date().toISOString(),
-        hmo: results.hmo?.id || "N/A",
+        hmo: results.hmo_id || "N/A",
       }
 
-      console.log("Payload:", payload) // Log the payload to verify its structure
-
+      // Add billing to patient
       const response = await axios.post(
         `https://api2.caregiverhospital.com/patient/add-billing-to-patient/${results.patient_id}/`,
         payload
       )
+
       console.log("Response data:", response.data)
+
+      // Update the payment status of the lab test
+      const paymentStatusPayload = { payment_status: true }
+      const updateResponse = await axios.put(
+        `https://api2.caregiverhospital.com/lab-test/lab-test/${results.id}/update-payment/`,
+        paymentStatusPayload
+      )
+
+      console.log("Payment status updated:", updateResponse.data)
+
+      setPaymentComplete(true) // Update payment status
       onClose(true)
-    } catch (error: unknown) {
+    } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.error("Error updating lab test result:", error.response?.data)
-        setErrorMessage(error.response?.data.message || "An error occurred while updating the lab test result.")
-      } else if (error instanceof Error) {
-        console.error("Error updating lab test result:", error.message)
-        setErrorMessage(error.message || "An unexpected error occurred.")
+        console.error("Error:", error.response?.data)
+        setErrorMessage(error.response?.data.message || "An error occurred.")
       } else {
-        console.error("Unknown error:", error)
+        console.error("Unexpected error:", error)
         setErrorMessage("An unexpected error occurred.")
       }
       onClose(false)
@@ -216,7 +233,7 @@ const PaymentModal: React.FC<ModalProps> = ({ results, onClose }) => {
               <div>
                 <h5>{results.patient_name}</h5>
                 <p className="text-xs">
-                  HMO NAME/ID: {results.hmo?.name || "N/A"} ({results.policy_id || "N/A"})
+                  HMO NAME/ID: {results.hmo_name || "N/A"} ({results.policy_id || "N/A"})
                 </p>
               </div>
             </div>
@@ -283,13 +300,19 @@ const PaymentModal: React.FC<ModalProps> = ({ results, onClose }) => {
           )}
 
           <div className="mt-4 flex w-full gap-6">
-            <button
-              className="button-primary h-[50px] w-full rounded-sm text-[#FFFFFF] max-sm:h-[45px]"
-              onClick={handleSubmit}
-              disabled={isLoading}
-            >
-              {isLoading ? "Submitting..." : "Submit Invoice"}
-            </button>
+            {results.payment_status ? (
+              <p className="txt-2xl w-full rounded-md bg-black py-2 text-center font-bold text-[#46FFA6]">
+                Payment Recieved
+              </p>
+            ) : (
+              <button
+                className="button-primary h-[50px] w-full rounded-sm text-[#FFFFFF] max-sm:h-[45px]"
+                onClick={handleSubmit}
+                disabled={isLoading}
+              >
+                {isLoading ? "Submitting..." : "Submit Invoice"}
+              </button>
+            )}
           </div>
         </div>
       </div>

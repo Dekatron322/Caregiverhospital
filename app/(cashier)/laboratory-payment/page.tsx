@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import Footer from "components/Footer/Footer"
 import LabTests from "components/Dashboard/LabTests"
 import LaboratoryNav from "components/Navbar/LaboratoryNav"
-import CashierDashboard from "components/Sidebar/CashierSideBar"
+import CashierLabTests from "components/Dashboard/CashierLabTest"
 import CashierNav from "components/Navbar/CashierNav"
 
 interface LabTest {
@@ -56,7 +56,7 @@ export default function PharmacyDashboard() {
             </div>
 
             <div className="my-6 flex w-full grid-cols-2 gap-2 px-16 max-sm:px-3">
-              <CashierDashboard />
+              <CashierLabTests />
             </div>
 
             <Footer />

@@ -9,6 +9,15 @@ import CustomDropdown from "components/Patient/CustomDropdown"
 import CustomDropdownTest from "../Patient/CustomDropdownTest"
 
 interface RequestTest {
+  policy_id: any
+  hmo: {
+    id: string
+    name: string
+    category: string
+    description: string
+    status: boolean
+    pub_date: string
+  }
   id: string
   name: string
   // Add other properties here
@@ -147,6 +156,11 @@ const LabTestModal: React.FC<ModalProps> = ({ results, onClose, userId, onPrescr
         test_type: testName,
         test: testName,
         diagnosis_code: diagnosisName,
+        hmo_id: results.hmo.id,
+        policy_id: results.policy_id,
+        hmo_name: results.hmo.name,
+        hmo_category: results.hmo.category,
+        hmo_description: results.hmo.description,
         note,
         status_note: status,
         pub_date: new Date().toISOString(),

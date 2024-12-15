@@ -33,7 +33,7 @@ interface Patient {
     status: boolean
     pub_date: string
   }
-  policy_id?: string
+  policy_id: string
   allergies?: string
   nok_name: string
   nok_phone_no: string
@@ -107,6 +107,15 @@ interface AddPrescription {
 interface RequestTest {
   id: string
   name: string
+  policy_id: any
+  hmo: {
+    id: string
+    name: string
+    category: string
+    description: string
+    status: boolean
+    pub_date: string
+  }
 }
 
 interface Note {

@@ -30,7 +30,7 @@ interface LabTestResult {
   diagnosis_code: string
   discount_value: string
   name: string
-  hmo?: HMO
+  payment_status?: string
   test_price?: string
   lab_parameters: { param_title: string; id: string; param_unit: string; param_range: string; param_result: string }[]
 }
@@ -50,7 +50,7 @@ interface ModalProps {
   diagnosis?: Diagnosis
 }
 
-const LabTests = () => {
+const CashierLabTests = () => {
   const router = useRouter()
   const [isDone, setIsDone] = useState<boolean>(false)
   const [activeTab, setActiveTab] = useState("all")
@@ -240,22 +240,18 @@ const LabTests = () => {
                 <p className="text-xs font-bold">Discount</p>
               </div>
               <div className="w-full">
-                <p
-                  className={`w-32 rounded ${getStatusColor(
-                    results.status_note
-                  )} px-2 py-[6px] text-center text-xs text-[#000000]`}
-                >
-                  {results.status_note}
-                </p>
+                {results.payment_status ? (
+                  <p className="w-32 rounded bg-[#000000] px-2 py-[6px] text-center text-xs text-[#46FFA6]">Paid</p>
+                ) : (
+                  <p className="w-32 rounded bg-[#F2B8B5] px-2 py-[6px] text-center text-xs">Not Paid</p>
+                )}
               </div>
               <div className="w-full max-sm:hidden">
                 <p className="text-sm font-bold">{formatDate(results?.pub_date)}</p>
                 <p className="text-xs font-bold">Date Requested</p>
               </div>
               <div className="flex gap-2">
-                <RemoveRedEyeIcon className="text-[#46FFA6]" onClick={() => handleCardClick(results)} />
                 <AccountBalanceWalletIcon onClick={() => handlePaymentClick(results)} />
-                <DeleteForeverIcon className="text-[#F2B8B5]" onClick={() => handleDeleteClick(results.id)} />
               </div>
             </div>
           )
@@ -314,15 +310,6 @@ const LabTests = () => {
               >
                 Not Approved
               </button>
-
-              {/* <button
-                className={`${
-                  activeTab === "discarded" ? "active-tab whitespace-nowrap" : "inactive-tab whitespace-nowrap"
-                }`}
-                onClick={() => setActiveTab("discarded")}
-              >
-                Discarded
-              </button> */}
             </div>
             <div className="search-bg mb-4 flex h-10 items-center justify-between gap-2 rounded border border-[#CFDBD5] px-3 py-1 max-md:w-[180px] lg:w-[300px]">
               <Image className="icon-style" src="/icons.svg" width={16} height={16} alt="dekalo" />
@@ -371,4 +358,4 @@ const LabTests = () => {
   )
 }
 
-export default LabTests
+export default CashierLabTests
