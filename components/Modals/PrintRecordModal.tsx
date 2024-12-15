@@ -90,9 +90,7 @@ const PrintRecordModal: React.FC<ModalProps> = ({ show, onClose, record }) => {
 
           <div className="mb-3 flex items-center gap-2">
             <AssignmentIndOutlinedIcon className="text-black" />
-            <p className="flex items-center gap-1 text-sm text-black">
-              Issued to: {record.patient_name} {record.patient_id}
-            </p>
+            <p className="flex items-center gap-1 text-sm text-black">Issued to: {record.patient_name}</p>
           </div>
 
           <h2 className="mb-3 text-lg font-bold text-black">Test Result</h2>
@@ -102,7 +100,7 @@ const PrintRecordModal: React.FC<ModalProps> = ({ show, onClose, record }) => {
                 <h2 className="mb-3 text-lg font-bold text-black">Lab Parameters</h2>
                 {record.lab_parameters.map((param: any, index: any) => (
                   <div key={index} className="mb-3">
-                    <p className="text-sm text-black">Value: {param.id}</p>
+                    {/* <p className="text-sm text-black">Value: {param.id}</p> */}
                     <p className="text-sm text-black">Value: {param.param_title}</p>
                     <p className="text-sm text-black">Unit: {param.param_unit}</p>
                     <p className="text-sm text-black">Reference Range: {param.param_range}</p>
