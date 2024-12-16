@@ -33,7 +33,7 @@ interface LabTestResult {
   name: string
   hmo?: HMO
   test_price?: string
-  payment_status?: string
+  payment_status?: boolean
   lab_parameters: { param_title: string; id: string; param_unit: string; param_range: string; param_result: string }[]
 }
 
@@ -55,7 +55,6 @@ interface ModalProps {
 const LabTests = () => {
   const router = useRouter()
   const [isDone, setIsDone] = useState<boolean>(false)
-  const [activeTab, setActiveTab] = useState("all")
   const [clickedCard, setClickedCard] = useState<LabTestResult | null>(null)
   const [paymentCard, setPaymentCard] = useState<LabTestResult | null>(null)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
@@ -203,6 +202,16 @@ const LabTests = () => {
     }
   }
 
+  const filterLogic = {
+    all: () => true, // Show all results
+    approved: (results: LabTestResult) => results.payment_status === true, // Paid
+    notApproved: (results: LabTestResult) => results.payment_status === false, // Not Paid
+  }
+
+  type ActiveTab = keyof typeof filterLogic
+
+  const [activeTab, setActiveTab] = useState<ActiveTab>("all")
+
   const renderResults = (filter: (results: LabTestResult) => boolean) => {
     return (
       <div className="flex flex-col gap-2">
@@ -296,57 +305,44 @@ const LabTests = () => {
           </div>
         ) : (
           <>
-            <div className="tab-bg mb-4 flex items-center gap-3 rounded-lg p-1 md:w-[260px] md:border">
-              <button
-                className={`${activeTab === "all" ? "active-tab" : "inactive-tab"}`}
-                onClick={() => setActiveTab("all")}
-              >
-                All
-              </button>
-              <button
-                className={`${activeTab === "approved" ? "active-tab" : "inactive-tab"}`}
-                onClick={() => setActiveTab("approved")}
-              >
-                Approved
-              </button>
-
-              <button
-                className={`${
-                  activeTab === "not approved" ? "active-tab whitespace-nowrap" : "inactive-tab whitespace-nowrap"
-                }`}
-                onClick={() => setActiveTab("not approved")}
-              >
-                Not Approved
-              </button>
-
-              {/* <button
-                className={`${
-                  activeTab === "discarded" ? "active-tab whitespace-nowrap" : "inactive-tab whitespace-nowrap"
-                }`}
-                onClick={() => setActiveTab("discarded")}
-              >
-                Discarded
-              </button> */}
-            </div>
-            <div className="search-bg mb-4 flex h-10 items-center justify-between gap-2 rounded border border-[#CFDBD5] px-3 py-1 max-md:w-[180px] lg:w-[300px]">
-              <Image className="icon-style" src="/icons.svg" width={16} height={16} alt="dekalo" />
-              <Image className="dark-icon-style" src="/search-dark.svg" width={16} height={16} alt="dekalo" />
-              <input
-                type="text"
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={handleSearchChange}
-                className="w-full bg-transparent text-xs outline-none focus:outline-none"
-              />
+            <div>
+              <div className="tab-bg md:borde mb-4 flex items-center gap-3 rounded-lg p-1 md:w-[260px]">
+                <button
+                  onClick={() => setActiveTab("all")}
+                  className={activeTab === "all" ? "active-tab" : "inactive-tab"}
+                >
+                  All
+                </button>
+                <button
+                  onClick={() => setActiveTab("approved")}
+                  className={activeTab === "approved" ? "active-tab" : "inactive-tab"}
+                >
+                  Approved
+                </button>
+                <button
+                  onClick={() => setActiveTab("notApproved")}
+                  className={activeTab === "notApproved" ? "active-tab" : "inactive-tab"}
+                >
+                  Not Approved
+                </button>
+              </div>
+              <div>
+                <div className="search-bg mb-4 flex h-10 items-center justify-between gap-2 rounded border border-[#CFDBD5] px-3 py-1 max-md:w-[180px] lg:w-[300px]">
+                  <Image className="icon-style" src="/icons.svg" width={16} height={16} alt="dekalo" />
+                  <Image className="dark-icon-style" src="/search-dark.svg" width={16} height={16} alt="dekalo" />
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    className="w-full bg-transparent text-xs outline-none focus:outline-none"
+                  />
+                </div>
+                {renderResults(filterLogic[activeTab])}
+              </div>
             </div>
           </>
         )}
-
-        {activeTab === "all" && renderResults(() => true)}
-        {activeTab === "approved" && renderResults((results) => results.status_note.toLowerCase() === "approved")}
-        {activeTab === "not approved" &&
-          renderResults((results) => results.status_note.toLowerCase() === "not approved")}
-        {activeTab === "discarded" && renderResults((results) => results.status_note.toLowerCase() === "discarded")}
       </div>
 
       {isModalOpen && clickedCard && <TestModal results={clickedCard} onClose={handleModalClose} />}

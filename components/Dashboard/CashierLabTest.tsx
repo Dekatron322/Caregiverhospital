@@ -30,7 +30,7 @@ interface LabTestResult {
   diagnosis_code: string
   discount_value: string
   name: string
-  payment_status?: string
+  payment_status?: boolean
   test_price?: string
   lab_parameters: { param_title: string; id: string; param_unit: string; param_range: string; param_result: string }[]
 }
@@ -53,7 +53,7 @@ interface ModalProps {
 const CashierLabTests = () => {
   const router = useRouter()
   const [isDone, setIsDone] = useState<boolean>(false)
-  const [activeTab, setActiveTab] = useState("all")
+
   const [clickedCard, setClickedCard] = useState<LabTestResult | null>(null)
   const [paymentCard, setPaymentCard] = useState<LabTestResult | null>(null)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
@@ -106,11 +106,6 @@ const CashierLabTests = () => {
     fetchData()
   }, [refresh])
 
-  const handleCardClick = (results: LabTestResult) => {
-    setClickedCard(results)
-    setIsModalOpen(true)
-  }
-
   const handlePaymentClick = (results: LabTestResult) => {
     const diagnosis = diagnosisData.find((diag) => diag.code === results.diagnosis_code)
     const resultWithDiagnosis = { ...results, diagnosis }
@@ -129,23 +124,6 @@ const CashierLabTests = () => {
       setTimeout(() => setShowPaymentSuccessNotification(false), 5000)
     }
     setIsPaymentModalOpen(false)
-  }
-
-  const toggleDone = () => {
-    setIsDone(!isDone)
-  }
-
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "approved":
-        return "bg-green-200"
-      case "not approved":
-        return "bg-[#F2B8B5]"
-      case "discarded":
-        return "bg-gray-200"
-      default:
-        return "bg-gray-200"
-    }
   }
 
   const formatDate = (dateString: string) => {
@@ -181,25 +159,15 @@ const CashierLabTests = () => {
 
   const totalPages = Math.ceil(filteredResults.length / resultsPerPage)
 
-  const handleDeleteClick = (id: string) => {
-    setSelectedLabTestId(id)
-    setIsDeleteModalOpen(true)
+  const filterLogic = {
+    all: () => true, // Show all results
+    approved: (results: LabTestResult) => results.payment_status === true, // Paid
+    notApproved: (results: LabTestResult) => results.payment_status === false, // Not Paid
   }
 
-  const deleteLabTest = async () => {
-    if (!selectedLabTestId) return
+  type ActiveTab = keyof typeof filterLogic
 
-    try {
-      await axios.delete(`https://api2.caregiverhospital.com/lab-test/lab-test/${selectedLabTestId}/`)
-      setShowSuccessNotification(true)
-      setRefresh(!refresh) // Refresh the data after deletion
-      setTimeout(() => setShowSuccessNotification(false), 5000)
-      setIsDeleteModalOpen(false)
-    } catch (error) {
-      console.error("Error deleting lab test:", error)
-      alert("Failed to delete lab test.")
-    }
-  }
+  const [activeTab, setActiveTab] = useState<ActiveTab>("all")
 
   const renderResults = (filter: (results: LabTestResult) => boolean) => {
     return (
@@ -241,7 +209,7 @@ const CashierLabTests = () => {
               </div>
               <div className="w-full">
                 {results.payment_status ? (
-                  <p className="w-32 rounded bg-[#000000] px-2 py-[6px] text-center text-xs text-[#46FFA6]">Paid</p>
+                  <p className="w-32 rounded bg-[#46ffa6] px-2 py-[6px] text-center text-xs text-[#000000]">Paid</p>
                 ) : (
                   <p className="w-32 rounded bg-[#F2B8B5] px-2 py-[6px] text-center text-xs">Not Paid</p>
                 )}
@@ -256,7 +224,7 @@ const CashierLabTests = () => {
             </div>
           )
         })}
-        <div className="mb-4 flex items-center justify-end  max-sm:px-3 md:mt-4">
+        <div className="mb-4 flex items-center justify-end max-sm:px-3 md:mt-4">
           {Array.from({ length: totalPages }, (_, index) => (
             <button
               key={index + 1}
@@ -264,7 +232,7 @@ const CashierLabTests = () => {
               className={`pagination-button ${
                 currentPage === index + 1
                   ? "active h-6 w-6 rounded-full bg-[#131414] text-sm text-[#ffffff] shadow"
-                  : "h-6 w-6 rounded-full bg-[#F1FFF0] text-sm text-[#1E1E1E]"
+                  : "h-6 w-6 rounded-full bg-[#F1F1F1] text-sm"
               }`}
             >
               {index + 1}
@@ -288,60 +256,49 @@ const CashierLabTests = () => {
           </div>
         ) : (
           <>
-            <div className="tab-bg mb-4 flex items-center gap-3 rounded-lg p-1 md:w-[260px] md:border">
-              <button
-                className={`${activeTab === "all" ? "active-tab" : "inactive-tab"}`}
-                onClick={() => setActiveTab("all")}
-              >
-                All
-              </button>
-              <button
-                className={`${activeTab === "approved" ? "active-tab" : "inactive-tab"}`}
-                onClick={() => setActiveTab("approved")}
-              >
-                Approved
-              </button>
-
-              <button
-                className={`${
-                  activeTab === "not approved" ? "active-tab whitespace-nowrap" : "inactive-tab whitespace-nowrap"
-                }`}
-                onClick={() => setActiveTab("not approved")}
-              >
-                Not Approved
-              </button>
-            </div>
-            <div className="search-bg mb-4 flex h-10 items-center justify-between gap-2 rounded border border-[#CFDBD5] px-3 py-1 max-md:w-[180px] lg:w-[300px]">
-              <Image className="icon-style" src="/icons.svg" width={16} height={16} alt="dekalo" />
-              <Image className="dark-icon-style" src="/search-dark.svg" width={16} height={16} alt="dekalo" />
-              <input
-                type="text"
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={handleSearchChange}
-                className="w-full bg-transparent text-xs outline-none focus:outline-none"
-              />
+            <div>
+              <div className="tab-bg md:borde mb-4 flex items-center gap-3 rounded-lg p-1 md:w-[260px]">
+                <button
+                  onClick={() => setActiveTab("all")}
+                  className={activeTab === "all" ? "active-tab" : "inactive-tab"}
+                >
+                  All
+                </button>
+                <button
+                  onClick={() => setActiveTab("approved")}
+                  className={activeTab === "approved" ? "active-tab" : "inactive-tab"}
+                >
+                  Approved
+                </button>
+                <button
+                  onClick={() => setActiveTab("notApproved")}
+                  className={activeTab === "notApproved" ? "active-tab" : "inactive-tab"}
+                >
+                  Not Approved
+                </button>
+              </div>
+              <div>
+                <div className="search-bg mb-4 flex h-10 items-center justify-between gap-2 rounded border border-[#CFDBD5] px-3 py-1 max-md:w-[180px] lg:w-[300px]">
+                  <Image className="icon-style" src="/icons.svg" width={16} height={16} alt="dekalo" />
+                  <Image className="dark-icon-style" src="/search-dark.svg" width={16} height={16} alt="dekalo" />
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={searchQuery}
+                    onChange={handleSearchChange}
+                    className="w-full bg-transparent text-xs outline-none focus:outline-none"
+                  />
+                </div>
+                {renderResults(filterLogic[activeTab])}
+              </div>
             </div>
           </>
         )}
-
-        {activeTab === "all" && renderResults(() => true)}
-        {activeTab === "approved" && renderResults((results) => results.status_note.toLowerCase() === "approved")}
-        {activeTab === "not approved" &&
-          renderResults((results) => results.status_note.toLowerCase() === "not approved")}
-        {activeTab === "discarded" && renderResults((results) => results.status_note.toLowerCase() === "discarded")}
       </div>
 
       {isModalOpen && clickedCard && <TestModal results={clickedCard} onClose={handleModalClose} />}
       {isPaymentModalOpen && paymentCard && <PaymentModal results={paymentCard} onClose={handlePaymentModalClose} />}
-      {isDeleteModalOpen && (
-        <DeleteTestModal
-          title="Confirm Deletion"
-          description="Are you sure you want to discard this lab test? This action cannot be undone."
-          onConfirm={deleteLabTest}
-          onCancel={() => setIsDeleteModalOpen(false)}
-        />
-      )}
+
       {showSuccessNotification && (
         <div className="animation-fade-in absolute bottom-16 m-5  flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514] md:right-16">
           <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />

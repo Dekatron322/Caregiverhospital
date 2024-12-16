@@ -29,7 +29,7 @@ interface LabTestResult {
   patient_id: string
   discount_value: string
   status_note: string
-  payment_status?: string
+  payment_status?: boolean
   hmo?: HMO
 }
 
