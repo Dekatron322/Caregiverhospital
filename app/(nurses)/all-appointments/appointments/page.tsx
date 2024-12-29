@@ -81,6 +81,21 @@ interface PatientDetail {
     test_type: string
     pub_date: string
   }[]
+  notes: [
+    {
+      id: string
+      title: string
+      detail: string
+      status: string
+      pub_date: any
+    },
+  ]
+}
+
+interface Note {
+  id: string
+  detail: string
+  title: string
 }
 
 export default function PatientDetailPage() {
@@ -181,6 +196,18 @@ export default function PatientDetailPage() {
     } catch (error) {
       console.error("Error refreshing patient details:", error)
     }
+  }
+
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }
+    return new Date(dateString).toLocaleDateString(undefined, options)
   }
 
   if (!patientDetail) {
@@ -346,7 +373,21 @@ export default function PatientDetailPage() {
                     </div>
 
                     <div className="mb-6 md:w-3/4">
-                      <PatientDetails patientDetail={patientDetail} />{" "}
+                      <PatientDetails patientDetail={patientDetail} /> {/* Notes Section */}
+                      <div className="notes-section mb-4 mt-10 rounded border p-4">
+                        <h3 className="mb-4 font-bold">Patient Notes</h3>
+                        {patientDetail.notes.length > 0 ? (
+                          patientDetail.notes.map((note) => (
+                            <div key={note.id} className="">
+                              <p className="mb-3 text-sm">{note.detail}</p>
+                              <p className="mb-2 text-sm text-[#087a43]">{formatDate(note.pub_date)}</p>
+                              <div className="my-5 h-[1px] w-full bg-slate-700"></div>
+                            </div>
+                          ))
+                        ) : (
+                          <p>No notes available for this patient.</p>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
