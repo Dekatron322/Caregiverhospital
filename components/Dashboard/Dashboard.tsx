@@ -10,7 +10,7 @@ interface Appointment {
   doctor: string
   detail: string
   pub_date: string
-  status: string
+  status: boolean
   patient_name: string // This is the name of the patient from the appointment
   time: string
   complain: string
@@ -48,16 +48,6 @@ const Appointments = () => {
   useEffect(() => {
     fetchAppointments()
   }, [refresh])
-
-  const toggleDone = (appointmentId: number) => {
-    setAppointments((prevAppointments) =>
-      prevAppointments.map((appointment) =>
-        appointment.id === appointmentId
-          ? { ...appointment, status: appointment.status === "done" ? "pending" : "done" }
-          : appointment
-      )
-    )
-  }
 
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
@@ -140,7 +130,7 @@ const Appointments = () => {
   const renderPendingAppointments = () => (
     <div className="flex flex-col gap-2">
       {appointments
-        .filter((appointment) => appointment.status !== "done")
+        .filter((appointment) => appointment.status === true)
         .map((appointment) => renderAppointmentDetails(appointment))}
     </div>
   )
@@ -148,7 +138,7 @@ const Appointments = () => {
   const renderDoneAppointments = () => (
     <div className="flex flex-col gap-2">
       {appointments
-        .filter((appointment) => appointment.status === "done")
+        .filter((appointment) => appointment.status === false)
         .map((appointment) => renderAppointmentDetails(appointment))}
     </div>
   )

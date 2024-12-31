@@ -1,7 +1,6 @@
 "use client"
 import React, { useEffect, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
-import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
 import Image from "next/image"
 import Link from "next/link"
@@ -51,7 +50,6 @@ interface Patient {
     note: string
     status: boolean
     pub_date: string
-
     doctor_name: string
     discount_value: string
   }[]
@@ -140,6 +138,7 @@ export default function PatientDetailPage() {
   const fetchPatientDetails = async () => {
     try {
       const patientId = localStorage.getItem("selectedAppointmentId")
+
       if (!patientId) {
         console.error("No appointment ID found in localStorage.")
         return
@@ -219,7 +218,7 @@ export default function PatientDetailPage() {
                   <div className="mb-3 grid w-full grid-cols-4 gap-2 max-sm:grid-cols-2">
                     <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
                       <Image src="/pt-dashboard-01.svg" height={40} width={40} alt="" />
-                      <h3 className="py-2 font-bold">Heart Rate</h3>
+                      <h3 className="py-2 font-bold">Heart Rate </h3>
                       <p>{patient.heart_rate || "N/A"}</p>
                     </div>
                     <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">

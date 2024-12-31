@@ -11,7 +11,7 @@ interface Appointment {
   doctor: string
   detail: string
   pub_date: string
-  status: string
+  status: boolean
   patient_id: any
   patient_name: string
   time: string
@@ -153,7 +153,7 @@ const NursesAppointments = () => {
   const renderPendingAppointments = () => (
     <div className="flex flex-col gap-2">
       {appointments
-        .filter((appointment) => appointment.status !== "done")
+        .filter((appointment) => appointment.status === true)
         .map((appointment) => renderAppointmentDetails(appointment))}
     </div>
   )
@@ -161,7 +161,7 @@ const NursesAppointments = () => {
   const renderDoneAppointments = () => (
     <div className="flex flex-col gap-2">
       {appointments
-        .filter((appointment) => appointment.status === "done")
+        .filter((appointment) => appointment.status === false)
         .map((appointment) => renderAppointmentDetails(appointment))}
     </div>
   )

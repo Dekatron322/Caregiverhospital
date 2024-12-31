@@ -1,14 +1,17 @@
 "use client"
 import React, { useEffect, useState } from "react"
-import { PiDotsThree } from "react-icons/pi"
+import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye"
+import { TiEdit } from "react-icons/ti"
 import { useRouter } from "next/navigation"
+import styles from "../../components/Modals/modal.module.css"
+import { LiaTimesSolid } from "react-icons/lia"
 
 interface Appointment {
   id: any
   doctor: string
   detail: string
   pub_date: string
-  status: string
+  status: boolean
   patient_id: any
   patient_name: string
   time: string
@@ -20,10 +23,40 @@ const DoctorsAppointments = () => {
   const [activeTab, setActiveTab] = useState("all")
   const [appointments, setAppointments] = useState<Appointment[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isModalVisible, setIsModalVisible] = useState(false)
+  const [selectedAppointmentId, setSelectedAppointmentId] = useState<number | null>(null)
 
   const handleAppointmentClick = (appointmentId: number) => {
     localStorage.setItem("selectedAppointmentId", appointmentId.toString())
     router.push(`/doctor-dashboard/doctor/`)
+  }
+
+  const handleEditClick = (appointmentId: number) => {
+    setSelectedAppointmentId(appointmentId)
+    setIsModalVisible(true)
+  }
+
+  const handleConfirmUpdate = async () => {
+    if (selectedAppointmentId !== null) {
+      try {
+        const response = await fetch(
+          `https://api2.caregiverhospital.com/appointment/update-appointment-status/${selectedAppointmentId}/`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status: false }), // Updated payload
+          }
+        )
+        if (!response.ok) {
+          throw new Error("Failed to update appointment status")
+        }
+        // Optionally refresh the appointments list
+        fetchAppointments()
+        setIsModalVisible(false)
+      } catch (error) {
+        console.error("Error updating appointment status:", error)
+      }
+    }
   }
 
   const fetchAppointments = async () => {
@@ -83,11 +116,7 @@ const DoctorsAppointments = () => {
   }
 
   const renderAppointmentDetails = (appointment: Appointment) => (
-    <div
-      key={appointment.id}
-      className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
-      onClick={() => handleAppointmentClick(appointment.patient_id)}
-    >
+    <div key={appointment.id} className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2">
       <div className="flex w-full items-center gap-2">
         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46ffa6] max-md:hidden">
           <p className="capitalize text-[#000000]">{appointment.patient_name.charAt(0)}</p>
@@ -113,8 +142,9 @@ const DoctorsAppointments = () => {
         <p className="text-xs">Complain</p>
       </div>
 
-      <div className="max-md:hidden">
-        <PiDotsThree />
+      <div className="flex items-center gap-2">
+        <RemoveRedEyeIcon onClick={() => handleAppointmentClick(appointment.patient_id)} />
+        <TiEdit className="text-lg" onClick={() => handleEditClick(appointment.id)} />
       </div>
     </div>
   )
@@ -128,7 +158,7 @@ const DoctorsAppointments = () => {
   const renderPendingAppointments = () => (
     <div className="flex flex-col gap-2">
       {appointments
-        .filter((appointment) => appointment.status !== "done")
+        .filter((appointment) => appointment.status === true)
         .map((appointment) => renderAppointmentDetails(appointment))}
     </div>
   )
@@ -136,7 +166,7 @@ const DoctorsAppointments = () => {
   const renderDoneAppointments = () => (
     <div className="flex flex-col gap-2">
       {appointments
-        .filter((appointment) => appointment.status === "done")
+        .filter((appointment) => appointment.status === false)
         .map((appointment) => renderAppointmentDetails(appointment))}
     </div>
   )
@@ -178,6 +208,35 @@ const DoctorsAppointments = () => {
           {activeTab === "pending" && renderPendingAppointments()}
           {activeTab === "done" && renderDoneAppointments()}
         </>
+      )}
+      {isModalVisible && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.deleteModalContent}>
+            <div className="px-6 py-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold">Confirm Deletion</h2>
+                <div className="border-black  hover:rounded-md hover:border">
+                  <LiaTimesSolid className="m-1 cursor-pointer" onClick={() => setIsModalVisible(false)} />
+                </div>
+              </div>
+              <p>Mark appointment as done?</p>
+              <div className="mt-3 flex w-full gap-5">
+                <button
+                  onClick={handleConfirmUpdate}
+                  className="button-secondary h-[50px] w-full rounded-sm max-sm:h-[45px]"
+                >
+                  Yes, mark
+                </button>
+                <button
+                  className="button-danger h-[50px] w-full rounded-sm max-sm:h-[45px]"
+                  onClick={() => setIsModalVisible(false)}
+                >
+                  No, Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
