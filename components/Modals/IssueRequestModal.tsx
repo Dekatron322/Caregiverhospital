@@ -46,6 +46,7 @@ interface Prescription {
   issue_status: boolean
   payment_status?: boolean
   discount_value: string
+  down_payment: string
 }
 
 interface Procedure {
@@ -99,6 +100,7 @@ const IssueRequestModal: React.FC<PrescriptionModalProps> = ({
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [paymentStatus, setPaymentStatus] = useState(prescription?.payment_status)
+  const [downPayment, setDownPayment] = useState(0)
 
   if (!isOpen || !patient || !prescription) {
     return null
@@ -149,6 +151,7 @@ const IssueRequestModal: React.FC<PrescriptionModalProps> = ({
         status: true,
         pub_date: new Date().toISOString(), // Or use the appropriate date if provided
         hmo: patient.hmo?.id || "N/A",
+        down_payment: downPayment,
       }
 
       console.log("Payload:", payload) // Log the payload to verify its structure
@@ -215,7 +218,7 @@ const IssueRequestModal: React.FC<PrescriptionModalProps> = ({
               </div>
             </div>
 
-            <div className="tab-bg mt-2 w-full rounded p-4">
+            <div className="tab-bg my-3 w-full rounded p-4">
               <div className="flex items-center justify-between" onClick={() => toggleOpen(0)}>
                 <p>Orders ₦{calculateTotal()}</p>
                 <IoIosArrowDown />
@@ -245,21 +248,35 @@ const IssueRequestModal: React.FC<PrescriptionModalProps> = ({
                     <p className="text-sm">Medicine Price</p>
                     <p className="text-sm">₦{prescription.dosage}</p>
                   </div>
+
                   <div className="flex items-center justify-between pb-2">
                     <p className="text-sm">Discount %</p>
                     <p className="text-sm">{prescription.discount_value || "N/A"}</p>
                   </div>
                   <div className="w-full border"></div>
-                  <div className="flex items-center justify-between pt-4">
+                  <div className="flex items-center justify-between pb-2 pt-4">
                     <p className="text-sm">Total</p>
 
                     <p className="text-sm font-bold">₦{calculateTotal()}</p>
                   </div>
+                  {/* <div className="flex items-center justify-between ">
+                    <p className="text-sm">Down Payment</p>
+                    <p className="text-sm">₦{prescription.down_payment}</p>
+                  </div> */}
 
                   {/* <p className="text-xs">HMO ID: {results.hmo?.id || "N/A"}</p> */}
                 </div>
               )}
             </div>
+            <label htmlFor="down-payment">Down Payment:</label>
+            <input
+              id="down-payment"
+              type="number"
+              value={downPayment}
+              onChange={(e) => setDownPayment(Number(e.target.value))}
+              className="search-bg mt-1 block w-full rounded-md border-gray-300 p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              placeholder="Enter down payment"
+            />
           </div>
           <div className="mt-4 flex w-full gap-6">
             {prescription.payment_status ? (

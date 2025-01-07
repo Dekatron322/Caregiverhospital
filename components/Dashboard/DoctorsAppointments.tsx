@@ -214,7 +214,7 @@ const DoctorsAppointments = () => {
           <div className={styles.deleteModalContent}>
             <div className="px-6 py-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold">Confirm Deletion</h2>
+                <h2 className="text-xl font-bold">Confirm Completion</h2>
                 <div className="border-black  hover:rounded-md hover:border">
                   <LiaTimesSolid className="m-1 cursor-pointer" onClick={() => setIsModalVisible(false)} />
                 </div>

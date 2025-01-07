@@ -1,11 +1,8 @@
 import React, { useEffect, useState } from "react"
 import axios from "axios"
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet"
-import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye"
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline"
 import IssueRequestModal from "components/Modals/IssueRequestModal"
 import ViewPrescriptionModal from "components/Modals/ViewPrescriptionModal"
-import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
 import DeleteTestModal from "components/Modals/DeleteTestModal"
 import Image from "next/image"
 
@@ -26,6 +23,7 @@ interface Prescription {
   issue_status: boolean // changed from string to boolean
   pub_date: string
   quantity: string
+  down_payment: string
 }
 
 interface Patient {

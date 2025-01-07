@@ -3,12 +3,12 @@
 import clsx from "clsx"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Admissions, DashboardIcon, Diagnosis, ProcedureIcon } from "./Icons"
+import { Admissions, DashboardIcon, Diagnosis, Finance, ProcedureIcon } from "./Icons"
 
 const links = [
   { name: "Issue Request", href: "/cashier-dashboard", icon: DashboardIcon },
   { name: "Laboratoy Test Request", href: "/laboratory-payment", icon: Admissions },
-  //   { name: "Diagnosis", href: "/all-diagnosis", icon: Diagnosis },
+  { name: "Down Payment", href: "/down-payment", icon: Finance },
   //   { name: "Proceduces", href: "/all-procedure", icon: ProcedureIcon },
 ]
 
