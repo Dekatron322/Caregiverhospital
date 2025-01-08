@@ -165,33 +165,41 @@ const AllDownPayment: React.FC = () => {
 
   // Calculate balance for each patient and filter out patients with zero balance
   const calculateAndFilterPatients = () => {
-    const updatedPatients = patients.filter((patient) => {
-      const billing = patient.billings[0]
-      if (!billing) return false
+    const updatedPatients = patients
+      .map((patient) => {
+        const filteredBillings = patient.billings.filter((billing) => {
+          const chargeAmount = parseFloat(billing.charge_amount || "0")
+          const downPayment = parseFloat(billing.down_payment || "0")
+          const payments = billing.payments || []
+          const totalSubsequentPayments = payments.reduce((sum, id) => {
+            const amount = parseFloat(paymentAmounts[id] || "0")
+            return sum + (!isNaN(amount) ? amount : 0)
+          }, 0)
 
-      const chargeAmount = parseFloat(billing.charge_amount || "0")
-      const downPayment = parseFloat(billing.down_payment || "0")
-      const payments = billing.payments || []
-      const totalSubsequentPayments = payments.reduce((sum, id) => {
-        const amount = parseFloat(paymentAmounts[id] || "0")
-        return sum + (!isNaN(amount) ? amount : 0)
-      }, 0)
+          // Calculate balance
+          const balance = chargeAmount - downPayment - totalSubsequentPayments
 
-      const balance = chargeAmount - downPayment - totalSubsequentPayments
+          // Retain only billings with outstanding balances
+          return balance > 0
+        })
 
-      // Only include patients with a balance greater than 0
-      return balance > 0
-    })
+        // Return the patient only if they have unresolved billings
+        return {
+          ...patient,
+          billings: filteredBillings,
+        }
+      })
+      .filter((patient) => patient.billings.length > 0) // Exclude patients with no billings
 
     setPatients(updatedPatients)
-    setFilteredPatients(updatedPatients) // Update filtered list as well
+    setFilteredPatients(updatedPatients)
   }
 
-  useEffect(() => {
-    if (Object.keys(paymentAmounts).length > 0) {
-      calculateAndFilterPatients()
-    }
-  }, [paymentAmounts])
+  //   useEffect(() => {
+  //     if (Object.keys(paymentAmounts).length > 0) {
+  //       calculateAndFilterPatients()
+  //     }
+  //   }, [paymentAmounts])
 
   const handleMakePayment = (patient: Patient) => {
     setSelectedPatient(patient)
