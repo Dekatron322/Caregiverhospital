@@ -41,6 +41,7 @@ type Prescription = {
   issue_status: boolean
   pub_date: string
   quantity: string
+  note: string
   discount_value: string
   payment_status?: boolean
 }
@@ -109,6 +110,18 @@ const ViewPrescriptionModal: React.FC<PrescriptionModalProps> = ({
     }
   }
 
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }
+    return new Date(dateString).toLocaleDateString(undefined, options)
+  }
+
   return (
     <>
       <div className={styles.modalOverlay}>
@@ -138,10 +151,13 @@ const ViewPrescriptionModal: React.FC<PrescriptionModalProps> = ({
                 <strong>Usage:</strong> {prescription.usage}
               </p>
               <p>
-                <strong>Dosage:</strong> {prescription.dosage}
+                <strong>Rate:</strong> {prescription.dosage}
               </p>
               <p>
                 <strong>Procedure:</strong> {procedureDetails?.name}
+              </p>
+              <p>
+                <strong>Doctors Note:</strong> {prescription.note}
               </p>
               <p>
                 <strong>Price:</strong> {procedureDetails?.price}
@@ -159,7 +175,7 @@ const ViewPrescriptionModal: React.FC<PrescriptionModalProps> = ({
                 <strong>Discount Value:</strong> {prescription.discount_value}
               </p>
               <p>
-                <strong>Date:</strong> {prescription.pub_date}
+                <strong>Date:</strong> {formatDate(prescription.pub_date)}
               </p>
             </div>
             <div className="mt-4 flex items-center justify-between">

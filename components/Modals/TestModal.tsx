@@ -18,6 +18,7 @@ interface LabTestResult {
   test_type: string
   diagnosis_code: string
   discount_value: string
+  note?: string
   id: string
   lab_parameters: LabParameter[]
 }
@@ -74,6 +75,9 @@ const TestModal: React.FC<TestModalProps> = ({ results, onClose }) => {
           </p>
           <p>
             Test Type: <span className="text-semibold">{results.test_type}</span>
+          </p>
+          <p>
+            Doctor Note: <span className="text-semibold">{results.note}</span>
           </p>
           <p>
             Diagnosis Code: <span className="text-semibold">{results.diagnosis_code}</span>

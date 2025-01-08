@@ -24,6 +24,7 @@ interface Prescription {
   pub_date: string
   quantity: string
   down_payment: string
+  note: string
 }
 
 interface Patient {

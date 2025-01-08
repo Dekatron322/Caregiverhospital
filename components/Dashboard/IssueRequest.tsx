@@ -26,6 +26,7 @@ interface Prescription {
   status: string
   issue_status: boolean // changed from string to boolean
   pub_date: string
+  note: string
   quantity: string
 }
 
