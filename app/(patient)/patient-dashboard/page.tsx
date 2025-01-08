@@ -10,12 +10,126 @@ import Link from "next/link"
 import { IoEyeSharp, IoPrintOutline } from "react-icons/io5"
 import PatientNav from "components/Navbar/PatientNav"
 import Footer from "components/Footer/Footer"
+import PrintRecordModal from "components/Modals/PrintRecordModal"
+
+interface Appointment {
+  id: number
+  doctor: string
+  pub_date: string
+  detail: string
+}
+
+interface Prescription {
+  id: string
+  doctor_name: string
+  category: string
+  name: string
+  complain: string
+  code: string
+  unit: string
+  dosage: string
+  rate: string
+  usage: string
+  discount_value: string
+  note: string
+  status: boolean
+  pub_date: string
+}
+
+interface MedicalRecord {
+  id: string
+  doctor_name: string
+  doctor_request_title: string
+  doctor_request_description: string
+  test_type: string
+  result: string
+  pub_date: string
+
+  status_note: string
+  discount_value: string
+  lab_parameters?: {
+    id: string
+    param_title: string
+    param_result: string
+    param_unit: string
+    param_range: string
+  }[]
+}
+
+interface Patient {
+  id: string
+  name: string
+  heart_rate?: string
+  body_temperature?: string
+  glucose_level?: string
+  blood_pressure?: string
+  address: string
+  phone_no: string
+  dob: string
+  blood_group?: string
+  hmo: {
+    id: string
+    name: string
+    category: string
+    description: string
+    status: boolean
+    pub_date: string
+  }
+  policy_id?: string
+  allergies?: string
+  nok_name: string
+  nok_phone_no: string
+  appointments: { id: number; doctor: string; pub_date: string; detail: string }[]
+  prescriptions: {
+    id: string
+    category: string
+    name: string
+    complain: string
+    code: string
+    unit: string
+    dosage: string
+    rate: string
+    usage: string
+    note: string
+    status: boolean
+    pub_date: string
+    doctor_name: string
+    discount_value: string
+  }[]
+  lab_tests: {
+    id: string
+    doctor_name: string
+    doctor_request_title: string
+    doctor_request_description: string
+    test_type: string
+    result: string
+    pub_date: string
+    payment_status?: string
+    status_note: string
+    discount_value: string
+    lab_parameters: {
+      id: string
+      param_title: string
+      param_result: string
+      param_unit: string
+      param_range: string
+    }[]
+  }[]
+  testt: {
+    id: string
+    title: string
+    detail: string
+    test_range: string
+  }[]
+}
 
 const PatientDetailPage: React.FC = () => {
   const [patient, setPatient] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter() // Initialize the router
+  const [selectedRecord, setSelectedRecord] = useState<MedicalRecord | null>(null)
+  const [modalVisible, setModalVisible] = useState(false)
 
   useEffect(() => {
     const fetchPatientDetails = async () => {
@@ -38,6 +152,17 @@ const PatientDetailPage: React.FC = () => {
 
     fetchPatientDetails()
   }, [router])
+
+  const handleViewClick = (record: MedicalRecord) => {
+    const recordWithPatientName = {
+      ...record,
+      patient_name: patient?.name,
+      patient_id: patient?.id,
+      lab_parameters: record.lab_parameters,
+    }
+    setSelectedRecord(recordWithPatientName)
+    setModalVisible(true)
+  }
 
   if (loading) {
     return (
@@ -222,10 +347,10 @@ const PatientDetailPage: React.FC = () => {
                                   </div>
 
                                   <div className="flex gap-2">
-                                    <button className="flex w-28 items-center justify-center gap-1 rounded bg-[#46FFA6] px-2 py-[2px] text-xs text-[#000000]">
-                                      <IoPrintOutline /> Print
-                                    </button>
-                                    <button className="flex w-28 items-center justify-center gap-1 rounded bg-[#349DFB] px-2 py-[2px] text-xs text-[#000000]">
+                                    <button
+                                      onClick={() => handleViewClick(record)}
+                                      className="flex w-28 items-center justify-center gap-1 rounded bg-[#349DFB] px-2 py-[2px] text-xs text-[#000000]"
+                                    >
                                       <IoEyeSharp /> View
                                     </button>
                                   </div>
@@ -244,6 +369,7 @@ const PatientDetailPage: React.FC = () => {
             </div>
             <Footer />
           </div>
+          <PrintRecordModal show={modalVisible} onClose={() => setModalVisible(false)} record={selectedRecord} />
         </div>
       </section>
     </>
