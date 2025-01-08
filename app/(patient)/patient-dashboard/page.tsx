@@ -27,7 +27,7 @@ const PatientDetailPage: React.FC = () => {
       }
 
       try {
-        const response = await axios.get(`https://api2.caregiverhospital.com/patient/patient/${id}/`)
+        const response = await axios.get(`https://api2.caregiverhospital.com/patient/patient/get/detail/${id}/`)
         setPatient(response.data)
       } catch (error) {
         setError("Failed to fetch patient details.")

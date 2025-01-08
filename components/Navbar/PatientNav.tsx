@@ -55,7 +55,9 @@ const PatientNav: React.FC = () => {
     try {
       const userId = localStorage.getItem("id")
       if (userId) {
-        const response = await axios.get<UserDetails>(`https://api2.caregiverhospital.com/patient/patient/${userId}/`)
+        const response = await axios.get<UserDetails>(
+          `https://api2.caregiverhospital.com/patient/patient/get/detail/${userId}/`
+        )
         if (response.data) {
           setUserDetails(response.data)
         } else {
