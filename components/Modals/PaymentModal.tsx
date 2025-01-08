@@ -31,6 +31,7 @@ interface LabTestResult {
   status_note: string
   payment_status?: boolean
   hmo?: HMO
+  down_payment: string
 }
 
 interface Diagnosis {
@@ -79,6 +80,7 @@ const PaymentModal: React.FC<ModalProps> = ({ results, onClose }) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [testPrice, setTestPrice] = useState<string | null>(null)
   const [paymentComplete, setPaymentComplete] = useState(false)
+  const [downPayment, setDownPayment] = useState(0)
 
   useEffect(() => {
     // Fetch diagnosis info when results.diagnosis_code changes
@@ -171,6 +173,7 @@ const PaymentModal: React.FC<ModalProps> = ({ results, onClose }) => {
         payment_status: true,
         pub_date: new Date().toISOString(),
         hmo: results.hmo_id || "N/A",
+        down_payment: downPayment,
       }
 
       // Add billing to patient
@@ -238,7 +241,7 @@ const PaymentModal: React.FC<ModalProps> = ({ results, onClose }) => {
             </div>
           </div>
 
-          <div className="tab-bg mt-2 w-full rounded p-4">
+          <div className="tab-bg my-3 w-full rounded p-4">
             <div className="flex items-center justify-between" onClick={() => toggleOpen(0)}>
               <p>
                 Orders{" "}
@@ -287,6 +290,15 @@ const PaymentModal: React.FC<ModalProps> = ({ results, onClose }) => {
               </div>
             )}
           </div>
+          <label htmlFor="down-payment">Down Payment:</label>
+          <input
+            id="down-payment"
+            type="number"
+            value={downPayment}
+            onChange={(e) => setDownPayment(Number(e.target.value))}
+            className="search-bg mt-1 block w-full rounded-md border-gray-300 p-3 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            placeholder="Enter down payment"
+          />
 
           {errorMessage && (
             <div className="mt-4 text-red-600">

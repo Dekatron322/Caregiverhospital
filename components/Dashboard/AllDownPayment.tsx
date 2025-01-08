@@ -2,7 +2,6 @@ import { useEffect, useState } from "react"
 import { LiaTimesSolid } from "react-icons/lia"
 import styles from "../../components/Modals/modal.module.css"
 
-// Define the types for the patient and related data structures
 interface Billing {
   id: string
   enroll_number: string
@@ -11,10 +10,11 @@ interface Billing {
   payment_status: boolean
   procedure_code: string
   diagnosis_code: string
-  payments: string[] // Array of payment IDs
+  payments: string[]
 }
 
 interface Patient {
+  uniqueBillingId: any
   id: string
   name: string
   gender: string
@@ -25,7 +25,7 @@ interface Patient {
 }
 
 interface PaymentResponse {
-  amount: string // Adjust the type based on the actual data structure
+  amount: string
 }
 
 const AllDownPayment: React.FC = () => {
@@ -36,6 +36,8 @@ const AllDownPayment: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null)
   const [paymentAmount, setPaymentAmount] = useState<string>("")
+  const [filteredPatients, setFilteredPatients] = useState<Patient[]>([])
+  const [searchQuery, setSearchQuery] = useState<string>("")
 
   const handleRegisterPayment = async () => {
     if (!selectedPatient || !paymentAmount) return
@@ -60,8 +62,7 @@ const AllDownPayment: React.FC = () => {
       closeModal()
       alert("Payment registered successfully.")
 
-      // Re-fetch the patients to update the payment information
-      await fetchPatients() // Re-fetch after payment registration
+      await fetchPatients()
     } catch (err: any) {
       setError(err.message)
     } finally {
@@ -69,15 +70,11 @@ const AllDownPayment: React.FC = () => {
     }
   }
 
-  // Ensure fetchPatients is defined outside of useEffect so it can be reused
   const fetchPatients = async () => {
     try {
       setLoading(true)
-      const start = 0
-      const stop = 10
-
       const response = await fetch(
-        `https://api2.caregiverhospital.com/patient/patient-with-payment/${start}/${stop}/payment/`,
+        `https://api2.caregiverhospital.com/patient/patient-with-payment/{start}/{stop}/payment/`,
         {
           method: "GET",
           headers: {
@@ -87,26 +84,52 @@ const AllDownPayment: React.FC = () => {
       )
 
       if (!response.ok) {
-        throw new Error("Failed to fetch patients.")
+        throw new Error(`Failed to fetch patients. Status: ${response.status}`)
       }
 
       const data = (await response.json()) as Patient[]
-      const filteredPatients = data.filter((patient) =>
-        patient.billings.some((billing) => {
-          const downPayment = parseFloat(billing.down_payment)
-          return !isNaN(downPayment) && downPayment > 0
-        })
+
+      const expandedPatients: Patient[] = data.flatMap((patient) =>
+        patient.billings.map((billing, index) => ({
+          ...patient,
+          billings: [billing],
+          uniqueBillingId: `${patient.id}-${index}`,
+        }))
       )
 
-      setPatients(filteredPatients)
+      const uniquePatients = Array.from(new Map(expandedPatients.map((p) => [p.uniqueBillingId, p])).values()).filter(
+        (patient) => {
+          const billing = patient.billings[0]
+          const downPayment = parseFloat(billing?.down_payment || "0")
+          return downPayment > 0
+        }
+      )
+
+      setPatients(uniquePatients)
+      setFilteredPatients(uniquePatients)
     } catch (err: any) {
-      setError(err.message)
+      setError(err.message || "An unexpected error occurred.")
     } finally {
       setLoading(false)
     }
   }
 
-  // Move fetchPatients outside of useEffect to reuse it
+  const handleSearch = (query: string) => {
+    setSearchQuery(query)
+    if (query.trim() === "") {
+      setFilteredPatients(patients)
+    } else {
+      const lowerCaseQuery = query.toLowerCase()
+      const filtered = patients.filter((patient) => {
+        return (
+          patient.name.toLowerCase().includes(lowerCaseQuery) ||
+          patient.policy_id.toLowerCase().includes(lowerCaseQuery)
+        )
+      })
+      setFilteredPatients(filtered)
+    }
+  }
+
   useEffect(() => {
     fetchPatients()
   }, [])
@@ -121,8 +144,8 @@ const AllDownPayment: React.FC = () => {
           try {
             const response = await fetch(`https://api2.caregiverhospital.com/billing/payment/${id}/`)
             if (response.ok) {
-              const data = (await response.json()) as PaymentResponse // Type assertion
-              amounts[id] = data.amount // Assuming `data.amount` contains the payment amount
+              const data = (await response.json()) as PaymentResponse
+              amounts[id] = data.amount
             } else {
               amounts[id] = "N/A"
             }
@@ -155,10 +178,13 @@ const AllDownPayment: React.FC = () => {
       }, 0)
 
       const balance = chargeAmount - downPayment - totalSubsequentPayments
+
+      // Only include patients with a balance greater than 0
       return balance > 0
     })
 
     setPatients(updatedPatients)
+    setFilteredPatients(updatedPatients) // Update filtered list as well
   }
 
   useEffect(() => {
@@ -183,11 +209,18 @@ const AllDownPayment: React.FC = () => {
   return (
     <div>
       <h1>Patients with Down Payment</h1>
-      {patients.length === 0 ? (
+      <input
+        type="text"
+        placeholder="Search by name or HMO ID"
+        value={searchQuery}
+        onChange={(e) => handleSearch(e.target.value)}
+        className="mb-4 w-full max-w-[350px] rounded border p-2"
+      />
+      {filteredPatients.length === 0 ? (
         <p>No patients found.</p>
       ) : (
         <>
-          {patients.map((patient) => (
+          {filteredPatients.map((patient) => (
             <div key={patient.id} className="mb-2 flex w-full items-center justify-between gap-3 rounded-lg border p-2">
               <div className="flex w-full items-center gap-2">
                 <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46ffa6] max-md:hidden">
@@ -249,7 +282,7 @@ const AllDownPayment: React.FC = () => {
                       }, 0)
 
                       return !isNaN(chargeAmount) && !isNaN(downPayment)
-                        ? (chargeAmount - downPayment - totalSubsequentPayments).toFixed(2)
+                        ? (chargeAmount - totalSubsequentPayments).toFixed(2)
                         : "N/A"
                     })()}
                   </p>
@@ -294,7 +327,7 @@ const AllDownPayment: React.FC = () => {
                   }, 0)
 
                   return !isNaN(chargeAmount) && !isNaN(downPayment)
-                    ? (chargeAmount - downPayment - totalSubsequentPayments).toFixed(2)
+                    ? (chargeAmount - totalSubsequentPayments).toFixed(2)
                     : "N/A"
                 })()}
               </p>

@@ -30,6 +30,7 @@ interface LabTestResult {
   payment_status?: boolean
   test_price?: string
   lab_parameters: { param_title: string; id: string; param_unit: string; param_range: string; param_result: string }[]
+  down_payment: string
 }
 
 interface Diagnosis {
