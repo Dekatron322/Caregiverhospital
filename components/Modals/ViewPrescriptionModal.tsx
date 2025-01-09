@@ -151,7 +151,7 @@ const ViewPrescriptionModal: React.FC<PrescriptionModalProps> = ({
                 <strong>Usage:</strong> {prescription.usage}
               </p>
               <p>
-                <strong>Rate:</strong> {prescription.dosage}
+                <strong>Rate:</strong> {prescription.rate} Time(s)
               </p>
               <p>
                 <strong>Procedure:</strong> {procedureDetails?.name}
