@@ -11,6 +11,7 @@ interface Billing {
   procedure_code: string
   diagnosis_code: string
   payments: string[]
+  pub_date: string
 }
 
 interface Patient {
@@ -214,6 +215,18 @@ const AllDownPayment: React.FC = () => {
 
   if (loading) return <p>Loading...</p>
 
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    }
+    return new Date(dateString).toLocaleDateString(undefined, options)
+  }
+
   return (
     <div>
       <h1>Patients with Down Payment</h1>
@@ -293,6 +306,14 @@ const AllDownPayment: React.FC = () => {
                         ? (chargeAmount - totalSubsequentPayments).toFixed(2)
                         : "N/A"
                     })()}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex w-full items-center gap-2">
+                <div>
+                  <p className="text-xs font-bold">
+                    Date Initiated: {formatDate(patient.billings[0]?.pub_date || "N/A")}
                   </p>
                 </div>
               </div>
