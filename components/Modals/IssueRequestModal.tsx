@@ -213,7 +213,7 @@ const IssueRequestModal: React.FC<PrescriptionModalProps> = ({
                 </div>
               </div>
               <div>
-                <p className="text-xs">{formatDate(procedureDetails?.pub_date)}</p>
+                <p className="text-xs">{formatDate(prescription?.pub_date)}</p>
                 {/* <p className="text-xs">{formatDate(results.pub_date)}</p> */}
               </div>
             </div>

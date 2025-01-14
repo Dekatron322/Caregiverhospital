@@ -236,12 +236,12 @@ const PaymentModal: React.FC<ModalProps> = ({ results, onClose }) => {
               </div>
             </div>
             <div>
-              <p className="text-xs">{formatDate(diagnosisInfo?.pub_date)}</p>
+              <p className="text-xs">{formatDate(results?.pub_date)}</p>
               {/* <p className="text-xs">{formatDate(results.pub_date)}</p> */}
             </div>
           </div>
 
-          <div className="tab-bg my-3 w-full rounded p-4">
+          <div className="tab-bg my- w-full rounded p-4">
             <div className="flex items-center justify-between" onClick={() => toggleOpen(0)}>
               <p>
                 Orders{" "}

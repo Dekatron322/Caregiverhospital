@@ -7,7 +7,7 @@ import { Admissions, DashboardIcon, Diagnosis, Finance, ProcedureIcon } from "./
 
 const links = [
   { name: "Issue Request", href: "/cashier-dashboard", icon: DashboardIcon },
-  { name: "Laboratoy Test Request", href: "/laboratory-payment", icon: Admissions },
+  { name: "Laboratory Test Request", href: "/laboratory-payment", icon: Admissions },
   { name: "Down Payment", href: "/down-payment", icon: Finance },
   //   { name: "Proceduces", href: "/all-procedure", icon: ProcedureIcon },
 ]
