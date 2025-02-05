@@ -77,7 +77,7 @@ const LabTests = () => {
       try {
         // Fetch lab test results
         const labTestResponse = await axios.get("https://api2.caregiverhospital.com/lab-test/lab-test/")
-        const labTestData = labTestResponse.data
+        let labTestData: LabTestResult[] = labTestResponse.data
 
         // Fetch diagnosis data
         const diagnosisResponse = await axios.get("https://api2.caregiverhospital.com/diagnosis/diagnosis/")
@@ -85,6 +85,9 @@ const LabTests = () => {
         setDiagnosisData(fetchedDiagnosisData)
 
         if (Array.isArray(labTestData)) {
+          // Sort labTestData by pub_date in descending order (newest to oldest)
+          labTestData.sort((a, b) => new Date(b.pub_date).getTime() - new Date(a.pub_date).getTime())
+
           const tests = labTestData.map((test: any) => {
             const diagnosis = fetchedDiagnosisData.find((diag: any) => diag.code === test.diagnosis_code)
             return {
