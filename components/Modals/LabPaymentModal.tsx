@@ -233,7 +233,7 @@ const LabPaymentModal: React.FC<ModalProps> = ({ results, onClose }) => {
               </div>
             </div>
             <div>
-              <p className="text-xs">{formatDate(diagnosisInfo?.pub_date)}</p>
+              <p className="text-xs">{formatDate(results?.pub_date)}</p>
               {/* <p className="text-xs">{formatDate(results.pub_date)}</p> */}
             </div>
           </div>
