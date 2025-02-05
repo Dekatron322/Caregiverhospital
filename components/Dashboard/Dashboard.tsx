@@ -4,6 +4,7 @@ import axios from "axios"
 import { useRouter } from "next/navigation"
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
 import DeleteTestModal from "components/Modals/DeleteTestModal"
+import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye"
 
 interface Appointment {
   id: any
@@ -11,7 +12,8 @@ interface Appointment {
   detail: string
   pub_date: string
   status: boolean
-  patient_name: string // This is the name of the patient from the appointment
+  patient_id: any
+  patient_name: string
   time: string
   complain: string
 }
@@ -26,6 +28,11 @@ const Appointments = () => {
   const [selectedLabTestId, setSelectedLabTestId] = useState<string | null>(null)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const [showPaymentSuccessNotification, setShowPaymentSuccessNotification] = useState(false)
+
+  const handleAppointmentClick = (appointmentId: number) => {
+    localStorage.setItem("selectedAppointmentId", appointmentId.toString())
+    router.push(`/appointments/appointment-detail/`)
+  }
 
   const fetchAppointments = async () => {
     try {
@@ -115,6 +122,7 @@ const Appointments = () => {
           <p className="text-xs">Complain</p>
         </div>
         <div className="flex gap-2">
+          <RemoveRedEyeIcon className="text-[#46FFA6]" onClick={() => handleAppointmentClick(appointment.patient_id)} />
           <DeleteForeverIcon className="text-[#F2B8B5]" onClick={() => handleDeleteClick(appointment.id)} />
         </div>
       </div>
