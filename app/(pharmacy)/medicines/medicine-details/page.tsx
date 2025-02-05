@@ -1,7 +1,6 @@
 "use client"
 import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
 import { IoMdArrowBack } from "react-icons/io"
 import { HiOutlineTrash } from "react-icons/hi2"
@@ -10,10 +9,8 @@ import { FaRegEdit } from "react-icons/fa"
 import DeleteMedicineModal from "components/Modals/DeleteMedicineModal"
 import Image from "next/image"
 import EditMedicineModal from "components/Modals/EditMedicineModal"
-
 import PharmacyNav from "components/Navbar/PharmacyNav"
 
-// Define types
 interface Medicine {
   id: string
   name: string
@@ -40,7 +37,7 @@ export default function MedicineDetailPage({ params }: { params: { medicineId: s
   const [medicineDetail, setMedicineDetail] = useState<Medicine | null>(null)
   const [isAdmissionOpen, setIsAdmissionOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
-  const [isEditOpen, setIsEditOpen] = useState(false) // New state for edit modal
+  const [isEditOpen, setIsEditOpen] = useState(false)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const router = useRouter()
   const { medicineId } = params
@@ -203,7 +200,7 @@ export default function MedicineDetailPage({ params }: { params: { medicineId: s
                 </div>
                 <div className="flex gap-3">
                   <div
-                    onClick={openEditModal} // Open edit modal on click
+                    onClick={openEditModal}
                     className="mt-4 flex h-[50px] w-[150px] cursor-pointer content-center items-center justify-center gap-2 rounded bg-[#46FFA6] text-[#000000]"
                   >
                     <FaRegEdit />
@@ -246,14 +243,14 @@ export default function MedicineDetailPage({ params }: { params: { medicineId: s
         isOpen={isDeleteOpen}
         onClose={closeDeleteModal}
         onSubmitSuccess={handleHmoSubmissionSuccess}
-        medicineId={medicineDetail?.id} // Ensure the correct ID is passed
+        medicineId={medicineDetail?.id}
       />
 
       <EditMedicineModal
         isOpen={isEditOpen}
         onClose={closeEditModal}
-        onSubmitSuccess={handleHmoSubmissionSuccess} // Use the same success handler
-        medicine={medicineDetail} // Pass medicine details to the modal
+        onSubmitSuccess={handleHmoSubmissionSuccess}
+        medicine={medicineDetail}
       />
     </>
   )
