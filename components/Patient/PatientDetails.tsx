@@ -214,15 +214,15 @@ const PatientDetails: React.FC<PatientDetailsProps> = ({ patientDetail }) => {
     <div className="flex flex-col gap-2">
       {filteredMedicalRecords.map((medical) => (
         <div key={medical.id} className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2">
-          <div className="max-md:hidden">
+          <div className="w-full max-md:hidden">
             <p className="text-sm font-bold">{formatDateTime(medical.pub_date)}</p>
             <small className="text-xm ">Date and Time</small>
           </div>
-          <div className="">
+          <div className="w-full">
             <p className="text-sm font-bold">{medical.test}</p>
             <small className="text-xm ">Name</small>
           </div>
-          <div className="flex items-center gap-1 text-sm font-bold max-md:hidden">
+          <div className="flex w-full items-center gap-1 text-sm font-bold max-md:hidden">
             {/* <span>
               <Image src={medical.doctor_image} height={40} width={40} alt="" />
             </span> */}
