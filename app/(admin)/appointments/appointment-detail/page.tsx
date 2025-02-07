@@ -245,7 +245,7 @@ export default function PatientDetailPage() {
       <section className="h-full">
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
-            <NursesNav />
+            <DashboardNav />
 
             {patientDetail && (
               <div className="px-16 max-md:px-3 sm:py-10">

@@ -239,9 +239,6 @@ const PatientDetails: React.FC<PatientDetailsProps> = ({ patientDetail }) => {
             <small className="text-xm ">Test</small>
           </div> */}
           <div className="flex gap-2">
-            <button className="flex w-28 items-center justify-center gap-1 rounded bg-[#46FFA6] px-2 py-2 text-xs text-[#000000]">
-              <IoPrintOutline /> Print
-            </button>
             <button
               className="flex w-28 items-center justify-center gap-1 rounded bg-[#349DFB] px-2 py-2 text-xs text-[#000000]"
               onClick={() => handleViewClick(medical)}
