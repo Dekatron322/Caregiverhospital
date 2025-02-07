@@ -269,6 +269,7 @@ const IssueRequest = () => {
       {filteredPatients.map((patient) =>
         patient.prescriptions
           .filter((prescription) => !prescription.issue_status) // Pending prescriptions
+          .sort((a, b) => new Date(b.pub_date).getTime() - new Date(a.pub_date).getTime()) // Sort by pub_date descending
           .map((prescription) => renderPrescriptionDetails(patient, prescription))
       )}
     </div>

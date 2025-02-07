@@ -68,16 +68,6 @@ const PrintRecordModal: React.FC<ModalProps> = ({ show, onClose, record }) => {
       <div className={styles.modalBodys}>
         <div className="p-4" ref={modalContentRef}>
           <div className="mb-4 flex items-center justify-between">
-            <Image className="icon-style content-center" src="/ic_logo.svg" width={150} height={43} alt="dekalo" />
-
-            <Image
-              className="dark-icon-style content-center"
-              src="/dark_logo.svg"
-              width={150}
-              height={43}
-              alt="dekalo"
-            />
-
             <button onClick={onClose}>
               <CloseOutlinedIcon />
             </button>
@@ -105,15 +95,32 @@ const PrintRecordModal: React.FC<ModalProps> = ({ show, onClose, record }) => {
           <h2 className="mb-3 text-lg font-bold">Test Result</h2>
           <div className="result_area  h-full w-full rounded-lg p-4">
             {record.lab_parameters && record.lab_parameters.length > 0 && (
-              <div className="mt-4">
+              <div className="mt-2">
+                <div className="flex w-full items-center justify-center">
+                  <Image
+                    className="icon-style content-center"
+                    src="/ic_logo.svg"
+                    width={200}
+                    height={43}
+                    alt="dekalo"
+                  />
+
+                  <Image
+                    className="dark-icon-style content-center"
+                    src="/dark_logo.svg"
+                    width={200}
+                    height={43}
+                    alt="dekalo"
+                  />
+                </div>
                 <h2 className="mb-3 text-lg font-bold text-black">Lab Parameters</h2>
                 {record.lab_parameters.map((param: any, index: any) => (
-                  <div key={index} className="mb-3">
+                  <div key={index} className="mb-3 flex justify-between rounded-md border p-4">
                     {/* <p className="text-sm text-black">Value: {param.id}</p> */}
-                    <p className="text-sm text-black">Value: {param.param_title}</p>
-                    <p className="text-sm text-black">Unit: {param.param_unit}</p>
-                    <p className="text-sm text-black">Reference Range: {param.param_range}</p>
-                    <p className="text-bas text-black">Result: {param.param_result}</p>
+                    <p className="text-xs text-black">Value: {param.param_title}</p>
+                    <p className="text-xs text-black">Unit: {param.param_unit}</p>
+                    <p className="text-xs text-black">Reference Range: {param.param_range}</p>
+                    <p className="text-xs text-black">Result: {param.param_result}</p>
                   </div>
                 ))}
               </div>

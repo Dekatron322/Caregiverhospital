@@ -54,7 +54,6 @@ export default function MedicineDetailPage({ params }: { params: { medicineId: s
         throw new Error("Failed to fetch medicine details")
       }
       const data = (await response.json()) as Medicine
-      // Fetch category name
       const categoryResponse = await fetch(
         `https://api2.caregiverhospital.com/medicine-category/medicine_category/${data.category}`
       )
@@ -62,7 +61,6 @@ export default function MedicineDetailPage({ params }: { params: { medicineId: s
         throw new Error("Failed to fetch category details")
       }
       const categoryData = (await categoryResponse.json()) as Category
-      // Replace category ID with category name
       setMedicineDetail({ ...data, category: categoryData.name })
     } catch (error) {
       console.error("Error fetching medicine details:", error)
