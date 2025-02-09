@@ -172,11 +172,11 @@ export default function Dashboard() {
               </div>
             </div>
             <div className="flex gap-6 max-md:flex-col max-md:px-4 max-md:pt-6 md:mb-16 md:px-16 md:pt-16">
-              <div className="md:w-[75%]">
+              <div className="md:w-full">
                 <p className="mb-8 font-semibold max-md:mb-4">Appointments</p>
                 <Appointments />
               </div>
-              <div className=" w-full rounded-xl border-[0.5px] px-4 py-4 shadow md:w-[25%]">
+              {/* <div className=" w-full rounded-xl border-[0.5px] px-4 py-4 shadow md:w-[25%]">
                 <div className="mb-4 flex items-center justify-between">
                   <h3 className="font-bold">Admissions</h3>
                   <button className="redirect">
@@ -191,20 +191,20 @@ export default function Dashboard() {
                       <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46FFA6] max-md:hidden">
                         <p className="capitalize text-[#000000]">{item.patientName.charAt(0)}</p>
                       </div>
-                      {/* <Image src="/path/to/default/image" height={40} width={40} alt="" /> */}
+                     
                       <div>
                         <div className=" ">
                           <p className="text-sm font-semibold">{item.patientName}</p>
                           <p className="text-xs font-semibold">{item.checkApp.reason}</p>
                           <p className="text-xs">{item.checkApp.ward}</p>
-                          {/* <p className="text-sm">{new Date(item.checkApp.checkout_date).toLocaleDateString()}</p> */}
+                          
                         </div>
                       </div>
                     </div>
                     <p className="text-sm">{new Date(item.checkApp.checkout_date).toLocaleDateString()}</p>
                   </div>
                 ))}
-              </div>
+              </div> */}
             </div>
 
             <Footer />

@@ -28,6 +28,7 @@ const Appointments = () => {
   const [selectedLabTestId, setSelectedLabTestId] = useState<string | null>(null)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const [showPaymentSuccessNotification, setShowPaymentSuccessNotification] = useState(false)
+  const [searchTerm, setSearchTerm] = useState("")
 
   const handleAppointmentClick = (appointmentId: number) => {
     localStorage.setItem("selectedAppointmentId", appointmentId.toString())
@@ -88,6 +89,10 @@ const Appointments = () => {
     }
   }
 
+  const filteredAppointments = appointments.filter((appointment) =>
+    appointment.patient_name.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
   const renderAppointmentDetails = (appointment: Appointment) => {
     const displayName =
       appointment.patient_name && appointment.patient_name.trim() ? appointment.patient_name : "Unknown Patient"
@@ -131,13 +136,13 @@ const Appointments = () => {
 
   const renderAllAppointments = () => (
     <div className="flex flex-col gap-2">
-      {appointments.map((appointment) => renderAppointmentDetails(appointment))}
+      {filteredAppointments.map((appointment) => renderAppointmentDetails(appointment))}
     </div>
   )
 
   const renderPendingAppointments = () => (
     <div className="flex flex-col gap-2">
-      {appointments
+      {filteredAppointments
         .filter((appointment) => appointment.status === true)
         .map((appointment) => renderAppointmentDetails(appointment))}
     </div>
@@ -145,7 +150,7 @@ const Appointments = () => {
 
   const renderDoneAppointments = () => (
     <div className="flex flex-col gap-2">
-      {appointments
+      {filteredAppointments
         .filter((appointment) => appointment.status === false)
         .map((appointment) => renderAppointmentDetails(appointment))}
     </div>
@@ -163,26 +168,38 @@ const Appointments = () => {
         </div>
       ) : (
         <>
-          <div className="tab-bg mb-8 flex w-[190px] items-center gap-3 rounded-lg p-1 md:border">
-            <button
-              className={`${activeTab === "all" ? "active-tab" : "inactive-tab"}`}
-              onClick={() => setActiveTab("all")}
-            >
-              All
-            </button>
-            <button
-              className={`${activeTab === "pending" ? "active-tab" : "inactive-tab"}`}
-              onClick={() => setActiveTab("pending")}
-            >
-              Pending
-            </button>
-            <button
-              className={`${activeTab === "done" ? "active-tab" : "inactive-tab"}`}
-              onClick={() => setActiveTab("done")}
-            >
-              Done
-            </button>
+          <div className="tab-bg mb-8 flex w-[190px] flex-col items-start gap-3 rounded-lg p-1 md:flex-row md:items-start md:border">
+            <div className="flex   gap-3 md:flex-row md:items-center">
+              <div className="flex items-center  gap-3">
+                <button
+                  className={`${activeTab === "all" ? "active-tab" : "inactive-tab"}`}
+                  onClick={() => setActiveTab("all")}
+                >
+                  All
+                </button>
+                <button
+                  className={`${activeTab === "pending" ? "active-tab" : "inactive-tab"}`}
+                  onClick={() => setActiveTab("pending")}
+                >
+                  Pending
+                </button>
+                <button
+                  className={`${activeTab === "done" ? "active-tab" : "inactive-tab"}`}
+                  onClick={() => setActiveTab("done")}
+                >
+                  Done
+                </button>
+              </div>
+            </div>
           </div>
+
+          <input
+            type="text"
+            placeholder="Search by patient name..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="search-bg mb-4 w-full rounded-lg border p-2 md:w-[300px]"
+          />
 
           {activeTab === "all" && renderAllAppointments()}
           {activeTab === "pending" && renderPendingAppointments()}
