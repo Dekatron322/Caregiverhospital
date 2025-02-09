@@ -1,5 +1,6 @@
 "use client"
-import React, { useEffect, useState } from "react"
+
+import React, { useEffect, useState, useMemo, useCallback } from "react"
 import axios from "axios"
 import { useRouter } from "next/navigation"
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
@@ -7,12 +8,12 @@ import DeleteTestModal from "components/Modals/DeleteTestModal"
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye"
 
 interface Appointment {
-  id: any
+  id: string
   doctor: string
   detail: string
   pub_date: string
   status: boolean
-  patient_id: any
+  patient_id: string
   patient_name: string
   time: string
   complain: string
@@ -20,68 +21,57 @@ interface Appointment {
 
 const Appointments = () => {
   const router = useRouter()
-  const [activeTab, setActiveTab] = useState("all")
+  const [activeTab, setActiveTab] = useState<"all" | "pending" | "done">("all")
   const [appointments, setAppointments] = useState<Appointment[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [refresh, setRefresh] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [selectedLabTestId, setSelectedLabTestId] = useState<string | null>(null)
-  const [showSuccessNotification, setShowSuccessNotification] = useState(false)
-  const [showPaymentSuccessNotification, setShowPaymentSuccessNotification] = useState(false)
+  const [notification, setNotification] = useState<"success" | "payment" | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
 
-  const handleAppointmentClick = (appointmentId: number) => {
-    localStorage.setItem("selectedAppointmentId", appointmentId.toString())
-    router.push(`/appointments/appointment-detail/`)
-  }
-
-  const fetchAppointments = async () => {
-    try {
-      const response = await fetch(`https://api2.caregiverhospital.com/appointment/all/0/100/`)
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-      const data = (await response.json()) as Appointment[]
-
-      console.log("API Response Data:", data) // Log the response to check its structure
-
-      setAppointments(data)
-    } catch (error) {
-      console.error("Error fetching appointments:", error)
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
   useEffect(() => {
-    fetchAppointments()
-  }, [refresh])
+    const controller = new AbortController()
 
-  const formatDate = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
+    const fetchAppointments = async () => {
+      try {
+        const response = await fetch(`https://api2.caregiverhospital.com/appointment/all/0/100/`, {
+          signal: controller.signal,
+        })
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
+        const data = (await response.json()) as Appointment[]
+        setAppointments(data)
+      } catch (error: any) {
+        if (error.name !== "AbortError") console.error("Error fetching appointments:", error)
+      } finally {
+        setIsLoading(false)
+      }
     }
-    return new Date(dateString).toLocaleDateString(undefined, options)
-  }
 
-  const handleDeleteClick = (id: string) => {
+    fetchAppointments()
+    return () => controller.abort() // Cleanup fetch on unmount
+  }, [])
+
+  const handleAppointmentClick = useCallback(
+    (appointmentId: string) => {
+      localStorage.setItem("selectedAppointmentId", appointmentId)
+      router.push(`/appointments/appointment-detail/`)
+    },
+    [router]
+  )
+
+  const handleDeleteClick = useCallback((id: string) => {
     setSelectedLabTestId(id)
     setIsDeleteModalOpen(true)
-  }
+  }, [])
 
   const deleteLabTest = async () => {
     if (!selectedLabTestId) return
 
     try {
       await axios.delete(`https://api2.caregiverhospital.com/appointment/appointment/${selectedLabTestId}/`)
-      setShowSuccessNotification(true)
-      setRefresh(!refresh) // Refresh the data after deletion
-      setTimeout(() => setShowSuccessNotification(false), 5000)
+      setAppointments((prev) => prev.filter((appt) => appt.id !== selectedLabTestId))
+      setNotification("success")
+      setTimeout(() => setNotification(null), 5000)
       setIsDeleteModalOpen(false)
     } catch (error) {
       console.error("Error deleting lab test:", error)
@@ -89,72 +79,66 @@ const Appointments = () => {
     }
   }
 
-  const filteredAppointments = appointments.filter((appointment) =>
-    appointment.patient_name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredAppointments = useMemo(
+    () =>
+      appointments.filter((appointment) => appointment.patient_name.toLowerCase().includes(searchTerm.toLowerCase())),
+    [appointments, searchTerm]
   )
 
-  const renderAppointmentDetails = (appointment: Appointment) => {
-    const displayName =
-      appointment.patient_name && appointment.patient_name.trim() ? appointment.patient_name : "Unknown Patient"
-    const initialLetter = displayName !== "Unknown Patient" ? displayName.charAt(0) : "?"
+  const renderAppointmentDetails = useCallback(
+    (appointment: Appointment) => {
+      const displayName = appointment.patient_name.trim() || "Unknown Patient"
+      const initialLetter = displayName !== "Unknown Patient" ? displayName.charAt(0) : "?"
 
-    return (
-      <div
-        key={appointment.id}
-        className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
-      >
-        <div className="flex w-full items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46ffa6] max-md:hidden">
-            <p className="capitalize text-[#000000]">{initialLetter}</p>
+      return (
+        <div
+          key={appointment.id}
+          className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
+        >
+          <div className="flex w-full items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46ffa6] max-md:hidden">
+              <p className="capitalize text-[#000000]">{initialLetter}</p>
+            </div>
+            <div>
+              <p className="text-sm font-bold">{displayName}</p>
+              <p className="text-xs">Patient Name</p>
+            </div>
           </div>
-          <div>
-            <p className="text-sm font-bold">{displayName}</p>
-            <p className="text-xs">Patient Name</p>
+          <div className="flex w-full flex-col">
+            <p className="text-sm font-bold">{appointment.doctor}</p>
+            <p className="text-xs">Doctor Assigned</p>
+          </div>
+          <div className="flex w-full flex-col max-md:hidden">
+            <p className="text-sm font-bold">{new Date(appointment.pub_date).toLocaleDateString()}</p>
+            <p className="text-xs">Last Appointment</p>
+          </div>
+          <div className="md:flex md:w-full md:flex-col md:items-center">
+            <p className="rounded bg-[#46FFA6] px-2 py-[2px] text-center text-xs font-bold text-black">
+              {appointment.detail}
+            </p>
+            <p className="text-xs">Complain</p>
+          </div>
+          <div className="flex gap-2">
+            <RemoveRedEyeIcon
+              className="text-[#46FFA6]"
+              onClick={() => handleAppointmentClick(appointment.patient_id)}
+            />
+            <DeleteForeverIcon className="text-[#F2B8B5]" onClick={() => handleDeleteClick(appointment.id)} />
           </div>
         </div>
-        <div className="flex w-full flex-col">
-          <p className="text-sm font-bold">{appointment.doctor}</p>
-          <p className="text-xs">Doctor Assigned</p>
-        </div>
-        <div className="flex w-full flex-col max-md:hidden">
-          <p className="text-sm font-bold">{formatDate(appointment.pub_date)}</p>
-          <p className="text-xs">Last Appointment</p>
-        </div>
-        <div className="md:flex md:w-full md:flex-col md:items-center">
-          <p className="rounded bg-[#46FFA6] px-2 py-[2px] text-center text-xs font-bold text-black">
-            {appointment.detail}
-          </p>
-          <p className="text-xs">Complain</p>
-        </div>
-        <div className="flex gap-2">
-          <RemoveRedEyeIcon className="text-[#46FFA6]" onClick={() => handleAppointmentClick(appointment.patient_id)} />
-          <DeleteForeverIcon className="text-[#F2B8B5]" onClick={() => handleDeleteClick(appointment.id)} />
-        </div>
-      </div>
-    )
-  }
-
-  const renderAllAppointments = () => (
-    <div className="flex flex-col gap-2">
-      {filteredAppointments.map((appointment) => renderAppointmentDetails(appointment))}
-    </div>
+      )
+    },
+    [handleAppointmentClick, handleDeleteClick]
   )
 
-  const renderPendingAppointments = () => (
-    <div className="flex flex-col gap-2">
-      {filteredAppointments
-        .filter((appointment) => appointment.status === true)
-        .map((appointment) => renderAppointmentDetails(appointment))}
-    </div>
-  )
+  const renderAppointments = useMemo(() => {
+    const filtered =
+      activeTab === "all"
+        ? filteredAppointments
+        : filteredAppointments.filter((appt) => (activeTab === "pending" ? appt.status : !appt.status))
 
-  const renderDoneAppointments = () => (
-    <div className="flex flex-col gap-2">
-      {filteredAppointments
-        .filter((appointment) => appointment.status === false)
-        .map((appointment) => renderAppointmentDetails(appointment))}
-    </div>
-  )
+    return <div className="flex flex-col gap-2">{filtered.map(renderAppointmentDetails)}</div>
+  }, [activeTab, filteredAppointments, renderAppointmentDetails])
 
   return (
     <div className="flex w-full flex-col">
@@ -169,27 +153,16 @@ const Appointments = () => {
       ) : (
         <>
           <div className="tab-bg mb-8 flex w-[190px] flex-col items-start gap-3 rounded-lg p-1 md:flex-row md:items-start md:border">
-            <div className="flex   gap-3 md:flex-row md:items-center">
-              <div className="flex items-center  gap-3">
+            <div className="flex gap-3 md:flex-row md:items-center">
+              {["all", "pending", "done"].map((tab) => (
                 <button
-                  className={`${activeTab === "all" ? "active-tab" : "inactive-tab"}`}
-                  onClick={() => setActiveTab("all")}
+                  key={tab}
+                  className={activeTab === tab ? "active-tab" : "inactive-tab"}
+                  onClick={() => setActiveTab(tab as "all" | "pending" | "done")}
                 >
-                  All
+                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
                 </button>
-                <button
-                  className={`${activeTab === "pending" ? "active-tab" : "inactive-tab"}`}
-                  onClick={() => setActiveTab("pending")}
-                >
-                  Pending
-                </button>
-                <button
-                  className={`${activeTab === "done" ? "active-tab" : "inactive-tab"}`}
-                  onClick={() => setActiveTab("done")}
-                >
-                  Done
-                </button>
-              </div>
+              ))}
             </div>
           </div>
 
@@ -201,11 +174,10 @@ const Appointments = () => {
             className="search-bg mb-4 w-full rounded-lg border p-2 md:w-[300px]"
           />
 
-          {activeTab === "all" && renderAllAppointments()}
-          {activeTab === "pending" && renderPendingAppointments()}
-          {activeTab === "done" && renderDoneAppointments()}
+          {renderAppointments}
         </>
       )}
+
       {isDeleteModalOpen && (
         <DeleteTestModal
           title="Confirm Delete"
