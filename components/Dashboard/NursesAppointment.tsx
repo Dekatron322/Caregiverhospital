@@ -28,6 +28,7 @@ const NursesAppointments = () => {
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const [showPaymentSuccessNotification, setShowPaymentSuccessNotification] = useState(false)
   const [refresh, setRefresh] = useState(false)
+  const [searchTerm, setSearchTerm] = useState("")
 
   const handleAppointmentClick = (appointmentId: number) => {
     localStorage.setItem("selectedAppointmentId", appointmentId.toString())
@@ -110,6 +111,10 @@ const NursesAppointments = () => {
     return new Date(dateString).toLocaleDateString(undefined, options)
   }
 
+  const filteredAppointments = appointments.filter((appointment) =>
+    appointment.patient_name.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
   const renderAppointmentDetails = (appointment: Appointment) => (
     <div key={appointment.id} className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2">
       <div className="flex w-full items-center gap-2">
@@ -146,13 +151,13 @@ const NursesAppointments = () => {
 
   const renderAllAppointments = () => (
     <div className="flex flex-col gap-2">
-      {appointments.map((appointment) => renderAppointmentDetails(appointment))}
+      {filteredAppointments.map((appointment) => renderAppointmentDetails(appointment))}
     </div>
   )
 
   const renderPendingAppointments = () => (
     <div className="flex flex-col gap-2">
-      {appointments
+      {filteredAppointments
         .filter((appointment) => appointment.status === true)
         .map((appointment) => renderAppointmentDetails(appointment))}
     </div>
@@ -160,7 +165,7 @@ const NursesAppointments = () => {
 
   const renderDoneAppointments = () => (
     <div className="flex flex-col gap-2">
-      {appointments
+      {filteredAppointments
         .filter((appointment) => appointment.status === false)
         .map((appointment) => renderAppointmentDetails(appointment))}
     </div>
@@ -198,6 +203,14 @@ const NursesAppointments = () => {
               Done
             </button>
           </div>
+
+          <input
+            type="text"
+            placeholder="Search by patient name..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="search-bg mb-4 w-full rounded-lg border p-2 md:w-[300px]"
+          />
 
           {activeTab === "all" && renderAllAppointments()}
           {activeTab === "pending" && renderPendingAppointments()}
