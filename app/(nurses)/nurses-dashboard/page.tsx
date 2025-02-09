@@ -293,10 +293,10 @@ export default function Patients() {
                   onChange={handleSearch}
                 />
               </div>
-              {/* <Link href="/patients/add" className="add-button">
+              <Link href="/nurses-dashboard/add" className="add-button">
                 <p className="text-[12px]">Add Patient</p>
                 <GoPlus />
-              </Link> */}
+              </Link>
             </div>
 
             <div className="mb-4 flex h-full flex-col gap-2 px-16 max-sm:px-4">
