@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback, useMemo } from "react"
 import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
 import { IoIosArrowForward } from "react-icons/io"
@@ -54,11 +54,8 @@ export default function Dashboard() {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [departmentToDelete, setDepartmentToDelete] = useState<number | null>(null)
 
-  useEffect(() => {
-    fetchDepartments()
-  }, [])
-
-  const fetchDepartments = async () => {
+  // Fetch departments
+  const fetchDepartments = useCallback(async () => {
     try {
       const response = await fetch("https://api2.caregiverhospital.com/department/department/")
       if (!response.ok) {
@@ -66,42 +63,74 @@ export default function Dashboard() {
       }
       const data = (await response.json()) as Department[]
       setDepartments(data)
-      setLoading(false)
     } catch (error) {
       console.error("Error fetching departments:", error)
+    } finally {
+      setLoading(false)
     }
-  }
+  }, [])
 
-  const openDepartmentModal = () => {
-    setIsAddDepartmentOpen(true)
-  }
+  useEffect(() => {
+    fetchDepartments()
+  }, [fetchDepartments])
 
-  const closeDepartmentModal = () => {
-    setIsAddDepartmentOpen(false)
-  }
-
-  const openDeleteModal = (id: number) => {
+  // Handle modal open/close
+  const openDepartmentModal = useCallback(() => setIsAddDepartmentOpen(true), [])
+  const closeDepartmentModal = useCallback(() => setIsAddDepartmentOpen(false), [])
+  const openDeleteModal = useCallback((id: number) => {
     setDepartmentToDelete(id)
     setIsDeleteOpen(true)
-  }
-
-  const closeDeleteModal = () => {
+  }, [])
+  const closeDeleteModal = useCallback(() => {
     setIsDeleteOpen(false)
     setDepartmentToDelete(null)
-  }
+  }, [])
 
-  const handleHmoSubmissionSuccess = async () => {
+  // Handle success notifications
+  const handleHmoSubmissionSuccess = useCallback(async () => {
     setShowSuccessNotification(true)
     setTimeout(() => setShowSuccessNotification(false), 5000)
     await fetchDepartments()
-  }
+  }, [fetchDepartments])
 
-  const handleDeleteSuccess = async () => {
+  const handleDeleteSuccess = useCallback(async () => {
     setShowDeleteNotification(true)
     setTimeout(() => setShowDeleteNotification(false), 5000)
     closeDeleteModal()
-    handleHmoSubmissionSuccess()
-  }
+    await fetchDepartments()
+  }, [closeDeleteModal, fetchDepartments])
+
+  // Memoize department cards to avoid unnecessary re-renders
+  const departmentCards = useMemo(
+    () =>
+      departments.map((department) => (
+        <div key={department.id} className="w-full rounded border p-4">
+          <div className="mb-4 flex justify-between">
+            <h6 className="font-bold">{department.name}</h6>
+            <Image src={getDepartmentImage(department.name)} height={48} width={48} alt={department.name} />
+          </div>
+          <div className="flex justify-between">
+            <h6 className="font-bold">Registered Staff</h6>
+            <h6 className="font-bold">{department.staffCount}</h6>
+          </div>
+          <div className="mt-4 flex w-full gap-2 lowercase">
+            <Link
+              href={`departments/${getDepartmentUrl(department.name)}`}
+              className="button-primary h-[50px] w-full rounded-sm capitalize max-sm:h-[45px]"
+            >
+              View
+            </Link>
+            <div
+              onClick={() => openDeleteModal(department.id)}
+              className="flex cursor-pointer content-center items-center justify-center rounded bg-[#F20089] text-[#ffffff] transition-colors duration-500 hover:bg-[#601410] hover:text-[#F2B8B5] max-md:p-2 md:h-[50px] md:w-[50px]"
+            >
+              <HiOutlineTrash />
+            </div>
+          </div>
+        </div>
+      )),
+    [departments, openDeleteModal]
+  )
 
   return (
     <>
@@ -110,7 +139,7 @@ export default function Dashboard() {
           <div className="flex w-screen flex-col">
             <DashboardNav />
             <div className="flex items-center justify-between px-16 pt-4 max-md:px-3">
-              <div className="flex items-center gap-2  ">
+              <div className="flex items-center gap-2">
                 <p className="font-bold">Admin Dashboard</p>
                 <IoIosArrowForward className="max-md:hidden" />
                 <p className="capitalize max-md:hidden">{pathname.split("/").pop()}</p>
@@ -130,32 +159,7 @@ export default function Dashboard() {
               </div>
             ) : (
               <div className="my-10 grid grid-cols-2 gap-4 px-16 max-md:mt-4 max-md:grid-cols-1 max-md:px-3">
-                {departments.map((department) => (
-                  <div key={department.id} className="w-full rounded border p-4">
-                    <div className="mb-4 flex justify-between">
-                      <h6 className="font-bold">{department.name}</h6>
-                      <Image src={getDepartmentImage(department.name)} height={48} width={48} alt={department.name} />
-                    </div>
-                    <div className="flex justify-between">
-                      <h6 className="font-bold">Registered Staff</h6>
-                      <h6 className="font-bold">{department.staffCount}</h6>
-                    </div>
-                    <div className="mt-4 flex w-full gap-2 lowercase">
-                      <Link
-                        href={`departments/${getDepartmentUrl(department.name)}`}
-                        className="button-primary h-[50px] w-full rounded-sm capitalize max-sm:h-[45px]"
-                      >
-                        View
-                      </Link>
-                      <div
-                        onClick={() => openDeleteModal(department.id)}
-                        className="flex cursor-pointer content-center items-center justify-center rounded bg-[#F20089] text-[#ffffff] transition-colors duration-500 hover:bg-[#601410] hover:text-[#F2B8B5] max-md:p-2 md:h-[50px] md:w-[50px]"
-                      >
-                        <HiOutlineTrash />
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                {departmentCards}
               </div>
             )}
             <Footer />
@@ -174,16 +178,16 @@ export default function Dashboard() {
         />
       </section>
       {showSuccessNotification && (
-        <div className="animation-fade-in absolute bottom-16  right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
+        <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
           <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm  text-[#0F920F]">Successfully added</span>
+          <span className="clash-font text-sm text-[#0F920F]">Successfully added</span>
         </div>
       )}
 
       {showDeleteNotification && (
-        <div className="animation-fade-in absolute bottom-16  right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
+        <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
           <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm  text-[#0F920F]">Successfully deleted</span>
+          <span className="clash-font text-sm text-[#0F920F]">Successfully deleted</span>
         </div>
       )}
     </>
