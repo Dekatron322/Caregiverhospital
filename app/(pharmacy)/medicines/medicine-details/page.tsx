@@ -49,13 +49,13 @@ export default function MedicineDetailPage({ params }: { params: { medicineId: s
       return
     }
     try {
-      const response = await fetch(`https://api2.caregiverhospital.com/medicine/medicine/${medicineId}`)
+      const response = await fetch(`https://api2.caregiverhospital.com/medicine/medicine/${medicineId}/`)
       if (!response.ok) {
         throw new Error("Failed to fetch medicine details")
       }
       const data = (await response.json()) as Medicine
       const categoryResponse = await fetch(
-        `https://api2.caregiverhospital.com/medicine-category/medicine_category/${data.category}`
+        `https://api2.caregiverhospital.com/medicine-category/medicine_category/${data.category}/`
       )
       if (!categoryResponse.ok) {
         throw new Error("Failed to fetch category details")
@@ -140,7 +140,10 @@ export default function MedicineDetailPage({ params }: { params: { medicineId: s
                 <div className="pt-10">
                   <h3 className="font-bold">{medicineDetail.name}</h3>
                   <div className="mt-4 grid w-full grid-cols-2 gap-2 max-sm:grid-cols-1">
-                    <div key={medicineDetail.id} className="auth flex flex-col justify-center rounded-sm border ">
+                    <div
+                      key={`medicine-${medicineDetail.id}`}
+                      className="auth flex flex-col justify-center rounded-sm border "
+                    >
                       <p className="px-4 py-2 font-semibold">Medicine</p>
                       <div className="border"></div>
                       <div className="flex justify-between">

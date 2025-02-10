@@ -68,7 +68,13 @@ export default function Medicines() {
   }, [])
 
   const handlePatientClick = (medicineId: string) => {
+    if (!medicineId) {
+      console.error("Medicine ID is undefined or empty.")
+      return
+    }
     localStorage.setItem("selectedMedicineId", medicineId)
+    console.log(localStorage.getItem("selectedMedicineId"))
+
     router.push(`/medicines/medicine-details`)
   }
 
