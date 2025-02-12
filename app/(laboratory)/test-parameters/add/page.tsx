@@ -99,7 +99,7 @@ const Page: React.FC = () => {
       setShowSuccessNotification(true)
       setTimeout(() => setShowSuccessNotification(false), 3000)
       setTimeout(() => {
-        router.push(`/medicines/`)
+        router.push(`/test-parameters/`)
       }, 3000)
     } catch (error) {
       console.error("Error adding medicine:", error)
