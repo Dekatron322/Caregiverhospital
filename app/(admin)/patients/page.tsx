@@ -205,15 +205,23 @@ export default function Patients() {
             method: "DELETE",
           }
         )
+
         if (!response.ok) {
           throw new Error("Failed to delete patient")
         }
+
+        // Remove the deleted patient from the list
         setPatients((prevPatients) => prevPatients.filter((patient) => patient.id !== patientToDelete.id))
+
+        // Close the modal
         closeModal()
+
+        // Show success notification
         setShowSuccessNotification(true)
         setTimeout(() => setShowSuccessNotification(false), 5000)
       } catch (error) {
         console.error("Error deleting patient:", error)
+        // Optionally, show an error notification to the user
       }
     }
   }, [patientToDelete, closeModal])
