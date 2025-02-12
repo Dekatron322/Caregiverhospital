@@ -146,7 +146,7 @@ const Page = () => {
       setShowSuccessNotification(true)
       setTimeout(() => setShowSuccessNotification(false), 5000)
       setTimeout(() => {
-        router.push(`/patients/`)
+        router.push(`/nurses-dashboard/`)
       }, 5000)
     } catch (error) {
       console.error("Error:", error)
