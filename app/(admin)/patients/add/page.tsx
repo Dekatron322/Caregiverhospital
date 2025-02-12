@@ -42,7 +42,7 @@ const Page = () => {
   // Fetch HMOs
   const fetchHmos = useCallback(async () => {
     try {
-      const response = await fetch("https://api2.caregiverhospital.com/hmo/hmo/")
+      const response = await fetch("https://api2.caregiverhospital.com/hmo/hmo/fetch/lite-mode/")
       const data = await response.json()
       setHmos(data as Hmo[])
     } catch (error) {
