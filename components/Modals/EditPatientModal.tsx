@@ -18,6 +18,9 @@ interface EditPatientModalProps {
 }
 
 const EditPatientModal: React.FC<EditPatientModalProps> = ({ isOpen, onClose, onConfirm, patient }) => {
+  // Log the patient object to verify its contents
+  console.log("Patient Data:", patient)
+
   const [formData, setFormData] = useState<Patients>(patient)
   const [showGenderDropdown, setShowGenderDropdown] = useState(false)
   const [showHmoDropdown, setShowHmoDropdown] = useState(false)
@@ -32,15 +35,16 @@ const EditPatientModal: React.FC<EditPatientModalProps> = ({ isOpen, onClose, on
   const dropdownRef = useRef<HTMLDivElement>(null)
 
   const handleSave = () => {
-    // Ensure non-editable fields retain their original values
     const updatedPatientData = {
       ...formData,
-      blood_pressure: patient.blood_pressure,
-      body_temperature: patient.body_temperature,
-      discount_value: patient.discount_value,
-      glucose_level: patient.glucose_level,
-      heart_rate: patient.heart_rate,
+      blood_pressure: patient.blood_pressure || "N/A",
+      body_temperature: patient.body_temperature || "N/A",
+      discount_value: patient.discount_value || "N/A",
+      glucose_level: patient.glucose_level || "N/A",
+      heart_rate: patient.heart_rate || "N/A",
     }
+    console.log("Updated Patient Data:", updatedPatientData)
+
     onConfirm(updatedPatientData)
   }
 
@@ -73,8 +77,8 @@ const EditPatientModal: React.FC<EditPatientModalProps> = ({ isOpen, onClose, on
             </div>
           </div>
           <form>
+            {/* Existing form fields */}
             <div className="my-4 grid grid-cols-3 gap-3 max-sm:grid-cols-2">
-              {/* Existing form fields */}
               <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                 <input
                   type="text"
