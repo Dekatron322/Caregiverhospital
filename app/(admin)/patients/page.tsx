@@ -3,7 +3,7 @@ import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io"
 import { usePathname, useRouter } from "next/navigation"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye"
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
 import BorderColorOutlinedIcon from "@mui/icons-material/BorderColorOutlined"
@@ -240,10 +240,19 @@ export default function Patients() {
     return age
   }, [])
 
-  // Memoize filtered patients
-  const filteredPatients = useMemo(() => {
-    return patients.filter((patient) => patient.name.toLowerCase().includes(searchQuery.toLowerCase()))
-  }, [patients, searchQuery])
+  // Filter patients by name, email, or membership number
+  const filteredPatients = patients.filter((patient) => {
+    const query = searchQuery.toLowerCase()
+    const nameMatch = patient.name.toLowerCase().includes(query)
+    const emailMatch = patient.email_address.toLowerCase().includes(query)
+    const membershipMatch = patient.membership_no.toLowerCase().includes(query)
+
+    // Split the search query into parts for names with spaces
+    const queryParts = query.split(" ")
+    const namePartsMatch = queryParts.every((part) => patient.name.toLowerCase().includes(part))
+
+    return nameMatch || emailMatch || membershipMatch || namePartsMatch
+  })
 
   return (
     <section>
