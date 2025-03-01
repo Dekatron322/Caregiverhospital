@@ -1,9 +1,9 @@
 "use client"
 import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
-import { IoIosArrowBack, IoIosArrowForward, IoMdSearch } from "react-icons/io"
+import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io"
 import { usePathname, useRouter } from "next/navigation"
-import { SetStateAction, useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye"
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
 import BorderColorOutlinedIcon from "@mui/icons-material/BorderColorOutlined"
@@ -13,7 +13,6 @@ import { GoPlus } from "react-icons/go"
 import { IoAddCircleSharp } from "react-icons/io5"
 import DeletePatientModal from "components/Modals/DeletePatientModal"
 import EditPatientModal from "components/Modals/EditPatientModal"
-import DoctorNav from "components/Navbar/DoctorNav"
 import NursesNav from "components/Navbar/NursesNav"
 
 export interface Patients {
@@ -63,105 +62,19 @@ export default function Patients() {
   const [showEditedNotification, setShowEditedNotification] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [patientToEdit, setPatientToEdit] = useState<Patients | null>(null)
-  const [allPatients, setAllPatients] = useState<Patients[]>([])
 
   const patientsPerPage = 100
 
-  const handleEditClick = (patient: Patients) => {
-    setPatientToEdit(patient)
-    setIsEditModalOpen(true)
-  }
-
-  const closeEditModal = () => {
-    setPatientToEdit(null)
-    setIsEditModalOpen(false)
-  }
-
-  // Preprocess patient data for updates
-  const preprocessPatientData = (data: Patients) => {
-    const processedData: Partial<Patients> = {}
-    if (data.heart_rate) processedData.heart_rate = data.heart_rate
-    if (data.body_temperature) processedData.body_temperature = data.body_temperature
-    if (data.glucose_level) processedData.glucose_level = data.glucose_level
-    if (data.blood_pressure) processedData.blood_pressure = data.blood_pressure
-    if (data.discount_value) processedData.discount_value = data.discount_value
-
-    if (data.hmo) {
-      processedData.hmo = {
-        id: data.hmo.id,
-        name: data.hmo.name || "",
-        category: data.hmo.category || "",
-        description: data.hmo.description || "",
-        status: data.hmo.status ?? false,
-        pub_date: data.hmo.pub_date || "",
-      }
-    }
-
-    processedData.name = data.name
-    processedData.gender = data.gender
-    processedData.dob = data.dob
-    processedData.membership_no = data.membership_no
-    processedData.email_address = data.email_address
-    processedData.phone_no = data.phone_no
-    processedData.address = data.address
-    processedData.allergies = data.allergies
-    processedData.age = data.age
-    processedData.nok_name = data.nok_name
-    processedData.password = data.password
-    processedData.nok_phone_no = data.nok_phone_no
-    processedData.nok_address = data.nok_address
-    processedData.status = data.status
-    processedData.policy_id = data.policy_id
-
-    return processedData
-  }
-
-  const confirmEdit = async (updatedPatientData: Patients) => {
-    if (patientToEdit) {
-      try {
-        const preprocessedData = preprocessPatientData(updatedPatientData)
-        const response = await fetch(`https://api2.caregiverhospital.com/patient/edit/patient/${patientToEdit.id}/`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(preprocessedData),
-        })
-
-        if (!response.ok) {
-          const errorData = await response.json()
-          console.error("Failed to update patient:", errorData)
-          throw new Error("Failed to update patient")
-        }
-
-        setPatients((prevPatients) =>
-          prevPatients.map((patient) => (patient.id === updatedPatientData.id ? updatedPatientData : patient))
-        )
-        closeEditModal()
-        setShowEditedNotification(true)
-        setTimeout(() => setShowEditedNotification(false), 5000)
-      } catch (error) {
-        console.error("Error updating patient:", error)
-      }
-    }
-  }
-
-  const handlePatientClick = (patientId: string) => {
-    localStorage.setItem("selectedPatientId", patientId)
-    router.push(`/nurses-dashboard/patient`)
-  }
-
-  const fetchPatients = async (page: number, query: string = "") => {
+  // Fetch patients
+  const fetchPatients = useCallback(async (page: number, query: string = "") => {
     setLoading(true)
     const start = (page - 1) * patientsPerPage + 1
     const stop = page * patientsPerPage
 
     try {
-      let response
       let data: Patients[] = []
 
       if (query) {
-        // Split query into parts for each word in the name
         const queryParts = query.split(" ")
         for (const part of queryParts) {
           const encodedQueryPart = encodeURIComponent(part)
@@ -171,13 +84,12 @@ export default function Patients() {
 
           if (searchResponse.ok) {
             const partData = (await searchResponse.json()) as Patients[]
-            data = [...data, ...partData] // Append results for each part of the query
+            data = [...data, ...partData]
           }
         }
-        // Remove duplicates from merged results, if any
         data = Array.from(new Set(data.map((p) => p.id))).map((id) => data.find((p) => p.id === id)!)
       } else {
-        response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${start}/${stop}`)
+        const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${start}/${stop}`)
         if (!response.ok) throw new Error("Failed to fetch patients")
         data = (await response.json()) as Patients[]
       }
@@ -189,88 +101,163 @@ export default function Patients() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
   useEffect(() => {
     fetchPatients(currentPage, searchQuery)
-  }, [currentPage, searchQuery])
+  }, [currentPage, searchQuery, fetchPatients])
 
-  useEffect(() => {
-    const storedPatientId = localStorage.getItem("selectedPatientId")
-    if (storedPatientId) {
-      fetchPatientDetails(storedPatientId)
-    } else {
-      console.error("No patient ID found in localStorage")
-    }
+  // Handle search
+  const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value)
+    setCurrentPage(1)
   }, [])
 
-  const fetchPatientDetails = async (patientId: string) => {
-    try {
-      const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/get/detail/${patientId}/`)
-      if (!response.ok) {
-        throw new Error("Failed to fetch patient details")
-      }
-      const data = await response.json()
-      // Handle the data here
-    } catch (error) {
-      console.error("Error fetching patient details:", error)
-    }
-  }
+  // Handle edit click
+  const handleEditClick = useCallback((patient: Patients) => {
+    setPatientToEdit(patient)
+    setIsEditModalOpen(true)
+  }, [])
 
-  const openModal = (patient: Patients) => {
+  // Close edit modal
+  const closeEditModal = useCallback(() => {
+    setPatientToEdit(null)
+    setIsEditModalOpen(false)
+  }, [])
+
+  // Preprocess patient data for updates
+  const preprocessPatientData = useCallback((data: Patients) => {
+    const processedData: Partial<Patients> = {
+      ...data,
+      hmo: {
+        id: data.hmo.id,
+        name: data.hmo.name || "",
+        category: data.hmo.category || "",
+        description: data.hmo.description || "",
+        status: data.hmo.status ?? false,
+        pub_date: data.hmo.pub_date || "",
+      },
+    }
+    return processedData
+  }, [])
+
+  // Confirm edit
+  const confirmEdit = useCallback(
+    async (updatedPatientData: Patients) => {
+      if (patientToEdit) {
+        try {
+          const preprocessedData = preprocessPatientData(updatedPatientData)
+          const response = await fetch(`https://api2.caregiverhospital.com/patient/edit/patient/${patientToEdit.id}/`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(preprocessedData),
+          })
+
+          if (!response.ok) {
+            const errorData = await response.json()
+            console.error("Failed to update patient:", errorData)
+            throw new Error("Failed to update patient")
+          }
+
+          setPatients((prevPatients) =>
+            prevPatients.map((patient) => (patient.id === updatedPatientData.id ? updatedPatientData : patient))
+          )
+          closeEditModal()
+          setShowEditedNotification(true)
+          setTimeout(() => setShowEditedNotification(false), 5000)
+        } catch (error) {
+          console.error("Error updating patient:", error)
+        }
+      }
+    },
+    [patientToEdit, preprocessPatientData, closeEditModal]
+  )
+
+  // Handle patient click
+  const handlePatientClick = useCallback(
+    (patientId: string) => {
+      localStorage.setItem("selectedPatientId", patientId)
+      router.push(`/nurses-dashboard/patient`)
+    },
+    [router]
+  )
+
+  // Open delete modal
+  const openModal = useCallback((patient: Patients) => {
     setPatientToDelete(patient)
     setIsModalOpen(true)
-  }
+  }, [])
 
-  const closeModal = () => {
+  // Close delete modal
+  const closeModal = useCallback(() => {
     setPatientToDelete(null)
     setIsModalOpen(false)
-  }
+  }, [])
 
-  const confirmDelete = async () => {
+  // Confirm delete
+  const confirmDelete = useCallback(async () => {
     if (patientToDelete) {
       try {
-        const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${patientToDelete.id}/`, {
-          method: "DELETE",
-        })
+        const response = await fetch(
+          `https://api2.caregiverhospital.com/patient/patient/get/detail/${patientToDelete.id}/`,
+          {
+            method: "DELETE",
+          }
+        )
+
         if (!response.ok) {
           throw new Error("Failed to delete patient")
         }
-        setPatients(patients.filter((patient) => patient.id !== patientToDelete.id))
+
+        // Remove the deleted patient from the list
+        setPatients((prevPatients) => prevPatients.filter((patient) => patient.id !== patientToDelete.id))
+
+        // Close the modal
         closeModal()
+
+        // Show success notification
         setShowSuccessNotification(true)
         setTimeout(() => setShowSuccessNotification(false), 5000)
       } catch (error) {
         console.error("Error deleting patient:", error)
+        // Optionally, show an error notification to the user
       }
     }
-  }
+  }, [patientToDelete, closeModal])
 
-  // Handle search
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value)
-    setCurrentPage(1) // Reset to first page on search
-  }
-
-  const calculateAge = (dobString: string) => {
+  // Calculate age
+  const calculateAge = useCallback((dobString: string) => {
     const today = new Date()
     const dob = new Date(dobString)
     let age = today.getFullYear() - dob.getFullYear()
     const monthDiff = today.getMonth() - dob.getMonth()
 
-    // Adjust age if birthday hasn't occurred yet this year
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
       age--
     }
 
     return age
-  }
+  }, [])
+
+  const filteredPatients = patients.filter((patient) => {
+    const query = searchQuery.toLowerCase()
+    const nameMatch = patient.name.toLowerCase().includes(query)
+    const emailMatch = patient.email_address.toLowerCase().includes(query)
+    const membershipMatch = patient.membership_no.toLowerCase().includes(query)
+
+    const queryParts = query.split(" ")
+    const namePartsMatch = queryParts.every((part) => patient.name.toLowerCase().includes(part))
+
+    return nameMatch || emailMatch || membershipMatch || namePartsMatch
+  })
 
   return (
     <section>
-      <div className="h-full ">
-        <div className="flex min-h-screen ">
-          <div className="flex w-screen flex-col ">
+      <div className="h-full">
+        <div className="flex min-h-screen">
+          <div className="flex w-screen flex-col">
             <NursesNav />
 
             <div className="flex items-center gap-2 px-16 pt-4 max-md:px-3">
@@ -308,7 +295,7 @@ export default function Patients() {
                     </span>
                   ))}
                 </div>
-              ) : patients.length === 0 ? (
+              ) : filteredPatients.length === 0 ? (
                 <div className="mt-auto flex h-full w-full items-center justify-center">
                   <div>
                     <Image src="/undraw_medical_care_movn.svg" height={237} width={341} alt="pharmacy" />
@@ -324,73 +311,58 @@ export default function Patients() {
               ) : (
                 <div className="relative w-full overflow-hidden">
                   <div className="overflow-x- mb-2">
-                    {patients
-                      .filter((patient) => patient.name.toLowerCase().includes(searchQuery.toLowerCase()))
-                      .map((patient) => (
-                        <div
-                          key={patient.id}
-                          className="mb-2 flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
-                        >
-                          <div className="flex items-center gap-1 text-sm font-bold md:w-[20%]">
-                            {/* {patient.image ? (
-                        <img
-                          src={`https://api2.caregiverhospital.com${patient.image}`}
-                          alt={patient.name}
-                          width={32}
-                          height={32}
-                          className="rounded-full"
-                        />
-                      ) : ( */}
-                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46FFA6] max-sm:hidden">
-                              <p className="capitalize text-[#000000]">{patient.name.charAt(0)}</p>
-                            </div>
-                            {/* )} */}
-                          </div>
-                          <div className="flex w-full items-center gap-1 text-sm font-bold">
-                            <div>
-                              <p>{patient.name}</p>
-                              <small className="text-xs">{patient.email_address}</small>
-                            </div>
-                          </div>
-
-                          <div className="w-full max-md:hidden">
-                            <p className="text-xs font-bold">{calculateAge(patient.dob)} years old</p>
-                            <small className="text-xs">Age</small>
-                          </div>
-                          <div className="w-full max-md:hidden">
-                            <div className="flex gap-1 text-sm font-bold">{patient.membership_no}</div>
-                            <small className="text-xs">Hmo ID</small>
-                          </div>
-                          <div className="w-full">
-                            <p className="text-sm font-bold">{patient.hmo.name}</p>
-                            <small className="text-xs">
-                              {patient.hmo.name === "Cargivers Finance" ? "Out of Pocket" : "Hmo name"}
-                            </small>
-                          </div>
-                          <div className="w-full max-md:hidden">
-                            {patient.hmo.status ? (
-                              <p className="w-[100px] rounded bg-[#46FFA6] px-2 py-[2px] text-center text-xs text-[#000000]">
-                                Active
-                              </p>
-                            ) : (
-                              <p className="w-[100px] rounded bg-[#F20089] px-2 py-[2px] text-center text-xs text-[#ffffff]">
-                                Inactive
-                              </p>
-                            )}
-                          </div>
-                          <div className="flex gap-2">
-                            <RemoveRedEyeIcon
-                              className="text-[#46FFA6]"
-                              onClick={() => handlePatientClick(patient.id)}
-                            />
-                            <BorderColorOutlinedIcon onClick={() => handleEditClick(patient)} />
-                            <DeleteForeverIcon className="text-[#F2B8B5]" onClick={() => openModal(patient)} />
+                    {filteredPatients.map((patient) => (
+                      <div
+                        key={patient.id}
+                        className="mb-2 flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
+                      >
+                        <div className="flex items-center gap-1 text-sm font-bold md:w-[20%]">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46FFA6] max-sm:hidden">
+                            <p className="capitalize text-[#000000]">{patient.name.charAt(0)}</p>
                           </div>
                         </div>
-                      ))}
+                        <div className="flex w-full items-center gap-1 text-sm font-bold">
+                          <div>
+                            <p>{patient.name}</p>
+                            <small className="text-xs">{patient.email_address}</small>
+                          </div>
+                        </div>
+
+                        <div className="w-full max-md:hidden">
+                          <p className="text-xs font-bold">{calculateAge(patient.dob)} years old</p>
+                          <small className="text-xs">Age</small>
+                        </div>
+                        <div className="w-full max-md:hidden">
+                          <div className="flex gap-1 text-sm font-bold">{patient.membership_no}</div>
+                          <small className="text-xs">Hmo ID</small>
+                        </div>
+                        <div className="w-full">
+                          <p className="text-sm font-bold">{patient.hmo.name}</p>
+                          <small className="text-xs">
+                            {patient.hmo.name === "Cargivers Finance" ? "Out of Pocket" : "Hmo name"}
+                          </small>
+                        </div>
+                        <div className="w-full max-md:hidden">
+                          {patient.hmo.status ? (
+                            <p className="w-[100px] rounded bg-[#46FFA6] px-2 py-[2px] text-center text-xs text-[#000000]">
+                              Active
+                            </p>
+                          ) : (
+                            <p className="w-[100px] rounded bg-[#F20089] px-2 py-[2px] text-center text-xs text-[#ffffff]">
+                              Inactive
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex gap-2">
+                          <RemoveRedEyeIcon className="text-[#46FFA6]" onClick={() => handlePatientClick(patient.id)} />
+                          <BorderColorOutlinedIcon onClick={() => handleEditClick(patient)} />
+                          <DeleteForeverIcon className="text-[#F2B8B5]" onClick={() => openModal(patient)} />
+                        </div>
+                      </div>
+                    ))}
                   </div>
 
-                  <div className="flex justify-between  py-4 max-md:px-3">
+                  <div className="flex justify-between py-4 max-md:px-3">
                     <button
                       onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                       disabled={currentPage === 1}
@@ -428,16 +400,16 @@ export default function Patients() {
         )}
 
         {showSuccessNotification && (
-          <div className="animation-fade-in absolute bottom-16  right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
+          <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
             <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
-            <span className="clash-font text-sm  text-[#0F920F]">Deleted Successfully</span>
+            <span className="clash-font text-sm text-[#0F920F]">Deleted Successfully</span>
           </div>
         )}
 
         {showEditedNotification && (
-          <div className="animation-fade-in absolute bottom-16  right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
+          <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
             <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
-            <span className="clash-font text-sm  text-[#0F920F]">Updated Successfully</span>
+            <span className="clash-font text-sm text-[#0F920F]">Updated Successfully</span>
           </div>
         )}
       </div>

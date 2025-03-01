@@ -9,6 +9,7 @@ interface HMO {
   id: string
   name: string
 }
+
 interface EditPatientModalProps {
   isOpen: boolean
   onClose: () => void
@@ -18,17 +19,29 @@ interface EditPatientModalProps {
 
 const EditPatientModal: React.FC<EditPatientModalProps> = ({ isOpen, onClose, onConfirm, patient }) => {
   const [formData, setFormData] = useState<Patients>(patient)
-  const [showGenderDropdown, setShowGenderDropdown] = useState(false) // State for gender dropdown
+  const [showGenderDropdown, setShowGenderDropdown] = useState(false)
   const [showHmoDropdown, setShowHmoDropdown] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedHmo, setSelectedHmo] = useState<string | null>(formData.hmo.id || "")
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }))
   }
+
   const dropdownRef = useRef<HTMLDivElement>(null)
+
   const handleSave = () => {
-    onConfirm(formData)
+    // Ensure non-editable fields retain their original values
+    const updatedPatientData = {
+      ...formData,
+      blood_pressure: patient.blood_pressure,
+      body_temperature: patient.body_temperature,
+      discount_value: patient.discount_value,
+      glucose_level: patient.glucose_level,
+      heart_rate: patient.heart_rate,
+    }
+    onConfirm(updatedPatientData)
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,18 +60,21 @@ const EditPatientModal: React.FC<EditPatientModalProps> = ({ isOpen, onClose, on
     setShowGenderDropdown(false)
   }
 
+  if (!isOpen) return null
+
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>
         <div className="p-4">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold">Edit Patient Details</h2>
-            <div className="border-black  hover:rounded-md hover:border">
+            <div className="border-black hover:rounded-md hover:border">
               <LiaTimesSolid className="m-1 cursor-pointer" onClick={onClose} />
             </div>
           </div>
           <form>
             <div className="my-4 grid grid-cols-3 gap-3 max-sm:grid-cols-2">
+              {/* Existing form fields */}
               <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                 <input
                   type="text"
@@ -71,6 +87,7 @@ const EditPatientModal: React.FC<EditPatientModalProps> = ({ isOpen, onClose, on
                 />
               </div>
 
+              {/* Gender dropdown */}
               <div className="relative flex items-center">
                 <div
                   className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2"
@@ -101,6 +118,8 @@ const EditPatientModal: React.FC<EditPatientModalProps> = ({ isOpen, onClose, on
                   </div>
                 )}
               </div>
+
+              {/* Date of Birth */}
               <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                 <input
                   type="datetime-local"
@@ -111,6 +130,8 @@ const EditPatientModal: React.FC<EditPatientModalProps> = ({ isOpen, onClose, on
                   className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
                 />
               </div>
+
+              {/* Email Address */}
               <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                 <input
                   type="text"
@@ -122,6 +143,8 @@ const EditPatientModal: React.FC<EditPatientModalProps> = ({ isOpen, onClose, on
                   onChange={handleChange}
                 />
               </div>
+
+              {/* Phone Number */}
               <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                 <input
                   type="text"
@@ -133,6 +156,8 @@ const EditPatientModal: React.FC<EditPatientModalProps> = ({ isOpen, onClose, on
                   onChange={handleChange}
                 />
               </div>
+
+              {/* Address */}
               <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                 <input
                   type="text"
@@ -145,11 +170,10 @@ const EditPatientModal: React.FC<EditPatientModalProps> = ({ isOpen, onClose, on
                 />
               </div>
             </div>
+
+            {/* Policy ID and Membership Number */}
             <div className="mb-3 flex gap-3">
-              <div
-                className="search-bg relative flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2"
-                ref={dropdownRef}
-              >
+              <div className="search-bg relative flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                 <div className="flex w-[100%] items-center justify-between gap-3">
                   <Image className="icon-style" src="/icons.svg" width={16} height={16} alt="dekalo" />
                   <Image className="dark-icon-style" src="/search-dark.svg" width={16} height={16} alt="dekalo" />
@@ -176,8 +200,10 @@ const EditPatientModal: React.FC<EditPatientModalProps> = ({ isOpen, onClose, on
                 />
               </div>
             </div>
-            <div className="mb-3 ">
-              <div className="mb-3 grid grid-cols-2 gap-3 ">
+
+            {/* Allergies and Password */}
+            <div className="mb-3">
+              <div className="mb-3 grid grid-cols-2 gap-3">
                 <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                   <input
                     type="text"
@@ -200,10 +226,11 @@ const EditPatientModal: React.FC<EditPatientModalProps> = ({ isOpen, onClose, on
                     onChange={handleChange}
                   />
                 </div>
-
                 <p className="my-2 text-xs text-[#0F920F]">Separate allergies with &rdquo;,&rdquo;</p>
               </div>
             </div>
+
+            {/* Next of Kin Information */}
             <h6 className="text-lg font-medium">Next of Kin Information</h6>
             <div className="mt-3">
               <div className="mb-3 grid grid-cols-3 gap-3 max-sm:grid-cols-1">
@@ -242,11 +269,9 @@ const EditPatientModal: React.FC<EditPatientModalProps> = ({ isOpen, onClose, on
                 </div>
               </div>
             </div>
-
-            {/* Repeat for other fields: gender, dob, membership_no, etc. */}
           </form>
           <div className="mt-4 flex w-full">
-            <button onClick={handleSave} className="button-primary h-[50px] w-full rounded px-4 py-2 ">
+            <button onClick={handleSave} className="button-primary h-[50px] w-full rounded px-4 py-2">
               Save Changes
             </button>
           </div>
