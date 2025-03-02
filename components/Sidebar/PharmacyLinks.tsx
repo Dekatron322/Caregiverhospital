@@ -14,6 +14,7 @@ const links = [
     icon: Departments,
   },
   { name: "Medicine Categories", href: "/medicine-categories", icon: Appointments },
+  { name: "Appointments", href: "/pharmacy-appointments", icon: Appointments },
   { name: "Issue Request", href: "/issue-request", icon: Staff },
   { name: "Patients", href: "/pharmacy-patients", icon: Patients },
   { name: "Admissions", href: "/pharmacy-admission", icon: Admissions },

@@ -5,7 +5,6 @@ import TestModal from "components/Modals/TestModal"
 import Image from "next/image"
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye"
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet"
-import PaymentModal from "components/Modals/PaymentModal"
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
 import DeleteTestModal from "components/Modals/DeleteTestModal"
 import LabPaymentModal from "components/Modals/LabPaymentModal"
@@ -26,7 +25,7 @@ interface LabTestResult {
   status_note: string
   pub_date: string
   patient_name: string
-  patient_id: string // Added field for patient ID
+  patient_id: string
   policy_id: string
   diagnosis_code: string
   discount_value: string
@@ -75,17 +74,14 @@ const LabTests = () => {
     const fetchData = async () => {
       setIsLoading(true)
       try {
-        // Fetch lab test results
         const labTestResponse = await axios.get("https://api2.caregiverhospital.com/lab-test/lab-test/")
         let labTestData: LabTestResult[] = labTestResponse.data
 
-        // Fetch diagnosis data
         const diagnosisResponse = await axios.get("https://api2.caregiverhospital.com/diagnosis/diagnosis/")
         const fetchedDiagnosisData = diagnosisResponse.data
         setDiagnosisData(fetchedDiagnosisData)
 
         if (Array.isArray(labTestData)) {
-          // Sort labTestData by pub_date in descending order (newest to oldest)
           labTestData.sort((a, b) => new Date(b.pub_date).getTime() - new Date(a.pub_date).getTime())
 
           const tests = labTestData.map((test: any) => {
@@ -129,7 +125,7 @@ const LabTests = () => {
   const handlePaymentModalClose = (isSuccess: boolean) => {
     if (isSuccess) {
       setShowPaymentSuccessNotification(true)
-      setRefresh(!refresh) // Trigger a refresh
+      setRefresh(!refresh)
       setTimeout(() => setShowPaymentSuccessNotification(false), 5000)
     }
     setIsPaymentModalOpen(false)
@@ -196,7 +192,7 @@ const LabTests = () => {
     try {
       await axios.delete(`https://api2.caregiverhospital.com/lab-test/lab-test/${selectedLabTestId}/`)
       setShowSuccessNotification(true)
-      setRefresh(!refresh) // Refresh the data after deletion
+      setRefresh(!refresh)
       setTimeout(() => setShowSuccessNotification(false), 5000)
       setIsDeleteModalOpen(false)
     } catch (error) {
@@ -206,9 +202,9 @@ const LabTests = () => {
   }
 
   const filterLogic = {
-    all: () => true, // Show all results
-    approved: (results: LabTestResult) => results.payment_status === true, // Paid
-    notApproved: (results: LabTestResult) => results.payment_status === false, // Not Paid
+    all: () => true,
+    approved: (results: LabTestResult) => results.payment_status === true,
+    notApproved: (results: LabTestResult) => results.payment_status === false,
   }
 
   type ActiveTab = keyof typeof filterLogic
