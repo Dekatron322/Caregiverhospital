@@ -1,4 +1,4 @@
-import React, { useEffect, useState, lazy, Suspense, useMemo, useCallback } from "react"
+import React, { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react"
 import axios from "axios"
 import Image from "next/image"
 import { debounce } from "lodash"
@@ -272,7 +272,7 @@ const IssueRequest = () => {
             </div>
             <div>
               <p className="text-xs font-bold">
-                {patient.name} - ({calculateAge(patient.dob)}yrs)
+                {patient.name} - ({calculateAge(patient.dob)})
               </p>
               <p className="text-xs">Doctor: {prescription.doctor_name}</p>
               <p className="text-xs">HMO ID: {patient.policy_id}</p>
