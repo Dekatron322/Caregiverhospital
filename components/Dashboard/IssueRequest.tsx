@@ -236,9 +236,10 @@ const IssueRequest = () => {
     setIsPreModalOpen(true)
   }, [])
 
-  const handleSearchChange = debounce((event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("Search query:", event.target.value) // Debugging log
     setSearchQuery(event.target.value)
-  }, 300)
+  }
 
   const filteredPatients = useMemo(() => {
     return patients.filter((patient) => patient.name.toLowerCase().includes(searchQuery.toLowerCase()))
