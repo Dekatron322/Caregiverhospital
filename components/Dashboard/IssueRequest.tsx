@@ -233,7 +233,7 @@ const IssueRequest = () => {
           </div>
           <div>
             <p className="text-xs font-bold">
-              {patient.name} - ({calculateAge(patient.dob)})
+              {patient.name} - ({calculateAge(patient.dob)}yrs)
             </p>
             <p className="text-xs">Doctor: {prescription.doctor_name}</p>
             <p className="text-xs">HMO ID: {patient.policy_id}</p>
