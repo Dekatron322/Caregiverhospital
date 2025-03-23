@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation"
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
 import DeleteTestModal from "components/Modals/DeleteTestModal"
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye"
+import Image from "next/image"
 
 interface Appointment {
   id: string
@@ -118,12 +119,14 @@ const Appointments = () => {
             </p>
             <p className="text-xs">Complain</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex w-full justify-end gap-2">
             <RemoveRedEyeIcon
               className="text-[#46FFA6]"
               onClick={() => handleAppointmentClick(appointment.patient_id)}
             />
-            <DeleteForeverIcon className="text-[#F2B8B5]" onClick={() => handleDeleteClick(appointment.id)} />
+            <div className="flex cursor-pointer items-center gap-2" onClick={() => handleDeleteClick(appointment.id)}>
+              <Image src="/Frame.png" alt="" height={24} width={24} />
+            </div>
           </div>
         </div>
       )

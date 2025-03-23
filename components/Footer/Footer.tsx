@@ -22,8 +22,9 @@ const Footer = () => {
   if (!mounted) {
     return null
   }
+
   return (
-    <div className="mt-auto flex justify-between border-t max-md:hidden">
+    <div className="sidebar fixed bottom-0 left-0 right-0 mt-auto flex justify-between border-t max-md:hidden">
       <div className="flex gap-6 px-16 py-4">
         <Link href="/" className="text-xs font-bold">
           Privacy Policy
@@ -51,6 +52,3 @@ const Footer = () => {
 }
 
 export default Footer
-function setMounted(arg0: boolean) {
-  throw new Error("Function not implemented.")
-}

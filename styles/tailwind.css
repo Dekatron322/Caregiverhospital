@@ -2,6 +2,34 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: "Sen";
+  src: url("../styles/fonts/Sen-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Sen";
+  src: url("../styles/fonts/Sen-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Sen";
+  src: url("../styles/fonts/Sen-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Sen";
+  src: url("../styles/fonts/Sen-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -10,6 +38,8 @@
 
 body {
   background-color: #ffffff;
+  font-family: "Sen";
+
   color: #1e1e1e;
 }
 
@@ -316,7 +346,7 @@ body {
 }
 
 .clash-font {
-  font-family: "Clash Display", sans-serif;
+  font-family: "Sen", sans-serif;
 }
 
 .dropdown-menu {

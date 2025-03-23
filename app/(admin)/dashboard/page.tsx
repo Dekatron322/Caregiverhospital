@@ -1,4 +1,5 @@
-"use client"
+"use client" // Mark this as a client component
+
 import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
 import { useCallback, useEffect, useMemo, useState } from "react"
@@ -92,8 +93,58 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <p>Loading...</p>
+      <div className="flex h-screen flex-col">
+        <DashboardNav />
+        <div className="flex-grow px-16 py-4 max-md:px-3">
+          <h4 className="mb-4 font-semibold">Statistics</h4>
+          <div className="flex gap-2 max-md:grid max-md:grid-cols-2">
+            {[1, 2, 3, 4].map((_, index) => (
+              <div key={index} className="w-full rounded border-[0.5px] p-4 shadow">
+                <div className="mb-8 flex justify-between">
+                  <div className="h-6 w-1/2 animate-pulse rounded bg-gray-200"></div>
+                  <div className="h-8 w-8 animate-pulse rounded-full bg-gray-200"></div>
+                </div>
+                <div className="flex justify-between">
+                  <div className="h-6 w-1/4 animate-pulse rounded bg-gray-200"></div>
+                  <div className="h-6 w-1/4 animate-pulse rounded bg-gray-200"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-8">
+            <p className="mb-4 font-semibold">Appointments</p>
+            <div className="flex flex-col gap-2">
+              {[1, 2, 3, 4].map((_, index) => (
+                <div key={index} className="flex w-full items-center justify-between rounded-lg border p-2">
+                  <div className="flex w-full items-center gap-2">
+                    <div className="h-8 w-8 animate-pulse rounded-full bg-gray-200 max-md:hidden"></div>
+                    <div>
+                      <div className="h-4 w-24 animate-pulse rounded bg-gray-200"></div>
+                      <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+                    </div>
+                  </div>
+                  <div className="flex w-full flex-col">
+                    <div className="h-4 w-24 animate-pulse rounded bg-gray-200"></div>
+                    <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+                  </div>
+                  <div className="flex w-full flex-col max-md:hidden">
+                    <div className="h-4 w-24 animate-pulse rounded bg-gray-200"></div>
+                    <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+                  </div>
+                  <div className="md:flex md:w-full md:flex-col md:items-center">
+                    <div className="h-6 w-16 animate-pulse rounded bg-gray-200"></div>
+                    <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+                  </div>
+                  <div className="flex gap-2">
+                    <div className="h-6 w-6 animate-pulse rounded-full bg-gray-200"></div>
+                    <div className="h-6 w-6 animate-pulse rounded-full bg-gray-200"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <Footer />
       </div>
     )
   }

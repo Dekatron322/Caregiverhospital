@@ -32,6 +32,9 @@ module.exports = {
       },
       fontFamily: {
         body: [
+          "Sen",
+          "SpaceGrotesk",
+          "Clash Display",
           "Inter",
           "ui-sans-serif",
           "system-ui",
@@ -47,9 +50,11 @@ module.exports = {
           "Segoe UI Emoji",
           "Segoe UI Symbol",
           "Noto Color Emoji",
-          "Clash Display",
         ],
         sans: [
+          "Sen",
+          "SpaceGrotesk",
+          "Clash Display",
           "Inter",
           "ui-sans-serif",
           "system-ui",
@@ -65,7 +70,6 @@ module.exports = {
           "Segoe UI Emoji",
           "Segoe UI Symbol",
           "Noto Color Emoji",
-          "Clash Display",
         ],
       },
       borderWidth: {

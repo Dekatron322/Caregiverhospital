@@ -1,11 +1,12 @@
 "use client"
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import axios from "axios"
 import { HiMiniStar } from "react-icons/hi2"
 import Image from "next/image"
 import Navbar from "components/Navbar/Navbar"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { toast, Toaster } from "sonner" // Import sonner
 
 interface RateIconProps {
   filled: boolean
@@ -28,20 +29,12 @@ const RateIcon: React.FC<RateIconProps> = ({ filled, onClick }) => {
 type Department = "Admin" | "Doctors" | "Pharmacy" | "Laboratory" | "Nurses" | "Cashier"
 
 const Page: React.FC = () => {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  const [rating, setRating] = useState<number>(0)
-  const [isAnonymous, setIsAnonymous] = useState<boolean>(false)
-  const [comment, setComment] = useState<string>("")
-  const [selectedAmenities, setSelectedAmenities] = useState<number[]>([])
-
   const [searchTerm, setSearchTerm] = useState<Department | "">("")
   const [showDropdown, setShowDropdown] = useState(false)
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [showSuccessNotification, setShowSuccessNotification] = useState(false)
-  const [showErrorNotification, setShowErrorNotification] = useState(false)
   const departments: Department[] = ["Admin", "Doctors", "Pharmacy", "Laboratory", "Nurses", "Cashier"]
 
   const router = useRouter() // Initialize the router
@@ -53,30 +46,6 @@ const Page: React.FC = () => {
     Laboratory: "/laboratory-dashboard",
     Nurses: "/nurses-dashboard",
     Cashier: "/cashier-dashboard",
-  }
-
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen)
-  }
-
-  const handleRateClick = (index: number) => {
-    setRating(index + 1)
-  }
-
-  const toggleAnonymous = () => {
-    setIsAnonymous(!isAnonymous)
-  }
-
-  const handleCommentChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setComment(event.target.value)
-  }
-
-  const toggleAmenity = (amenityId: number) => {
-    if (selectedAmenities.includes(amenityId)) {
-      setSelectedAmenities(selectedAmenities.filter((id) => id !== amenityId))
-    } else {
-      setSelectedAmenities([...selectedAmenities, amenityId])
-    }
   }
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -132,15 +101,30 @@ const Page: React.FC = () => {
       if (searchTerm) {
         const route = departmentRoutes[searchTerm]
         router.push(route)
-        setShowSuccessNotification(true)
-        setTimeout(() => setShowSuccessNotification(false), 5000)
+
+        // Display success toast
+        toast.success("Login Successful", {
+          description: "You have successfully logged in.",
+          duration: 5000,
+          cancel: {
+            label: "Close",
+            onClick: () => {},
+          },
+        })
       }
     } catch (error) {
       setError("Login failed. Please try again.")
       console.error("Login error:", error)
 
-      setShowErrorNotification(true)
-      setTimeout(() => setShowErrorNotification(false), 5000)
+      // Display error toast
+      toast.error("Login Failed", {
+        description: "Please check your credentials and try again.",
+        duration: 5000,
+        cancel: {
+          label: "Close",
+          onClick: () => {},
+        },
+      })
     } finally {
       setLoading(false)
     }
@@ -149,6 +133,7 @@ const Page: React.FC = () => {
   return (
     <>
       <Navbar />
+      <Toaster position="top-center" richColors /> {/* Add Toaster component */}
       <div className="flex h-screen w-full items-center justify-center">
         <div className="auth flex rounded-lg max-sm:w-full xl:min-w-[498px]">
           <div className="w-full justify-center px-6 py-6">
@@ -226,13 +211,15 @@ const Page: React.FC = () => {
                 </button>
               </div>
 
-              <div className="my-4 flex content-center items-center gap-2" onClick={toggleAnonymous}>
-                {isAnonymous ? (
-                  <Image src="/checkbox1.svg" width={14} height={14} alt="checkbox" />
-                ) : (
-                  <Image src="/checkbox.svg" width={14} height={14} alt="checkbox" />
-                )}
-                <p className="text-sm">Remember me</p>
+              <div className="my-4 flex content-center items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="remember-me"
+                  className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                />
+                <label htmlFor="remember-me" className="text-sm">
+                  Remember me
+                </label>
               </div>
 
               <div className="flex w-full gap-6">
@@ -260,18 +247,6 @@ const Page: React.FC = () => {
           </div>
         </div>
       </div>
-      {showSuccessNotification && (
-        <div className="animation-fade-in absolute bottom-16 m-5  flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514] md:right-16">
-          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm  text-[#0F920F]">Login Successfully</span>
-        </div>
-      )}
-      {showErrorNotification && (
-        <div className="animation-fade-in 0 absolute bottom-16  m-5 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#D14343] bg-[#FEE5E5] text-[#D14343] shadow-[#05420514] md:right-16">
-          <Image src="/check-circle-failed.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm  text-[#D14343]">{error}</span>
-        </div>
-      )}
     </>
   )
 }
