@@ -1,4 +1,4 @@
-"use client"
+"use client" // Mark this as a client component
 
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import axios from "axios"
@@ -119,7 +119,7 @@ const Appointments = () => {
             </p>
             <p className="text-xs">Complain</p>
           </div>
-          <div className="flex w-full justify-end gap-2">
+          <div className="flex gap-2">
             <RemoveRedEyeIcon
               className="text-[#46FFA6]"
               onClick={() => handleAppointmentClick(appointment.patient_id)}
@@ -144,42 +144,68 @@ const Appointments = () => {
   }, [activeTab, filteredAppointments, renderAppointmentDetails])
 
   return (
-    <div className="flex w-full flex-col">
-      {isLoading ? (
-        <div className="loading-text flex h-full items-center justify-center">
-          {"loading...".split("").map((letter, index) => (
-            <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>
-              {letter}
-            </span>
-          ))}
-        </div>
-      ) : (
-        <>
-          <div className="tab-bg mb-8 flex w-[190px] flex-col items-start gap-3 rounded-lg p-1 md:flex-row md:items-start md:border">
-            <div className="flex gap-3 md:flex-row md:items-center">
-              {["all", "pending", "done"].map((tab) => (
-                <button
-                  key={tab}
-                  className={activeTab === tab ? "active-tab" : "inactive-tab"}
-                  onClick={() => setActiveTab(tab as "all" | "pending" | "done")}
-                >
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                </button>
-              ))}
-            </div>
+    <div className="flex min-h-screen flex-col">
+      {/* Main Content */}
+      <div className="flex-grow ">
+        {isLoading ? (
+          // Loading state with animate-pulse
+          <div className="flex flex-col gap-2">
+            {[1, 2, 3, 4].map((_, index) => (
+              <div key={index} className="flex w-full items-center justify-between rounded-lg border p-2">
+                <div className="flex w-full items-center gap-2">
+                  <div className="h-8 w-8 animate-pulse rounded-full bg-gray-200 max-md:hidden"></div>
+                  <div>
+                    <div className="h-4 w-24 animate-pulse rounded bg-gray-200"></div>
+                    <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+                  </div>
+                </div>
+                <div className="flex w-full flex-col">
+                  <div className="h-4 w-24 animate-pulse rounded bg-gray-200"></div>
+                  <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+                </div>
+                <div className="flex w-full flex-col max-md:hidden">
+                  <div className="h-4 w-24 animate-pulse rounded bg-gray-200"></div>
+                  <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+                </div>
+                <div className="md:flex md:w-full md:flex-col md:items-center">
+                  <div className="h-6 w-16 animate-pulse rounded bg-gray-200"></div>
+                  <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+                </div>
+                <div className="flex gap-2">
+                  <div className="h-6 w-6 animate-pulse rounded-full bg-gray-200"></div>
+                  <div className="h-6 w-6 animate-pulse rounded-full bg-gray-200"></div>
+                </div>
+              </div>
+            ))}
           </div>
+        ) : (
+          <>
+            <div className="tab-bg mb-8 flex w-[190px] flex-col items-start gap-3 rounded-lg p-1 md:flex-row md:items-start md:border">
+              <div className="flex gap-3 md:flex-row md:items-center">
+                {["all", "pending", "done"].map((tab) => (
+                  <button
+                    key={tab}
+                    className={activeTab === tab ? "active-tab" : "inactive-tab"}
+                    onClick={() => setActiveTab(tab as "all" | "pending" | "done")}
+                  >
+                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-          <input
-            type="text"
-            placeholder="Search by patient name..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-bg mb-4 w-full rounded-lg border p-2 md:w-[300px]"
-          />
+            <input
+              type="text"
+              placeholder="Search by patient name..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-bg mb-4 w-full rounded-lg border p-2 md:w-[300px]"
+            />
 
-          {renderAppointments}
-        </>
-      )}
+            {renderAppointments}
+          </>
+        )}
+      </div>
 
       {isDeleteModalOpen && (
         <DeleteTestModal
