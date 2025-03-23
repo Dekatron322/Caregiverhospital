@@ -37,7 +37,7 @@
 }
 
 body {
-  background-color: #ffffff;
+  background-color: #f4f7f9;
   font-family: "Sen";
 
   color: #1e1e1e;
@@ -53,7 +53,7 @@ body {
 
 .sidebar {
   transition: width 0.3s;
-  background-color: #ebf0f0;
+  background-color: #ffffff;
 }
 
 .dashboard-style {
@@ -69,7 +69,7 @@ body {
 
 [data-theme="dark"] .sidebar {
   transition: width 0.3s;
-  background-color: #171818;
+  background-color: #0e161a;
 }
 
 .active-tab {
@@ -193,7 +193,7 @@ body {
 }
 
 [data-theme="dark"] body {
-  background-color: #000000;
+  background-color: #151e22;
   color: #fbfafc;
 }
 
@@ -202,11 +202,11 @@ body {
 }
 
 .button-primary {
-  @apply flex items-center justify-center rounded-sm bg-[#131414] px-10 text-[#FFFFFF] transition-colors duration-500 hover:bg-[#46FFA6] hover:text-[#000000] focus:bg-[#46FFA6] focus:text-[#000000]  active:bg-[#087A43] max-sm:h-10 max-sm:w-full;
+  @apply flex items-center justify-center rounded-sm bg-[#151E22] px-10 text-[#FFFFFF] transition-colors duration-500 hover:bg-[#05F29A] hover:text-[#151E22] focus:bg-[#46FFA6] focus:text-[#000000]  active:bg-[#087A43] max-sm:h-10 max-sm:w-full;
 }
 
 .button-danger {
-  @apply flex items-center justify-center rounded-sm bg-[#601410] px-10 text-[#FFFFFF] transition-colors hover:bg-[#000000] hover:text-[#FFFFFF] focus:bg-[#2952CC] active:bg-[#061E66]  max-sm:h-10 max-sm:w-full;
+  @apply flex items-center justify-center rounded-sm bg-[#D82E2E] px-10 text-[#FFFFFF] transition-colors duration-200 hover:bg-[#601410] hover:text-[#FFFFFF] focus:bg-[#2952CC] active:bg-[#061E66]  max-sm:h-10 max-sm:w-full;
 }
 
 .button-secondary {
@@ -214,7 +214,7 @@ body {
 }
 
 [data-theme="dark"] .button-primary {
-  @apply flex items-center justify-center rounded-sm border bg-transparent px-10 text-[#FFFFFF] transition-colors duration-500 hover:border-[#46FFA6] hover:bg-[#46FFA6] hover:text-[#000000] focus:bg-[#46FFA6] focus:text-[#000000]  active:bg-[#087A43]  max-sm:h-10 max-sm:w-full;
+  @apply flex items-center justify-center rounded-sm border bg-[#05F29A] px-10 text-[#151E22] transition-colors duration-500 hover:border-[#46FFA6] hover:bg-[#46FFA6] hover:text-[#000000] focus:bg-[#46FFA6] focus:text-[#000000]  active:bg-[#087A43]  max-sm:h-10 max-sm:w-full;
 }
 
 .button-outline {

@@ -164,12 +164,12 @@ export default function Dashboard() {
           <div className="flex w-screen flex-col">
             <DashboardNav />
 
-            <div className="px-16 py-4 max-md:px-3 md:mt-10">
+            <div className="px-12 py-4 max-md:px-3 md:mt-10">
               <h4 className="font-semibold">Statistics</h4>
             </div>
-            <div className="flex gap-2 px-16 max-md:grid max-md:grid-cols-2 max-md:px-3">
+            <div className=" flex gap-4 px-12 max-md:grid max-md:grid-cols-2 max-md:px-3">
               {statisticsCards.map((card, index) => (
-                <div key={index} className="w-full rounded border-[0.5px] p-4 shadow">
+                <div key={index} className="sidebar w-full rounded border-[0.5px] p-4 shadow">
                   <div className="mb-8 flex justify-between">
                     <h6 className="font-bold">{card.title}</h6>
                     <Image src={card.icon} height={30} width={30} alt={card.title.toLowerCase()} />

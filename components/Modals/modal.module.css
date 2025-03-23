@@ -6,6 +6,7 @@
   height: 100%;
   background: rgba(208, 208, 208, 0.8);
   display: flex;
+  overflow: hidden;
   align-items: center;
   justify-content: center;
 }
@@ -26,6 +27,7 @@
   height: 100%;
   background: rgba(208, 208, 208, 0.8);
   display: flex;
+  overflow: hidden;
   align-items: start;
   justify-content: end;
 }
@@ -108,11 +110,12 @@
 }
 
 .deleteModalContent {
-  background: #f9dedc;
+  background: #ffffff;
   color: #1e1e1e;
   border-radius: 5px;
-  max-width: 500px;
+  max-width: 376px;
   width: 100%;
+  overflow: hidden;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   margin-right: 16px;
   margin-left: 16px;

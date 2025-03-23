@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
 import styles from "./modal.module.css"
 import { LiaTimesSolid } from "react-icons/lia"
+import CancelDelete from "public/svgs/cancel-delete"
 
 interface DeleteDepartmentModalProps {
   isOpen: boolean
@@ -40,14 +41,15 @@ const DeleteDepartmentModal: React.FC<DeleteDepartmentModalProps> = ({
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.deleteModalContent}>
-        <div className="px-6 py-6">
+        <div className=" bg-[#F5F8FA] p-4">
           <div className="flex items-center justify-between">
             <h6 className="text-lg font-medium">Delete Department</h6>
-            <div className="border-black  hover:rounded-md hover:border">
-              <LiaTimesSolid className="m-1 cursor-pointer" onClick={onClose} />
+            <div className="m-1 cursor-pointer" onClick={onClose}>
+              <CancelDelete />
             </div>
           </div>
-
+        </div>
+        <div className="p-4">
           <div className="my-6">
             <p>Are you sure you want to delete this department? All Data from this department will be lost.</p>
           </div>

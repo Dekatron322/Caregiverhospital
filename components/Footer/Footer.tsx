@@ -23,7 +23,7 @@ const Footer = () => {
     return null
   }
   return (
-    <div className="mt-auto flex justify-between border-t max-md:hidden">
+    <div className="sidebar mt-auto flex justify-between border-t max-md:hidden">
       <div className="flex gap-6 px-16 py-4">
         <Link href="/" className="text-xs font-bold">
           Privacy Policy

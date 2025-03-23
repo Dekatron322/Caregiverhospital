@@ -147,7 +147,7 @@ const DashboardNav: React.FC = () => {
 
   return (
     <>
-      <nav className="hidden border-b px-16 py-4 md:block">
+      <nav className="sidebar hidden border-b px-16 py-4 md:block">
         <div className="flex items-center justify-between">
           <h5 className="font-bold capitalize">Admin Dashboard</h5>
 

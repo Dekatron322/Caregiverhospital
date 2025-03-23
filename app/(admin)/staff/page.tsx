@@ -1,4 +1,5 @@
-"use client"
+"use client" // Mark this as a client component
+
 import { useEffect, useState } from "react"
 import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
@@ -133,7 +134,7 @@ export default function Staff() {
           <div className="flex w-screen flex-col">
             <DashboardNav />
             <div className="flex items-center justify-between px-16 pt-4 max-md:px-3">
-              <div className="flex items-center gap-2  ">
+              <div className="flex items-center gap-2">
                 <p className="font-bold">Admin Dashboard</p>
                 <IoIosArrowForward className="max-md:hidden" />
                 <p className="capitalize max-md:hidden">{pathname.split("/").pop()}</p>
@@ -144,17 +145,29 @@ export default function Staff() {
               </Link>
             </div>
             {loading ? (
-              <div className="loading-text flex h-full items-center justify-center">
-                {"loading...".split("").map((letter, index) => (
-                  <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>
-                    {letter}
-                  </span>
+              // Loading state with animate-pulse
+              <div className="my-10 grid grid-cols-2 gap-2 px-16 max-md:mt-4 max-md:grid-cols-1 max-md:px-3">
+                {[1, 2, 3, 4].map((_, index) => (
+                  <div key={index} className="w-full rounded border p-4">
+                    <div className="mb-4 flex justify-between">
+                      <div className="h-6 w-24 animate-pulse rounded bg-gray-200"></div>
+                      <div className="h-12 w-12 animate-pulse rounded-full bg-gray-200"></div>
+                    </div>
+                    <div className="flex justify-between">
+                      <div className="h-4 w-32 animate-pulse rounded bg-gray-200"></div>
+                      <div className="h-4 w-8 animate-pulse rounded bg-gray-200"></div>
+                    </div>
+                    <div className="mt-4 flex w-full gap-2">
+                      <div className="h-12 w-full animate-pulse rounded bg-gray-200"></div>
+                      <div className="h-12 w-12 animate-pulse rounded bg-gray-200"></div>
+                    </div>
+                  </div>
                 ))}
               </div>
             ) : (
-              <div className="my-10 grid grid-cols-2 gap-2 px-16 max-md:mt-4 max-md:grid-cols-1 max-md:px-3">
+              <div className="my-10 grid gap-4 px-16 max-md:mt-4 max-md:grid-cols-1 max-md:px-3 xl:grid-cols-2 2xl:grid-cols-3">
                 {departments.map((department) => (
-                  <div key={department.id} className="w-full rounded border p-4">
+                  <div key={department.id} className="sidebar w-full rounded-md p-6  shadow-md">
                     <div className="mb-4 flex justify-between">
                       <h6 className="font-bold">{department.name}</h6>
                       <Image src={getDepartmentImage(department.name)} height={48} width={48} alt={department.name} />
@@ -166,13 +179,13 @@ export default function Staff() {
                     <div className="mt-4 flex w-full gap-2 lowercase">
                       <Link
                         href={`staff/${getDepartmentUrl(department.name)}`}
-                        className="button-primary h-[50px] w-full rounded-sm lowercase max-sm:h-[45px]"
+                        className="button-primary h-[50px] w-full rounded-sm max-sm:h-[45px]"
                       >
                         View
                       </Link>
                       <div
                         onClick={() => openDeleteModal(department.id)}
-                        className="flex cursor-pointer content-center items-center justify-center rounded bg-[#F20089] text-[#ffffff] transition-colors duration-500 hover:bg-[#601410] hover:text-[#F2B8B5] max-md:p-2 md:h-[50px] md:w-[50px]"
+                        className="flex cursor-pointer content-center items-center justify-center rounded bg-[#F14848] text-[#ffffff] transition-colors duration-500 hover:bg-[#601410] hover:text-[#F2B8B5] max-md:p-2 md:h-[50px] md:w-[50px]"
                       >
                         <HiOutlineTrash />
                       </div>
@@ -197,16 +210,16 @@ export default function Staff() {
         />
       </section>
       {showSuccessNotification && (
-        <div className="animation-fade-in absolute bottom-16  right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
+        <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
           <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm  text-[#0F920F]">Successfully added</span>
+          <span className="clash-font text-sm text-[#0F920F]">Successfully added</span>
         </div>
       )}
 
       {showDeleteNotification && (
-        <div className="animation-fade-in absolute bottom-16  right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
+        <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
           <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm  text-[#0F920F]">Successfully deleted</span>
+          <span className="clash-font text-sm text-[#0F920F]">Successfully deleted</span>
         </div>
       )}
     </>
