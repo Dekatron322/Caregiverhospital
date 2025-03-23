@@ -11,6 +11,7 @@ import { GoPlus } from "react-icons/go"
 import DepartmentModal from "components/Modals/DepartmentModal"
 import { HiOutlineTrash } from "react-icons/hi2"
 import DeleteDepartmentModal from "components/Modals/DeleteDepartmentModal"
+import { toast, Toaster } from "sonner" // Import Sonner
 
 interface Department {
   id: number
@@ -59,8 +60,6 @@ export default function Staff() {
   const [loading, setLoading] = useState(true)
   const [departments, setDepartments] = useState<Department[]>([])
   const [isAddDepartmentOpen, setIsAddDepartmentOpen] = useState(false)
-  const [showSuccessNotification, setShowSuccessNotification] = useState(false)
-  const [showDeleteNotification, setShowDeleteNotification] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [departmentToDelete, setDepartmentToDelete] = useState<number | null>(null)
 
@@ -115,16 +114,28 @@ export default function Staff() {
   }
 
   const handleHmoSubmissionSuccess = async () => {
-    setShowSuccessNotification(true)
-    setTimeout(() => setShowSuccessNotification(false), 5000)
+    toast.success("Department Added", {
+      description: "The department has been successfully added.",
+      duration: 5000,
+      cancel: {
+        label: "Close",
+        onClick: () => {},
+      },
+    })
     await fetchDepartments()
   }
 
   const handleDeleteSuccess = async () => {
-    setShowDeleteNotification(true)
-    setTimeout(() => setShowDeleteNotification(false), 5000)
+    toast.success("Department Deleted", {
+      description: "The department has been successfully deleted.",
+      duration: 5000,
+      cancel: {
+        label: "Close",
+        onClick: () => {},
+      },
+    })
     closeDeleteModal()
-    handleHmoSubmissionSuccess()
+    await fetchDepartments()
   }
 
   return (
@@ -146,9 +157,9 @@ export default function Staff() {
             </div>
             {loading ? (
               // Loading state with animate-pulse
-              <div className="my-10 grid grid-cols-2 gap-2 px-16 max-md:mt-4 max-md:grid-cols-1 max-md:px-3">
-                {[1, 2, 3, 4].map((_, index) => (
-                  <div key={index} className="w-full rounded border p-4">
+              <div className="my-10 grid gap-2 px-16 max-md:mt-4 max-md:grid-cols-1 max-md:px-3 xl:grid-cols-2 2xl:grid-cols-3">
+                {[1, 2, 3, 4, 5, 6].map((_, index) => (
+                  <div key={index} className="sidebar w-full rounded border p-4">
                     <div className="mb-4 flex justify-between">
                       <div className="h-6 w-24 animate-pulse rounded bg-gray-200"></div>
                       <div className="h-12 w-12 animate-pulse rounded-full bg-gray-200"></div>
@@ -167,7 +178,7 @@ export default function Staff() {
             ) : (
               <div className="my-10 grid gap-4 px-16 max-md:mt-4 max-md:grid-cols-1 max-md:px-3 xl:grid-cols-2 2xl:grid-cols-3">
                 {departments.map((department) => (
-                  <div key={department.id} className="sidebar w-full rounded-md p-6  shadow-md">
+                  <div key={department.id} className="sidebar w-full rounded-md p-6 shadow-md">
                     <div className="mb-4 flex justify-between">
                       <h6 className="font-bold">{department.name}</h6>
                       <Image src={getDepartmentImage(department.name)} height={48} width={48} alt={department.name} />
@@ -209,19 +220,7 @@ export default function Staff() {
           onSubmitSuccess={handleHmoSubmissionSuccess}
         />
       </section>
-      {showSuccessNotification && (
-        <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
-          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm text-[#0F920F]">Successfully added</span>
-        </div>
-      )}
-
-      {showDeleteNotification && (
-        <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
-          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm text-[#0F920F]">Successfully deleted</span>
-        </div>
-      )}
+      <Toaster position="top-center" richColors /> {/* Add Toaster component */}
     </>
   )
 }

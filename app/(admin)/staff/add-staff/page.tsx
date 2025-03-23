@@ -1,4 +1,5 @@
-"use client"
+"use client" // Mark this as a client component
+
 import React, { useEffect, useState } from "react"
 import axios from "axios"
 import { HiMiniStar } from "react-icons/hi2"
@@ -8,13 +9,14 @@ import { RiImageAddLine } from "react-icons/ri"
 import { useRouter } from "next/navigation"
 import { IoMdArrowBack } from "react-icons/io"
 import Image from "next/image"
-
 import CustomDropdown from "components/Patient/CustomDropdown"
+import { toast, Toaster } from "sonner" // Import Sonner
 
 interface RateIconProps {
   filled: boolean
   onClick: () => void
 }
+
 type Department = "Admin" | "Doctors" | "Pharmacy" | "Laboratory" | "Nurses" | "Patients" | "Cashier"
 
 const RateIcon: React.FC<RateIconProps> = ({ filled, onClick }) => {
@@ -28,6 +30,7 @@ const RateIcon: React.FC<RateIconProps> = ({ filled, onClick }) => {
     </span>
   )
 }
+
 const Page: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<Department | "">("")
   const [showDropdown, setShowDropdown] = useState(false)
@@ -39,11 +42,8 @@ const Page: React.FC = () => {
   const [fullName, setFullName] = useState("")
   const [gender, setGender] = useState("")
   const [qualification, setQualification] = useState("")
-
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [showSuccessNotification, setShowSuccessNotification] = useState(false)
-  const [showErrorNotification, setShowErrorNotification] = useState(false)
   const departments: Department[] = ["Admin", "Doctors", "Pharmacy", "Laboratory", "Nurses", "Patients", "Cashier"]
   const router = useRouter()
 
@@ -86,13 +86,29 @@ const Page: React.FC = () => {
         qualification,
       })
       console.log("Response:", response.data)
-      setShowSuccessNotification(true)
-      setTimeout(() => setShowSuccessNotification(false), 5000)
+
+      // Display success toast
+      toast.success("User Registered", {
+        description: "The user has been successfully registered.",
+        duration: 5000,
+        cancel: {
+          label: "Close",
+          onClick: () => {},
+        },
+      })
     } catch (error) {
       console.error("Error:", error)
       setError("Failed to register user")
-      setShowErrorNotification(true)
-      setTimeout(() => setShowErrorNotification(false), 5000)
+
+      // Display error toast
+      toast.error("Registration Failed", {
+        description: "Please check your inputs and try again.",
+        duration: 5000,
+        cancel: {
+          label: "Close",
+          onClick: () => {},
+        },
+      })
     } finally {
       setLoading(false)
     }
@@ -105,9 +121,9 @@ const Page: React.FC = () => {
 
   return (
     <>
-      <section className="h-full ">
-        <div className=" flex min-h-screen ">
-          <div className="flex  w-screen flex-col ">
+      <section className="h-full">
+        <div className="flex min-h-screen">
+          <div className="flex w-screen flex-col">
             <DashboardNav />
             <div className="flex justify-between px-16 pt-4 max-md:px-3">
               <button onClick={handleGoBack} className="redirect">
@@ -115,19 +131,14 @@ const Page: React.FC = () => {
                 <p className="">Go back</p>
               </button>
             </div>
-            <div className="mb-2 flex h-full w-full items-center justify-center">
-              <div className="auth flex rounded-lg md:w-2/3">
+            <div className="mb-2 flex w-full px-16 pt-4 max-md:px-3">
+              <div className="auth flex rounded-lg md:w-2/3 xl:w-[868px]">
                 <div className="w-full px-6 py-8">
                   <h6 className="text-lg font-medium">Register Staff</h6>
                   <p>Please enter staff essentials</p>
-                  <form onSubmit={handleSubmit} className="mt-12">
-                    <div className="mb-3">
-                      <div className="search-bg flex h-20 w-full content-center items-center justify-center rounded border border-dotted">
-                        <RiImageAddLine className="text-[#076fc6]" />
-                      </div>
-                    </div>
-                    <div className="mb-3 flex gap-3">
-                      <div className="search-bg  flex h-[50px] w-[100%] items-center justify-between gap-3  rounded   px-3 py-1  hover:border-[#5378F6]  focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+                  <form onSubmit={handleSubmit} className="mt-4">
+                    <div className="mb-3 grid grid-cols-2 gap-3">
+                      <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                         <input
                           type="text"
                           id="username"
@@ -139,7 +150,7 @@ const Page: React.FC = () => {
                           required
                         />
                       </div>
-                      <div className="search-bg  flex h-[50px] w-[100%] items-center justify-between gap-3  rounded   px-3 py-1  hover:border-[#5378F6]  focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+                      <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                         <input
                           type="password"
                           id="password"
@@ -151,7 +162,7 @@ const Page: React.FC = () => {
                           required
                         />
                       </div>
-                      <div className="search-bg  flex h-[50px] w-[100%] items-center justify-between gap-3  rounded   px-3 py-1  hover:border-[#5378F6]  focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+                      <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                         <input
                           type="email"
                           id="email"
@@ -162,11 +173,8 @@ const Page: React.FC = () => {
                           onChange={(e) => setEmail(e.target.value)}
                         />
                       </div>
-                    </div>
-
-                    <div className="mb-3 grid grid-cols-3 gap-3">
                       <div className="relative">
-                        <div className="search-bg  flex h-[50px] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2 max-sm:w-full ">
+                        <div className="search-bg flex h-[50px] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2 max-sm:w-full">
                           <Image className="icon-style" src="/icons.svg" width={16} height={16} alt="dekalo" />
                           <Image
                             className="dark-icon-style"
@@ -216,32 +224,30 @@ const Page: React.FC = () => {
                         )}
                       </div>
 
-                      <div className="search-bg  flex h-[50px] w-[100%] items-center justify-between gap-3  rounded   px-3 py-1  hover:border-[#5378F6]  focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+                      <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                         <input
                           type="text"
                           id="fullName"
                           placeholder="Full Name"
-                          className="h-[50px] w-full bg-transparent text-xs  outline-none focus:outline-none"
+                          className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
                           style={{ width: "100%", height: "50px" }}
                           value={fullName}
                           onChange={(e) => setFullName(e.target.value)}
                           required
                         />
                       </div>
-                      <div className="search-bg  flex h-[50px] w-[100%] items-center justify-between gap-3  rounded   px-3 py-1  hover:border-[#5378F6]  focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+                      <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                         <input
                           type="text"
                           id="phoneNumber"
                           placeholder="Phone number"
-                          className="h-[50px] w-full bg-transparent text-xs  outline-none focus:outline-none"
+                          className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
                           style={{ width: "100%", height: "50px" }}
                           value={phoneNumber}
                           onChange={(e) => setPhoneNumber(e.target.value)}
                         />
                       </div>
-                    </div>
-                    <div className="mb-3 flex gap-3">
-                      <div className="search-bg  flex h-[50px] w-[100%] items-center justify-between gap-3 rounded  py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+                      <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                         <CustomDropdown
                           options={genderOptions.map((gend) => ({ id: gend.id, name: gend.name }))}
                           selectedOption={gender}
@@ -249,7 +255,7 @@ const Page: React.FC = () => {
                           placeholder="Select Gender"
                         />
                       </div>
-                      <div className="search-bg  flex h-[50px] w-[100%] items-center justify-between gap-3  rounded   px-3 py-1  hover:border-[#5378F6]  focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+                      <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
                         <input
                           type="text"
                           id="qualification"
@@ -262,21 +268,19 @@ const Page: React.FC = () => {
                         />
                       </div>
                     </div>
-                    <div className="mb-3  gap-3">
-                      <div className="search-bg  flex h-[50px] w-[100%] items-center justify-between gap-3  rounded   px-3 py-1  hover:border-[#5378F6]  focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
-                        <input
-                          type="text"
-                          id="address"
-                          placeholder="Address"
-                          className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
-                          style={{ width: "100%", height: "50px" }}
-                          value={address}
-                          onChange={(e) => setAddress(e.target.value)}
-                        />
-                      </div>
+
+                    <div className="mb-3 gap-3">
+                      <textarea
+                        id="address"
+                        placeholder="Address"
+                        className="search-bg min-h-40 w-full rounded-md bg-transparent p-2 text-xs outline-none focus:outline-none"
+                        style={{ width: "100%", height: "50px" }}
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                      ></textarea>
                     </div>
                     <button
-                      className="button-primary h-[50px] w-full rounded-md  max-sm:h-[45px]"
+                      className="button-primary h-[50px] w-full rounded-md max-sm:h-[45px]"
                       type="submit"
                       disabled={loading}
                     >
@@ -290,18 +294,7 @@ const Page: React.FC = () => {
           </div>
         </div>
       </section>
-      {showSuccessNotification && (
-        <div className="animation-fade-in absolute bottom-16  right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
-          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm  text-[#0F920F]">User registered successfully</span>
-        </div>
-      )}
-      {showErrorNotification && (
-        <div className="animation-fade-in absolute bottom-16  right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#D14343] bg-[#FEE5E5] text-[#D14343] shadow-[#05420514]">
-          <Image src="/check-circle-failed.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm  text-[#D14343]">{error}</span>
-        </div>
-      )}
+      <Toaster position="top-center" richColors /> {/* Add Toaster component */}
     </>
   )
 }

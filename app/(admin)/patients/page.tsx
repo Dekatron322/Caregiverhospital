@@ -1,4 +1,5 @@
-"use client"
+"use client" // Mark this as a client component
+
 import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io"
@@ -13,6 +14,7 @@ import { GoPlus } from "react-icons/go"
 import { IoAddCircleSharp } from "react-icons/io5"
 import DeletePatientModal from "components/Modals/DeletePatientModal"
 import EditPatientModal from "components/Modals/EditPatientModal"
+import { toast, Toaster } from "sonner" // Import Sonner
 
 export interface Patients {
   id: string
@@ -57,8 +59,6 @@ export default function Patients() {
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [patientToDelete, setPatientToDelete] = useState<Patients | null>(null)
-  const [showSuccessNotification, setShowSuccessNotification] = useState(false)
-  const [showEditedNotification, setShowEditedNotification] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [patientToEdit, setPatientToEdit] = useState<Patients | null>(null)
 
@@ -164,10 +164,28 @@ export default function Patients() {
             prevPatients.map((patient) => (patient.id === updatedPatientData.id ? updatedPatientData : patient))
           )
           closeEditModal()
-          setShowEditedNotification(true)
-          setTimeout(() => setShowEditedNotification(false), 5000)
+
+          // Show success toast
+          toast.success("Patient Updated", {
+            description: "The patient has been successfully updated.",
+            duration: 5000,
+            cancel: {
+              label: "Close",
+              onClick: () => {},
+            },
+          })
         } catch (error) {
           console.error("Error updating patient:", error)
+
+          // Show error toast
+          toast.error("Update Failed", {
+            description: "Failed to update the patient. Please try again.",
+            duration: 5000,
+            cancel: {
+              label: "Close",
+              onClick: () => {},
+            },
+          })
         }
       }
     },
@@ -216,12 +234,27 @@ export default function Patients() {
         // Close the modal
         closeModal()
 
-        // Show success notification
-        setShowSuccessNotification(true)
-        setTimeout(() => setShowSuccessNotification(false), 5000)
+        // Show success toast
+        toast.success("Patient Deleted", {
+          description: "The patient has been successfully deleted.",
+          duration: 5000,
+          cancel: {
+            label: "Close",
+            onClick: () => {},
+          },
+        })
       } catch (error) {
         console.error("Error deleting patient:", error)
-        // Optionally, show an error notification to the user
+
+        // Show error toast
+        toast.error("Delete Failed", {
+          description: "Failed to delete the patient. Please try again.",
+          duration: 5000,
+          cancel: {
+            label: "Close",
+            onClick: () => {},
+          },
+        })
       }
     }
   }, [patientToDelete, closeModal])
@@ -289,11 +322,40 @@ export default function Patients() {
 
             <div className="mb-4 flex h-full flex-col gap-2 px-16 max-sm:px-4">
               {loading ? (
-                <div className="loading-text flex h-full items-center justify-center">
-                  {"loading...".split("").map((letter, index) => (
-                    <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>
-                      {letter}
-                    </span>
+                // Loading state with animate-pulse
+                <div className="grid gap-2">
+                  {[1, 2, 3, 4, 5, 6].map((_, index) => (
+                    <div key={index} className="sidebar flex w-full items-center justify-between rounded-lg border p-2">
+                      <div className="flex items-center gap-1 text-sm font-bold md:w-[20%]">
+                        <div className="h-8 w-8 animate-pulse rounded-full bg-gray-200 max-sm:hidden"></div>
+                      </div>
+                      <div className="flex w-full items-center gap-1 text-sm font-bold">
+                        <div>
+                          <div className="h-4 w-24 animate-pulse rounded bg-gray-200"></div>
+                          <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+                        </div>
+                      </div>
+                      <div className="w-full max-md:hidden">
+                        <div className="h-4 w-16 animate-pulse rounded bg-gray-200"></div>
+                        <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+                      </div>
+                      <div className="w-full max-md:hidden">
+                        <div className="h-4 w-16 animate-pulse rounded bg-gray-200"></div>
+                        <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+                      </div>
+                      <div className="w-full">
+                        <div className="h-4 w-16 animate-pulse rounded bg-gray-200"></div>
+                        <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+                      </div>
+                      <div className="w-full max-md:hidden">
+                        <div className="h-6 w-16 animate-pulse rounded bg-gray-200"></div>
+                      </div>
+                      <div className="flex gap-2">
+                        <div className="h-6 w-6 animate-pulse rounded-full bg-gray-200"></div>
+                        <div className="h-6 w-6 animate-pulse rounded-full bg-gray-200"></div>
+                        <div className="h-6 w-6 animate-pulse rounded-full bg-gray-200"></div>
+                      </div>
+                    </div>
                   ))}
                 </div>
               ) : filteredPatients.length === 0 ? (
@@ -315,7 +377,7 @@ export default function Patients() {
                     {filteredPatients.map((patient) => (
                       <div
                         key={patient.id}
-                        className="mb-2 flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
+                        className="sidebar mb-2 flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
                       >
                         <div className="flex items-center gap-1 text-sm font-bold md:w-[20%]">
                           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46FFA6] max-sm:hidden">
@@ -372,25 +434,24 @@ export default function Patients() {
                       <IoIosArrowBack />
                     </button>
                     <p>Page {currentPage}</p>
-                    <button onClick={() => setCurrentPage((prev) => prev + 1)} className="rounded bg-[#46ffac] p-2">
+                    <button
+                      onClick={() => setCurrentPage((prev) => prev + 1)}
+                      className="rounded bg-[#46ffac] p-2 text-black"
+                    >
                       <IoIosArrowForward />
                     </button>
                   </div>
                 </div>
               )}
-
-              <Footer />
             </div>
           </div>
         </div>
-
         <DeletePatientModal
           isOpen={isModalOpen}
           onClose={closeModal}
           onConfirm={confirmDelete}
           patientName={patientToDelete?.name || ""}
         />
-
         {patientToEdit && (
           <EditPatientModal
             isOpen={isEditModalOpen}
@@ -399,21 +460,9 @@ export default function Patients() {
             patient={patientToEdit}
           />
         )}
-
-        {showSuccessNotification && (
-          <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
-            <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
-            <span className="clash-font text-sm text-[#0F920F]">Deleted Successfully</span>
-          </div>
-        )}
-
-        {showEditedNotification && (
-          <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
-            <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
-            <span className="clash-font text-sm text-[#0F920F]">Updated Successfully</span>
-          </div>
-        )}
+        <Toaster position="top-center" richColors /> {/* Add Toaster component */}
       </div>
+      <Footer />
     </section>
   )
 }

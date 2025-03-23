@@ -1,7 +1,8 @@
-"use client" // Add this directive to ensure the code runs on the client-side
+"use client" // Ensure this runs on the client-side
 
 import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import { toast } from "sonner" // Import Sonner toast
 import AdmissionModal from "components/Modals/AdmissionModal"
 import AppointmentModal from "components/Modals/AppointmentModal"
 import DashboardNav from "components/Navbar/DashboardNav"
@@ -68,14 +69,11 @@ export default function PatientDetailPage() {
   const [patientDetail, setPatientDetail] = useState<PatientDetail | null>(null)
   const [isAdmissionOpen, setIsAdmissionOpen] = useState(false)
   const [isAppointmentOpen, setIsAppointmentOpen] = useState(false)
-  const [showSuccessNotification, setShowSuccessNotification] = useState(false)
-  const [showDeleteNotification, setShowDeleteNotification] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
     const fetchPatientDetails = async () => {
       const patientId = localStorage.getItem("selectedPatientId")
-
       if (!patientId) {
         console.error("No patient ID found in localStorage")
         return
@@ -93,7 +91,6 @@ export default function PatientDetailPage() {
         console.error("Error fetching patient details:", error)
       }
     }
-
     fetchPatientDetails()
   }, [])
 
@@ -118,14 +115,16 @@ export default function PatientDetailPage() {
   }
 
   const handleHmoSubmissionSuccess = () => {
-    setShowSuccessNotification(true)
-    setTimeout(() => setShowSuccessNotification(false), 5000)
+    toast.success("Successfully added") // Sonner toast for success
     refreshPatientDetails()
+  }
+
+  const handleDeleteSuccess = () => {
+    toast.success("Successfully deleted") // Sonner toast for delete
   }
 
   const refreshPatientDetails = async () => {
     const patientId = localStorage.getItem("selectedPatientId")
-
     if (!patientId) {
       console.error("No patient ID found in localStorage")
       return
@@ -149,13 +148,76 @@ export default function PatientDetailPage() {
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
             <DashboardNav />
-            <div className="loading-text flex h-full items-center justify-center">
-              {"loading...".split("").map((letter, index) => (
-                <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>
-                  {letter}
-                </span>
-              ))}
+            <div className="px-16 max-md:px-3 sm:py-10">
+              <div className="animate-pulse">
+                <div className="h-10 w-24 rounded-md bg-gray-200"></div>
+              </div>
+              <div className="pt-10">
+                <div className="mb-3 grid w-full grid-cols-4 gap-2 max-sm:grid-cols-2">
+                  {[...Array(4)].map((_, index) => (
+                    <div
+                      key={index}
+                      className="sidebar flex w-full flex-col items-center justify-center rounded-md border py-3 shadow-md"
+                    >
+                      <div className="h-10 w-10 rounded-full bg-gray-200"></div>
+                      <div className="mt-2 h-4 w-20 rounded bg-gray-200"></div>
+                      <div className="mt-2 h-4 w-16 rounded bg-gray-200"></div>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex justify-between gap-2 max-md:flex-col">
+                  <div className="md:w-1/4">
+                    <div className="sidebar flex flex-col justify-center rounded-md border px-4 py-8">
+                      <div className="flex items-center justify-center">
+                        <div className="h-14 w-14 rounded-full bg-gray-200"></div>
+                      </div>
+                      <div className="mt-3 h-4 w-24 rounded bg-gray-200"></div>
+                      <div className="mt-2 h-4 w-32 rounded bg-gray-200"></div>
+                      <div className="mt-2 h-4 w-40 rounded bg-gray-200"></div>
+                      <div className="my-4 w-full border"></div>
+                      <div className="space-y-2">
+                        {[...Array(5)].map((_, index) => (
+                          <div key={index} className="flex justify-between">
+                            <div className="h-4 w-16 rounded bg-gray-200"></div>
+                            <div className="h-4 w-16 rounded bg-gray-200"></div>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mt-6 flex w-full gap-2">
+                        <div className="h-10 w-[60%] rounded-md bg-gray-200"></div>
+                        <div className="h-10 w-[40%] rounded-md bg-gray-200"></div>
+                      </div>
+                    </div>
+                    <div className="py-2">
+                      <div className="h-4 w-24 rounded bg-gray-200"></div>
+                      <div className="mt-2 h-4 w-full rounded bg-gray-200"></div>
+                    </div>
+                    <div className="py-2">
+                      <div className="h-4 w-24 rounded bg-gray-200"></div>
+                      <div className="mt-2 h-4 w-full rounded bg-gray-200"></div>
+                    </div>
+                  </div>
+                  <div className="mb-6  md:w-3/4">
+                    <div className="mb-3 h-8 w-64 animate-pulse rounded bg-gray-200"></div>
+                    <div className="mb-3 h-6 w-40 animate-pulse rounded bg-gray-200"></div>
+                    <div className="flex flex-col gap-3">
+                      {[...Array(3)].map((_, index) => (
+                        <div
+                          key={index}
+                          className="sidebar flex w-full items-center justify-between  rounded-lg border p-2"
+                        >
+                          <div className="h-6 w-24 animate-pulse rounded bg-gray-200"></div>
+                          <div className="h-6 w-24 animate-pulse rounded bg-gray-200"></div>
+                          <div className="h-6 w-24 animate-pulse rounded bg-gray-200"></div>
+                          <div className="h-6 w-24 animate-pulse rounded bg-gray-200"></div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
+            <Footer />
           </div>
         </div>
       </section>
@@ -188,37 +250,36 @@ export default function PatientDetailPage() {
                 </button>
                 <div className="pt-10">
                   <div className="mb-3 grid w-full grid-cols-4 gap-2 max-sm:grid-cols-2">
-                    <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
+                    <div className="sidebar flex w-full flex-col items-center justify-center rounded-md border py-3 shadow-md ">
                       <Image src="/pt-dashboard-01.svg" height={40} width={40} alt="" />
                       <h3 className="py-2 font-bold">Heart Rate</h3>
                       <p>{patientDetail.heart_rate || "N/A"} bpm</p>
                     </div>
-                    <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
+                    <div className="sidebar flex w-full flex-col items-center justify-center rounded-md border py-3 shadow-md ">
                       <Image src="/pt-dashboard-02.svg" height={40} width={40} alt="" />
                       <h3 className="py-2 font-bold">Body Temperature</h3>
                       <p>
                         {patientDetail.body_temperature || "N/A"} <small>°C</small>
                       </p>
                     </div>
-                    <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
+                    <div className="sidebar flex w-full flex-col items-center justify-center rounded-md border py-3 shadow-md ">
                       <Image src="/pt-dashboard-03.svg" height={40} width={40} alt="" />
                       <h3 className="py-2 font-bold">Glucose Level</h3>
                       <p>{patientDetail.glucose_level || "N/A"} mg/dl</p>
                     </div>
-                    <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
+                    <div className="sidebar flex w-full flex-col items-center justify-center rounded-md border py-3 shadow-md ">
                       <Image src="/pt-dashboard-04.svg" height={40} width={40} alt="" />
                       <h3 className="py-2 font-bold">Blood Pressure</h3>
                       <p>{patientDetail.blood_pressure || "N/A"} mmHg</p>
                     </div>
                   </div>
                   <div className="flex justify-between gap-2 max-md:flex-col">
-                    <div className="md:w-1/4">
-                      <div className="flex flex-col justify-center rounded-md border px-4 py-8">
+                    <div className="md:w-1/4 ">
+                      <div className="sidebar flex flex-col justify-center rounded-md border px-4 py-8">
                         <div className="flex items-center justify-center">
                           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#46FFA6]">
                             <p className="capitalize text-[#000000]">{patientDetail.name.charAt(0)}</p>
                           </div>
-                          {/* <Image src="/default_patient_image.png" height={60} width={60} alt="Patient Image" /> */}
                         </div>
                         <h1 className="mt-3 text-center font-bold capitalize xl:text-sm">{patientDetail.name}</h1>
                         <p className="text-center text-base font-bold xl:text-sm">
@@ -280,7 +341,6 @@ export default function PatientDetailPage() {
                               ))
                             : "No allergies"}
                         </div>
-                        {/* <p className="mt-4 text-right font-medium">see all</p> */}
                       </div>
 
                       <div className="py-2">
@@ -311,8 +371,8 @@ export default function PatientDetailPage() {
         isOpen={isAdmissionOpen}
         onClose={closeAdmissionModal}
         onSubmitSuccess={handleHmoSubmissionSuccess}
-        patientDetail={patientDetail} // This should now be recognized
-        patientId={patientDetail.id} // Ensure this matches your interface requirements
+        patientDetail={patientDetail}
+        patientId={patientDetail.id}
       />
 
       <AppointmentModal
@@ -322,20 +382,6 @@ export default function PatientDetailPage() {
         patientDetail={patientDetail}
         patientId={patientDetail.id}
       />
-
-      {showSuccessNotification && (
-        <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
-          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm text-[#0F920F]">Successfully added</span>
-        </div>
-      )}
-
-      {showDeleteNotification && (
-        <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
-          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm text-[#0F920F]">Successfully deleted</span>
-        </div>
-      )}
     </>
   )
 }

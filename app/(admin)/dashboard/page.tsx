@@ -114,30 +114,38 @@ export default function Dashboard() {
           <div className="mt-8">
             <p className="mb-4 font-semibold">Appointments</p>
             <div className="flex flex-col gap-2">
-              {[1, 2, 3, 4].map((_, index) => (
-                <div key={index} className="flex w-full items-center justify-between rounded-lg border p-2">
+              <div className="sidebar mb-8 flex w-[190px] flex-col items-start gap-3 rounded-lg p-1 md:flex-row md:items-start md:border">
+                <div className="flex gap-3 md:flex-row md:items-center">
+                  {[...Array(2)].map((_, index) => (
+                    <div key={index} className="h-8 w-20 animate-pulse rounded bg-gray-200"></div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Skeleton Loading for Search Bar */}
+              <div className="search-bg mb-4 h-8 w-full rounded-lg border p-2 md:w-[300px]">
+                <div className="h-4 w-full animate-pulse rounded bg-gray-200"></div>
+              </div>
+              {[...Array(5)].map((_, index) => (
+                <div key={index} className="sidebar flex w-full items-center justify-between rounded-lg border p-2">
                   <div className="flex w-full items-center gap-2">
-                    <div className="h-8 w-8 animate-pulse rounded-full bg-gray-200 max-md:hidden"></div>
-                    <div>
+                    <div className="h-8 w-8 animate-pulse rounded-full bg-gray-200"></div>
+                    <div className="flex flex-col gap-1">
                       <div className="h-4 w-24 animate-pulse rounded bg-gray-200"></div>
-                      <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+                      <div className="h-3 w-16 animate-pulse rounded bg-gray-200"></div>
                     </div>
                   </div>
-                  <div className="flex w-full flex-col">
+                  <div className="flex w-full flex-col gap-1">
                     <div className="h-4 w-24 animate-pulse rounded bg-gray-200"></div>
-                    <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+                    <div className="h-3 w-16 animate-pulse rounded bg-gray-200"></div>
                   </div>
-                  <div className="flex w-full flex-col max-md:hidden">
+                  <div className="flex w-full flex-col gap-1 max-md:hidden">
                     <div className="h-4 w-24 animate-pulse rounded bg-gray-200"></div>
-                    <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
-                  </div>
-                  <div className="md:flex md:w-full md:flex-col md:items-center">
-                    <div className="h-6 w-16 animate-pulse rounded bg-gray-200"></div>
-                    <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+                    <div className="h-3 w-16 animate-pulse rounded bg-gray-200"></div>
                   </div>
                   <div className="flex gap-2">
-                    <div className="h-6 w-6 animate-pulse rounded-full bg-gray-200"></div>
-                    <div className="h-6 w-6 animate-pulse rounded-full bg-gray-200"></div>
+                    <div className="h-6 w-6 animate-pulse rounded bg-gray-200"></div>
+                    <div className="h-6 w-6 animate-pulse rounded bg-gray-200"></div>
                   </div>
                 </div>
               ))}

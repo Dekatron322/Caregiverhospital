@@ -3,7 +3,8 @@ import styles from "./modal.module.css"
 import { Patients } from "app/(admin)/patients/page"
 import { IoChevronDownOutline } from "react-icons/io5"
 import Image from "next/image"
-import { LiaTimesSolid } from "react-icons/lia"
+import CancelDelete from "public/svgs/cancel-delete"
+import { toast, Toaster } from "sonner" // Import Sonner toast notifications
 
 interface HMO {
   id: string
@@ -45,7 +46,28 @@ const EditPatientModal: React.FC<EditPatientModalProps> = ({ isOpen, onClose, on
     }
     console.log("Updated Patient Data:", updatedPatientData)
 
-    onConfirm(updatedPatientData)
+    try {
+      onConfirm(updatedPatientData)
+      // Display success toast notification
+      toast.success("Patient details updated successfully", {
+        description: "The patient's details have been successfully updated.",
+        duration: 5000,
+        cancel: {
+          label: "Close",
+          onClick: () => {},
+        },
+      })
+    } catch (error) {
+      // Display error toast notification if something goes wrong
+      toast.error("Failed to update patient details", {
+        description: "An error occurred while updating the patient details.",
+        duration: 5000,
+        cancel: {
+          label: "Close",
+          onClick: () => {},
+        },
+      })
+    }
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,12 +90,14 @@ const EditPatientModal: React.FC<EditPatientModalProps> = ({ isOpen, onClose, on
 
   return (
     <div className={styles.modalOverlay}>
+      {/* Add Toaster component to render the toast notifications */}
+      <Toaster position="top-center" richColors />
       <div className={styles.modalContent}>
-        <div className="p-4">
+        <div className="sidebar p-4">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold">Edit Patient Details</h2>
-            <div className="border-black hover:rounded-md hover:border">
-              <LiaTimesSolid className="m-1 cursor-pointer" onClick={onClose} />
+            <div className="m-1 cursor-pointer" onClick={onClose}>
+              <CancelDelete />
             </div>
           </div>
           <form>

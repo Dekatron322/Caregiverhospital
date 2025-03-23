@@ -97,7 +97,7 @@ body {
 }
 
 [data-theme="dark"] .search-bg {
-  @apply border-0 bg-[#242428] hover:bg-[#242428];
+  @apply border-0 bg-[#1C2529] hover:bg-[#1C2529];
 }
 
 .dashboard-style {
