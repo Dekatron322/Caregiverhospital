@@ -99,7 +99,7 @@ export default function Dashboard() {
           <h4 className="mb-4 font-semibold">Statistics</h4>
           <div className="flex gap-2 max-md:grid max-md:grid-cols-2">
             {[1, 2, 3, 4].map((_, index) => (
-              <div key={index} className="w-full rounded border-[0.5px] p-4 shadow">
+              <div key={index} className="sidebar w-full rounded border-[0.5px] p-4 shadow">
                 <div className="mb-8 flex justify-between">
                   <div className="h-6 w-1/2 animate-pulse rounded bg-gray-200"></div>
                   <div className="h-8 w-8 animate-pulse rounded-full bg-gray-200"></div>

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react"
 import styles from "./modal.module.css"
 import { LiaTimesSolid } from "react-icons/lia"
 import Image from "next/image"
+import { toast } from "sonner" // Import Sonner toast
 
 interface ReviewModalProps {
   isOpen: boolean
@@ -46,8 +47,6 @@ const UpdateVitalsModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubm
   const [glucoseLevel, setGlucoseLevel] = useState<string>("")
   const [bloodPressure, setBloodPressure] = useState<string>("")
   const [loading, setLoading] = useState(false)
-  const [showSuccessNotification, setShowSuccessNotification] = useState(false)
-  const [showErrorNotification, setShowErrorNotification] = useState(false)
 
   const fetchPatientData = async () => {
     try {
@@ -109,18 +108,36 @@ const UpdateVitalsModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubm
         await fetchPatientData()
 
         onSubmitSuccess()
-        setShowSuccessNotification(true)
-        setTimeout(() => setShowSuccessNotification(false), 5000)
+        toast.success("Vitals updated successfully", {
+          description: "The patient's vitals have been updated.",
+          duration: 5000,
+          cancel: {
+            label: "Close",
+            onClick: () => {},
+          },
+        }) // Sonner success toast
       } else {
         const errorData = await updateResponse.json()
         console.error("Failed to submit form", errorData)
-        setShowErrorNotification(true)
-        setTimeout(() => setShowErrorNotification(false), 5000)
+        toast.error("Error updating vitals", {
+          description: "Please try again or contact support.",
+          duration: 5000,
+          cancel: {
+            label: "Close",
+            onClick: () => {},
+          },
+        })
       }
     } catch (error) {
       console.error("Error submitting form", error)
-      setShowErrorNotification(true)
-      setTimeout(() => setShowErrorNotification(false), 5000)
+      toast.error("Error updating vitals", {
+        description: "Please try again or contact support.",
+        duration: 5000,
+        cancel: {
+          label: "Close",
+          onClick: () => {},
+        },
+      })
     } finally {
       setLoading(false)
       onClose()
@@ -196,18 +213,6 @@ const UpdateVitalsModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubm
           </div>
         </div>
       </div>
-      {showSuccessNotification && (
-        <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
-          <Image src="/check-circle.svg" width={16} height={16} alt="Success" />
-          <span className="text-sm font-normal">Vitals Updated Successfully</span>
-        </div>
-      )}
-      {showErrorNotification && (
-        <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#CC0000] bg-[#FFF1F1] text-[#CC0000] shadow-[#cc000014]">
-          <Image src="/error-triangle.svg" width={16} height={16} alt="Error" />
-          <span className="text-sm font-normal">Error updating vitals</span>
-        </div>
-      )}
     </div>
   )
 }

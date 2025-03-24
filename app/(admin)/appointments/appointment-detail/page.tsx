@@ -14,6 +14,7 @@ import { GoPlus } from "react-icons/go"
 import UpdateVitalsModal from "components/Modals/UpdateVitalsModal"
 import EditNoteIcon from "@mui/icons-material/EditNote"
 import UpdateAllergiesModal from "components/Modals/UpdateAllergiesModal"
+import { Toaster } from "sonner"
 
 interface PatientDetail {
   id: string
@@ -185,6 +186,7 @@ export default function PatientDetailPage() {
 
   return (
     <>
+      <Toaster position="top-center" richColors /> {/* Add Toaster component */}
       <section className="h-full">
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
@@ -203,24 +205,24 @@ export default function PatientDetailPage() {
               </div>
               <div className="pt-10">
                 <div className="mb-3 grid w-full grid-cols-4 gap-2 max-sm:grid-cols-2">
-                  <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
+                  <div className="sidebar flex w-full flex-col items-center justify-center rounded-md border py-3 shadow-md ">
                     <Image src="/pt-dashboard-01.svg" height={40} width={40} alt="" />
                     <h3 className="py-2 font-bold">Heart Rate</h3>
                     <p>{patientDetail.heart_rate || "N/A"} bpm</p>
                   </div>
-                  <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
+                  <div className="sidebar flex w-full flex-col items-center justify-center rounded-md border py-3 shadow-md ">
                     <Image src="/pt-dashboard-02.svg" height={40} width={40} alt="" />
                     <h3 className="py-2 font-bold">Body Temperature</h3>
                     <p>
                       {patientDetail.body_temperature || "N/A"} <small>°C</small>
                     </p>
                   </div>
-                  <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
+                  <div className="sidebar flex w-full flex-col items-center justify-center rounded-md border py-3 shadow-md ">
                     <Image src="/pt-dashboard-03.svg" height={40} width={40} alt="" />
                     <h3 className="py-2 font-bold">Glucose Level</h3>
                     <p>{patientDetail.glucose_level || "N/A"} mg/dl</p>
                   </div>
-                  <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
+                  <div className="sidebar flex w-full flex-col items-center justify-center rounded-md border py-3 shadow-md ">
                     <Image src="/pt-dashboard-04.svg" height={40} width={40} alt="" />
                     <h3 className="py-2 font-bold">Blood Pressure</h3>
                     <p>{patientDetail.blood_pressure || "N/A"} mmHg</p>
@@ -228,9 +230,9 @@ export default function PatientDetailPage() {
                 </div>
                 <div className="flex justify-between gap-2 max-md:flex-col">
                   <div className="md:w-1/4">
-                    <div className="flex flex-col justify-center rounded-md border px-4 py-8">
+                    <div className="sidebar flex flex-col justify-center rounded-md border px-4 py-8 shadow-md">
                       <div className="flex items-center justify-center">
-                        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#46FFA6]">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#46FFA6]">
                           <p className="capitalize text-[#000000]">{patientDetail.name.charAt(0)}</p>
                         </div>
                       </div>
@@ -314,7 +316,7 @@ export default function PatientDetailPage() {
 
                   <div className="mb-6 md:w-3/4">
                     <PatientDetails patientDetail={patientDetail} />
-                    <div className="notes-section mb-4 mt-10 rounded border p-4">
+                    <div className="notes-section sidebar mb-4 mt-10 rounded border p-4">
                       <h3 className="mb-4 font-bold">Patient Notes</h3>
                       {patientDetail.notes.length > 0 ? (
                         patientDetail.notes.map((note) => (
@@ -336,7 +338,6 @@ export default function PatientDetailPage() {
           </div>
         </div>
       </section>
-
       <UpdateAllergiesModal
         isOpen={isUpdateAllergiesOpen}
         onClose={closeUpdateAllergiesModal}
@@ -363,8 +364,7 @@ export default function PatientDetailPage() {
         patientDetail={patientDetail}
         patientId={patientDetail.id}
       />
-
-      {showSuccessNotification && (
+      {/* {showSuccessNotification && (
         <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
           <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
           <span className="clash-font text-sm text-[#0F920F]">Successfully added</span>
@@ -376,7 +376,7 @@ export default function PatientDetailPage() {
           <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
           <span className="clash-font text-sm text-[#0F920F]">Successfully deleted</span>
         </div>
-      )}
+      )} */}
     </>
   )
 }

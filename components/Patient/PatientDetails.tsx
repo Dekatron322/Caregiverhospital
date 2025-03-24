@@ -145,7 +145,7 @@ const PatientDetails: React.FC<PatientDetailsProps> = ({ patientDetail }) => {
       {filteredList.map((appointment) => (
         <div
           key={appointment.id}
-          className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
+          className="sidebar flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
         >
           <div className="flex w-full items-center gap-1 text-sm font-bold">
             <div>
@@ -178,33 +178,35 @@ const PatientDetails: React.FC<PatientDetailsProps> = ({ patientDetail }) => {
       {filteredPrescription.map((prescription) => (
         <div
           key={prescription.id}
-          className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
+          className="sidebar flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
         >
-          <div className="">
+          <div className="w-1/2">
             <p className="text-sm font-bold">{prescription.doctor_name}</p>
             <small className="text-xm ">Doctor</small>
           </div>
-          <div className="">
+          <div className="w-full">
             <p className="text-sm font-bold">{prescription.name}</p>
             <small className="text-xm ">Medication name</small>
           </div>
-          <div className="max-md:hidden">
+          <div className="w-full max-md:hidden">
             <p className="text-sm font-bold">{prescription.category}</p>
             <small className="text-xm ">Category</small>
           </div>
-          <div className="max-md:hidden">
+          <div className="w-full max-md:hidden">
             <p className="text-sm font-bold">{prescription.unit}</p>
             <small className="text-xm ">Quantity</small>
           </div>
-          <div className="max-md:hidden">
+          <div className="w-full max-md:hidden">
             <p className="text-sm font-bold">{prescription.dosage}</p>
             <small className="text-xm ">Dosage</small>
           </div>
-          <div className="max-md:hidden">
+          <div className=" max-md:hidden">
             <p className="text-sm font-bold">{prescription.usage}</p>
             <small className="text-xm ">Usage</small>
           </div>
-          <PiDotsThree />
+          {/* <div>
+            <PiDotsThree />
+          </div> */}
         </div>
       ))}
     </div>
@@ -213,7 +215,10 @@ const PatientDetails: React.FC<PatientDetailsProps> = ({ patientDetail }) => {
   const renderMedicalRecord = () => (
     <div className="flex flex-col gap-2">
       {filteredMedicalRecords.map((medical) => (
-        <div key={medical.id} className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2">
+        <div
+          key={medical.id}
+          className="sidebar flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
+        >
           <div className="w-full max-md:hidden">
             <p className="text-sm font-bold">{formatDateTime(medical.pub_date)}</p>
             <small className="text-xm ">Date and Time</small>

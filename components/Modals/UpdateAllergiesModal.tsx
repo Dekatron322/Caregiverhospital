@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react"
 import styles from "./modal.module.css"
 import { LiaTimesSolid } from "react-icons/lia"
 import Image from "next/image"
+import CancelDelete from "public/svgs/cancel-delete"
+import { toast } from "sonner" // Import Sonner toast
 
 interface ReviewModalProps {
   isOpen: boolean
@@ -45,8 +47,6 @@ interface PatientData {
 const UpdateAllergiesModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitSuccess, patientId }) => {
   const [allergies, setAllergies] = useState<string>("")
   const [loading, setLoading] = useState(false)
-  const [showSuccessNotification, setShowSuccessNotification] = useState(false)
-  const [showErrorNotification, setShowErrorNotification] = useState(false)
 
   useEffect(() => {
     if (isOpen) {
@@ -107,18 +107,36 @@ const UpdateAllergiesModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onS
       if (updateResponse.ok) {
         onSubmitSuccess()
         onClose()
-        setShowSuccessNotification(true)
-        setTimeout(() => setShowSuccessNotification(false), 5000)
+        toast.success("Allergies updated successfully", {
+          description: "The patient's allergies have been updated.",
+          duration: 5000,
+          cancel: {
+            label: "Close",
+            onClick: () => {},
+          },
+        }) // Sonner success toast
       } else {
         const errorData = await updateResponse.json()
         console.error("Failed to submit form", errorData)
-        setShowErrorNotification(true)
-        setTimeout(() => setShowErrorNotification(false), 5000)
+        toast.error("Error updating allergies", {
+          description: "Please try again or contact support.",
+          duration: 5000,
+          cancel: {
+            label: "Close",
+            onClick: () => {},
+          },
+        })
       }
     } catch (error) {
       console.error("Error submitting form", error)
-      setShowErrorNotification(true)
-      setTimeout(() => setShowErrorNotification(false), 5000)
+      toast.error("Error updating allergies", {
+        description: "Please try again or contact support.",
+        duration: 5000,
+        cancel: {
+          label: "Close",
+          onClick: () => {},
+        },
+      })
     } finally {
       setLoading(false)
     }
@@ -131,11 +149,11 @@ const UpdateAllergiesModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onS
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>
-        <div className="px-6 py-6">
-          <div className="flex items-center justify-between">
+        <div className="p-6">
+          <div className="flex items-center justify-between pb-4">
             <h6 className="text-lg font-medium">Update Allergies </h6>
-            <div className="hover:rounded-md hover:border">
-              <LiaTimesSolid className="m-1 cursor-pointer" onClick={onClose} />
+            <div className="cursor-pointer " onClick={onClose}>
+              <CancelDelete />
             </div>
           </div>
 
@@ -149,6 +167,7 @@ const UpdateAllergiesModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onS
               onChange={handleInputChange}
             />
           </div>
+          <p className="my-2 text-xs">Seperate Allergies with comma</p>
 
           <div className="mt-4 flex w-full gap-6">
             <button
@@ -161,18 +180,6 @@ const UpdateAllergiesModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onS
           </div>
         </div>
       </div>
-      {showSuccessNotification && (
-        <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
-          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm text-[#0F920F]">Allergies updated successfully</span>
-        </div>
-      )}
-      {showErrorNotification && (
-        <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#D14343] bg-[#FEE5E5] text-[#D14343] shadow-[#05420514]">
-          <Image src="/check-circle-failed.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm text-[#D14343]">Error updating allergies</span>
-        </div>
-      )}
     </div>
   )
 }
