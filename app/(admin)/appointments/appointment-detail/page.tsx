@@ -14,7 +14,7 @@ import { GoPlus } from "react-icons/go"
 import UpdateVitalsModal from "components/Modals/UpdateVitalsModal"
 import EditNoteIcon from "@mui/icons-material/EditNote"
 import UpdateAllergiesModal from "components/Modals/UpdateAllergiesModal"
-import { Toaster } from "sonner"
+import { Toaster, toast } from "sonner"
 
 interface PatientDetail {
   id: string
@@ -87,8 +87,6 @@ export default function PatientDetailPage() {
   const [isUpdateVitalsOpen, setIsUpdateVitalsOpen] = useState(false)
   const [isUpdateAllergiesOpen, setIsUpdateAllergiesOpen] = useState(false)
   const [isAppointmentOpen, setIsAppointmentOpen] = useState(false)
-  const [showSuccessNotification, setShowSuccessNotification] = useState(false)
-  const [showDeleteNotification, setShowDeleteNotification] = useState(false)
   const [patientId, setPatientId] = useState<string | null>(null)
   const router = useRouter()
 
@@ -104,6 +102,10 @@ export default function PatientDetailPage() {
       setPatientDetail(data)
     } catch (error) {
       console.error("Error fetching patient details:", error)
+      toast.error("Failed to fetch patient details", {
+        description: "Please try again or contact support.",
+        duration: 5000,
+      })
     }
   }, [])
 
@@ -129,8 +131,10 @@ export default function PatientDetailPage() {
 
   // Handle success notifications
   const handleHmoSubmissionSuccess = useCallback(() => {
-    setShowSuccessNotification(true)
-    setTimeout(() => setShowSuccessNotification(false), 5000)
+    toast.success("Operation successful", {
+      description: "The operation was completed successfully.",
+      duration: 5000,
+    })
     refreshPatientDetails()
   }, [])
 
@@ -165,19 +169,99 @@ export default function PatientDetailPage() {
     return age
   }, [])
 
+  // Loading state
   if (!patientDetail) {
     return (
       <section className="h-full">
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
             <DashboardNav />
-            <div className="loading-text flex h-full items-center justify-center">
-              {"loading...".split("").map((letter, index) => (
-                <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>
-                  {letter}
-                </span>
-              ))}
+            <div className="px-16 max-md:px-3 sm:py-10">
+              {/* Skeleton for the back button and update vitals button */}
+              <div className="flex justify-between">
+                <div className="h-10 w-24 animate-pulse rounded-md bg-gray-200"></div>
+                <div className="h-10 w-32 animate-pulse rounded-md bg-gray-200"></div>
+              </div>
+
+              {/* Skeleton for the vitals grid */}
+              <div className="mb-3 grid w-full grid-cols-4 gap-2 max-sm:grid-cols-2">
+                {[...Array(4)].map((_, index) => (
+                  <div
+                    key={index}
+                    className="sidebar flex h-32 w-full animate-pulse flex-col items-center justify-center rounded-md border bg-gray-200 py-3 shadow-md"
+                  >
+                    <div className="h-10 w-10 animate-pulse rounded-full bg-gray-300"></div>
+                    <div className="mt-2 h-4 w-20 animate-pulse rounded bg-gray-300"></div>
+                    <div className="mt-2 h-4 w-16 animate-pulse rounded bg-gray-300"></div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Skeleton for the main content */}
+              <div className="flex justify-between gap-2 max-md:flex-col">
+                <div className="md:w-1/4">
+                  {/* Skeleton for the patient profile card */}
+                  <div className="sidebar flex animate-pulse flex-col justify-center rounded-md border px-4 py-8 shadow-md">
+                    <div className="flex items-center justify-center">
+                      <div className="h-12 w-12 animate-pulse rounded-full bg-gray-300"></div>
+                    </div>
+                    <div className="mt-3 h-4 w-3/4 animate-pulse rounded bg-gray-300"></div>
+                    <div className="mt-2 h-4 w-1/2 animate-pulse rounded bg-gray-300"></div>
+                    <div className="my-4 flex w-full border"></div>
+                    {[...Array(5)].map((_, index) => (
+                      <div key={index} className="flex justify-between pb-2">
+                        <div className="h-4 w-16 animate-pulse rounded bg-gray-300"></div>
+                        <div className="h-4 w-16 animate-pulse rounded bg-gray-300"></div>
+                      </div>
+                    ))}
+                    <div className="mt-6 flex w-full gap-2">
+                      <div className="h-10 w-3/5 animate-pulse rounded-md bg-gray-300"></div>
+                      <div className="h-10 w-2/5 animate-pulse rounded-md bg-gray-300"></div>
+                    </div>
+                  </div>
+
+                  {/* Skeleton for the allergies section */}
+                  <div className="py-2">
+                    <div className="flex justify-between">
+                      <div className="h-4 w-20 animate-pulse rounded bg-gray-300"></div>
+                      <div className="h-6 w-6 animate-pulse rounded bg-gray-300"></div>
+                    </div>
+                    <div className="mt-2 flex flex-wrap">
+                      {[...Array(2)].map((_, index) => (
+                        <div key={index} className="w-1/2">
+                          <div className="m-1 h-8 animate-pulse rounded bg-gray-300"></div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Skeleton for the next of kin section */}
+                  <div className="py-2">
+                    <div className="h-4 w-24 animate-pulse rounded bg-gray-300"></div>
+                    <div className="mt-2 flex justify-between">
+                      <div className="h-4 w-32 animate-pulse rounded bg-gray-300"></div>
+                      <div className="h-6 w-6 animate-pulse rounded bg-gray-300"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mb-6 md:w-3/4">
+                  {/* Skeleton for the patient details section */}
+                  <div className="sidebar h-96 animate-pulse rounded border bg-gray-200 p-4"></div>
+
+                  {/* Skeleton for the patient notes section */}
+                  <div className="notes-section sidebar mb-4 mt-10 h-48 animate-pulse rounded border bg-gray-200 p-4">
+                    <div className="h-4 w-24 animate-pulse rounded bg-gray-300"></div>
+                    <div className="mt-4 space-y-2">
+                      {[...Array(3)].map((_, index) => (
+                        <div key={index} className="h-4 w-full animate-pulse rounded bg-gray-300"></div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
+            <Footer />
           </div>
         </div>
       </section>
@@ -364,19 +448,6 @@ export default function PatientDetailPage() {
         patientDetail={patientDetail}
         patientId={patientDetail.id}
       />
-      {/* {showSuccessNotification && (
-        <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
-          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm text-[#0F920F]">Successfully added</span>
-        </div>
-      )}
-
-      {showDeleteNotification && (
-        <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
-          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm text-[#0F920F]">Successfully deleted</span>
-        </div>
-      )} */}
     </>
   )
 }
