@@ -1,11 +1,9 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import styles from "./modal.module.css"
 import { Patient } from "utils"
-import { HiMiniStar } from "react-icons/hi2"
-import { LiaTimesSolid } from "react-icons/lia"
-import Image from "next/image"
-
+import { toast } from "sonner" // Import Sonner toast
 import CustomDropdown from "components/Patient/CustomDropdown"
+import CancelDelete from "public/svgs/cancel-delete"
 
 const wardOptions = [
   { id: "1", name: "Male Recovery" },
@@ -85,8 +83,6 @@ const AdmissionModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitS
   const [ward, setWard] = useState<string>("")
   const [reason, setReason] = useState<string>("")
   const [loading, setLoading] = useState(false)
-  const [showSuccessNotification, setShowSuccessNotification] = useState(false)
-  const [showErrorNotification, setShowErrorNotification] = useState(false)
 
   if (!isOpen) return null
 
@@ -111,17 +107,35 @@ const AdmissionModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitS
       if (response.ok) {
         onSubmitSuccess()
         onClose()
-        setShowSuccessNotification(true)
-        setTimeout(() => setShowSuccessNotification(false), 5000)
+        toast.success("Admission successful", {
+          description: "The patient has been admitted successfully.",
+          duration: 5000,
+          cancel: {
+            label: "Close",
+            onClick: () => {},
+          },
+        }) // Sonner success toast
       } else {
         console.error("Failed to submit form")
-        setShowErrorNotification(true)
-        setTimeout(() => setShowErrorNotification(false), 5000)
+        toast.error("Admission failed", {
+          description: "Please try again or contact support.",
+          duration: 5000,
+          cancel: {
+            label: "Close",
+            onClick: () => {},
+          },
+        }) // Sonner error toast
       }
     } catch (error) {
       console.error("Error submitting form", error)
-      setShowErrorNotification(true)
-      setTimeout(() => setShowErrorNotification(false), 5000)
+      toast.error("Admission failed", {
+        description: "An unexpected error occurred. Please try again.",
+        duration: 5000,
+        cancel: {
+          label: "Close",
+          onClick: () => {},
+        },
+      }) // Sonner error toast
     } finally {
       setLoading(false)
     }
@@ -133,8 +147,8 @@ const AdmissionModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitS
         <div className="px-6 py-6">
           <div className="flex items-center justify-between">
             <h6 className="text-lg font-medium">Admission </h6>
-            <div className="hover:rounded-md hover:border">
-              <LiaTimesSolid className="m-1 cursor-pointer" onClick={onClose} />
+            <div className="m-1 cursor-pointer" onClick={onClose}>
+              <CancelDelete />
             </div>
           </div>
           <p>Check in {Patient.find((patient) => patient.id === patientId)?.name}</p>
@@ -176,18 +190,6 @@ const AdmissionModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitS
           </div>
         </div>
       </div>
-      {showSuccessNotification && (
-        <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
-          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm text-[#0F920F]">User registered successfully</span>
-        </div>
-      )}
-      {showErrorNotification && (
-        <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#D14343] bg-[#FEE5E5] text-[#D14343] shadow-[#05420514]">
-          <Image src="/check-circle-failed.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm text-[#D14343]">Error registering user</span>
-        </div>
-      )}
     </div>
   )
 }

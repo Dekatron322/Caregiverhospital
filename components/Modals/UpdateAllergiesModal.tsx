@@ -152,7 +152,7 @@ const UpdateAllergiesModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onS
         <div className="p-6">
           <div className="flex items-center justify-between pb-4">
             <h6 className="text-lg font-medium">Update Allergies </h6>
-            <div className="cursor-pointer " onClick={onClose}>
+            <div className="m-1 cursor-pointer" onClick={onClose}>
               <CancelDelete />
             </div>
           </div>

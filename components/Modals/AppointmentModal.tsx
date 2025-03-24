@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react"
 import styles from "./modal.module.css"
-import { Patient } from "utils"
 import { HiMiniStar } from "react-icons/hi2"
-import { LiaTimesSolid } from "react-icons/lia"
-import Image from "next/image"
-
+import { toast } from "sonner" // Import Sonner toast
 import CustomDropdown from "components/Patient/CustomDropdown"
+import CancelDelete from "public/svgs/cancel-delete"
 
 interface RateIconProps {
   filled: boolean
@@ -23,6 +21,7 @@ const RateIcon: React.FC<RateIconProps> = ({ filled, onClick }) => {
     </span>
   )
 }
+
 interface PatientDetail {
   id: string
   name: string
@@ -92,8 +91,6 @@ const AppointmentModal: React.FC<ReviewModalProps> = ({
   const [detail, setDetail] = useState<string>("")
   const [loading, setLoading] = useState(false)
   const [doctors, setDoctors] = useState<{ id: string; name: string }[]>([])
-  const [showSuccessNotification, setShowSuccessNotification] = useState(false)
-  const [showErrorNotification, setShowErrorNotification] = useState(false)
 
   useEffect(() => {
     if (isOpen) {
@@ -142,17 +139,35 @@ const AppointmentModal: React.FC<ReviewModalProps> = ({
       if (response.ok) {
         onSubmitSuccess()
         onClose()
-        setShowSuccessNotification(true)
-        setTimeout(() => setShowSuccessNotification(false), 5000)
+        toast.success("Appointment booked successfully", {
+          description: "The appointment has been booked successfully.",
+          duration: 5000,
+          cancel: {
+            label: "Close",
+            onClick: () => {},
+          },
+        }) // Sonner success toast
       } else {
         console.error("Failed to submit form", await response.text())
-        setShowErrorNotification(true)
-        setTimeout(() => setShowErrorNotification(false), 5000)
+        toast.error("Appointment booking failed", {
+          description: "Please try again or contact support.",
+          duration: 5000,
+          cancel: {
+            label: "Close",
+            onClick: () => {},
+          },
+        }) // Sonner error toast
       }
     } catch (error) {
       console.error("Error submitting form", error)
-      setShowErrorNotification(true)
-      setTimeout(() => setShowErrorNotification(false), 5000)
+      toast.error("Appointment booking failed", {
+        description: "An unexpected error occurred. Please try again.",
+        duration: 5000,
+        cancel: {
+          label: "Close",
+          onClick: () => {},
+        },
+      }) // Sonner error toast
     } finally {
       setLoading(false)
     }
@@ -164,8 +179,8 @@ const AppointmentModal: React.FC<ReviewModalProps> = ({
         <div className="px-6 py-6">
           <div className="flex items-center justify-between">
             <h6 className="text-lg font-medium">Appointment</h6>
-            <div className="hover:rounded-md hover:border">
-              <LiaTimesSolid className="m-1 cursor-pointer" onClick={onClose} />
+            <div className="m-1 cursor-pointer" onClick={onClose}>
+              <CancelDelete />
             </div>
           </div>
           <p>Books an appointment for {patientDetail.name}</p>
@@ -207,18 +222,6 @@ const AppointmentModal: React.FC<ReviewModalProps> = ({
           </div>
         </div>
       </div>
-      {showSuccessNotification && (
-        <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
-          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm text-[#0F920F]">User registered successfully</span>
-        </div>
-      )}
-      {showErrorNotification && (
-        <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#D14343] bg-[#FEE5E5] text-[#D14343] shadow-[#05420514]">
-          <Image src="/check-circle-failed.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm text-[#D14343]">Error registering user</span>
-        </div>
-      )}
     </div>
   )
 }

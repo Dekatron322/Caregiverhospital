@@ -3,6 +3,7 @@ import styles from "./modal.module.css"
 import { LiaTimesSolid } from "react-icons/lia"
 import Image from "next/image"
 import { toast } from "sonner" // Import Sonner toast
+import CancelDelete from "public/svgs/cancel-delete"
 
 interface ReviewModalProps {
   isOpen: boolean
@@ -150,8 +151,8 @@ const UpdateVitalsModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubm
         <div className="px-6 py-6">
           <div className="flex items-center justify-between">
             <h6 className="text-lg font-medium">Update Vitals </h6>
-            <div className="hover:rounded-md hover:border">
-              <LiaTimesSolid className="m-1 cursor-pointer" onClick={onClose} />
+            <div className="m-1 cursor-pointer" onClick={onClose}>
+              <CancelDelete />
             </div>
           </div>
 
