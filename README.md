@@ -3,7 +3,7 @@
 [
 A comprehensive Hospital Management System (HMS) designed to streamline hospital operations, patient care, and HMO (Health Maintenance Organization) insurance processing. This system automates administrative workflows, enhances patient data management, and ensures seamless HMO claim approvals.🌍
 
-> [!NOTE] > **Dekatron** is a Next.js/Headless experts. Contact me at [cygnux696@gmail.com](https://cygnux696@gmail.com) if you’d like to talk about your project or just to have a chat with us
+> [!NOTE] **Dekatron** is a Next.js/Headless experts. Contact me at [cygnux696@gmail.com](https://cygnux696@gmail.com) if you’d like to talk about your project or just to have a chat with us
 
 ## Features
 
@@ -255,10 +255,6 @@ Contributions are always welcome! To contribute, please follow these steps:
 4. Push your changes to the forked repository.
 5. Create a pull request, and we'll review your changes.
 
-<br />
-<a href="https://discord.gg/fyWtyNKmfX" style="width: 100%; display: flex; justify-content: center;">
-  <img src="https://discordapp.com/api/guilds/1111676875782234175/widget.png?style=banner2" alt="Blazity Discord Banner"/>
-</a>
 <br />
 
 ## 📜 License
