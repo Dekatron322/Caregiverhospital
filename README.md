@@ -1,11 +1,10 @@
 <img align="right" width="360px" height="410px" src="./.github/assets/project-logo-vertical.png">
 
-# Next.js Enterprise Boilerplate </br>  [![GitHub Actions Workflow Status][check-workflow-badge]][check-workflow-badge-link] [![GitHub License][github-license-badge]][github-license-badge-link] [![GitHub contributors][github-contributors-badge]][github-contributors-badge-link] [![Discord][discord-badge]][discord-badge-link] [![Blazity][made-by-blazity-badge]][made-by-blazity-badge-link]
+# Caregivers Hospital </br> [![GitHub Actions Workflow Status][check-workflow-badge]][check-workflow-badge-link] [![GitHub License][github-license-badge]][github-license-badge-link] [![Dekatron][made-by-Dekatron-badge]][made-by-Dekatron-badge-link]
 
-Welcome to the _Next.js Enterprise Boilerplate_, an open-source template for enterprise projects! It's loaded with features that'll help you build a high-performance, maintainable, and enjoyable app. We've done all the heavy lifting for you, so sit back, relax, and get ready to conquer the world with your incredible app! 🌍
+A comprehensive Hospital Management System (HMS) designed to streamline hospital operations, patient care, and HMO (Health Maintenance Organization) insurance processing. This system automates administrative workflows, enhances patient data management, and ensures seamless HMO claim approvals.🌍
 
-> [!NOTE]
-> **Blazity** is a group of Next.js/Headless experts. Contact us at [contact@blazity.com](https://blazity.com) if you’d like to talk about your project or just to have a chat with us
+> [!NOTE] > **Dekatron** is a Next.js/Headless experts. Contact me at [cygnux696@gmail.com](https://cygnux696@gmail.com) if you’d like to talk about your project or just to have a chat with us
 
 ## Features
 
@@ -63,13 +62,13 @@ With this template, you get all the awesomeness you need:
 
 ## 🎯 Getting Started
 
-To get started with this boilerplate, follow these steps:
+To get started with this project, follow these steps:
 
 1. Fork & clone repository:
 
 ```bash
 ## Don't forget to ⭐ star and fork it first :)
-git clone https://github.com/<your_username)/next-enterprise.git
+git clone https://github.com/<your_username>/Caregiverhospital.git
 ```
 
 2. Install the dependencies:
@@ -92,12 +91,6 @@ yarn dev
 brew install pre-commit
 pre-commit install -t commit-msg
 ```
-
-## 🚀 Deployment
-
-Easily deploy your Next.js app with [Vercel](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=github&utm_campaign=next-enterprise) by clicking the button below:
-
-[![Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https://github.com/Blazity/next-enterprise)
 
 ## 📃 Scripts Overview
 
@@ -135,7 +128,7 @@ This will create a `graph.svg` file, which contains a graphical representation o
 
 ## 🧪 Testing
 
-This boilerplate comes with various testing setups to ensure your application's reliability and robustness.
+This project implemnts various testing setups to ensure your application's reliability and robustness.
 
 ### Running Tests
 
@@ -183,11 +176,11 @@ export const FilledForm: Story = {
 
 ### Smoke Testing
 
-In this boilerplate, we use Storybook's out-of-the-box support for smoke testing to verify that components render correctly without any errors. Just run `yarn test-storybook` to perform smoke testing. Remember to write stories in JSX or TSX format only. Smoke testing and a lot of other functionalities dont work well with MDX stories.
+In this Project, we use Storybook's out-of-the-box support for smoke testing to verify that components render correctly without any errors. Just run `yarn test-storybook` to perform smoke testing. Remember to write stories in JSX or TSX format only. Smoke testing and a lot of other functionalities dont work well with MDX stories.
 
 ## 🎨 Styling and Design System
 
-This boilerplate uses Tailwind CSS for styling and CVA for creating a powerful, easy-to-use design system. If you want to learn more about the setup, check out this fantastic video by Vercel:
+This Project uses Tailwind CSS for styling and CVA for creating a powerful, easy-to-use design system. If you want to learn more about the setup, check out this fantastic video by Vercel:
 
 [![Styling and Design System](https://img.youtube.com/vi/T-Zv73yZ_QI/0.jpg)](https://www.youtube.com/watch?v=T-Zv73yZ_QI&ab_channel=Vercel)
 
@@ -199,7 +192,7 @@ Creating variants using traditional CSS can be a tedious task, requiring you to 
 
 ## 💾 State Management
 
-While this boilerplate doesn't include a specific state management library, we believe it's essential for you to choose the one that best suits your project's needs. Here are some libraries we recommend for state management:
+While this project doesn't include a specific state management library, we believe it's essential for you to choose the one that best suits your project's needs. Here are some libraries we recommend for state management:
 
 ### Zustand
 
@@ -263,44 +256,15 @@ Contributions are always welcome! To contribute, please follow these steps:
 4. Push your changes to the forked repository.
 5. Create a pull request, and we'll review your changes.
 
-## Support
-
-If you're looking for help or simply want to share your thoughts about the project, we encourage you to join our Discord community. Here's the link: [https://blazity.com/discord](https://blazity.com/discord). It's a space where we exchange ideas and help one another. Everyone's input is appreciated, and we look forward to welcoming you.
-
 <br />
 <a href="https://discord.gg/fyWtyNKmfX" style="width: 100%; display: flex; justify-content: center;">
   <img src="https://discordapp.com/api/guilds/1111676875782234175/widget.png?style=banner2" alt="Blazity Discord Banner"/>
 </a>
 <br />
 
-
 ## 📜 License
 
 This project is licensed under the MIT License. For more information, see the [LICENSE](./LICENSE) file.
-
-## Contributors
-
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-<table>
-  <tbody>
-    <tr>
-      <td align="center" valign="top" width="14.28%"><a href="https://bstefanski.com/"><img src="https://avatars.githubusercontent.com/u/28964599?v=4?s=100" width="100px;" alt="Bart Stefanski"/><br /><sub><b>Bart Stefanski</b></sub></a><br /><a href="https://github.com/Blazity/next-enterprise/commits?author=bmstefanski" title="Code">💻</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://github.com/jjablonski-it"><img src="https://avatars.githubusercontent.com/u/51968772?v=4?s=100" width="100px;" alt="Jakub Jabłoński"/><br /><sub><b>Jakub Jabłoński</b></sub></a><br /><a href="#infra-jjablonski-it" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
-      <td align="center" valign="top" width="14.28%"><a href="https://neg4n.dev/"><img src="https://avatars.githubusercontent.com/u/57688858?v=4?s=100" width="100px;" alt="Igor Klepacki"/><br /><sub><b>Igor Klepacki</b></sub></a><br /><a href="https://github.com/Blazity/next-enterprise/commits?author=neg4n" title="Documentation">📖</a></td>
-    </tr>
-  </tbody>
-  <tfoot>
-    <tr>
-      <td align="center" size="13px" colspan="7">
-        <img src="https://raw.githubusercontent.com/all-contributors/all-contributors-cli/1b8533af435da9854653492b1327a23a4dbd0a10/assets/logo-small.svg">
-          <a href="https://all-contributors.js.org/docs/en/bot/usage">Add your contributions</a>
-        </img>
-      </td>
-    </tr>
-  </tfoot>
-</table>
 
 <!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
@@ -314,7 +278,6 @@ This project is licensed under the MIT License. For more information, see the [L
 [github-contributors-badge]: https://img.shields.io/github/contributors/blazity/next-enterprise?link=https%3A%2F%2Fgithub.com%2FBlazity%2Fnext-enterprise%2Fgraphs%2Fcontributors
 [discord-badge]: https://img.shields.io/discord/1111676875782234175?color=7b8dcd&link=https%3A%2F%2Fblazity.com%2Fdiscord
 [made-by-blazity-badge]: https://img.shields.io/badge/made_by-Blazity-blue?color=FF782B&link=https://blazity.com/
-
 [check-workflow-badge-link]: https://github.com/Blazity/next-enterprise/actions/workflows/check.yml
 [github-license-badge-link]: https://github.com/Blazity/next-enterprise/blob/main/LICENSE
 [github-contributors-badge-link]: https://github.com/Blazity/next-enterprise/graphs/contributors
