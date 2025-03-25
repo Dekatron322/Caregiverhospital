@@ -1,4 +1,4 @@
-# Caregivers Hospital </br> [![GitHub Actions Workflow Status][check-workflow-badge]][check-workflow-badge-link] [![GitHub License][github-license-badge]][github-license-badge-link] ![Dekatron322][made-by-Dekatron322-badge]][made-by-Dekatron322-badge-link]
+# Caregivers Hospital </br> [![GitHub Actions Workflow Status][check-workflow-badge]][check-workflow-badge-link] [![GitHub License][github-license-badge]][github-license-badge-link]
 
 [
 A comprehensive Hospital Management System (HMS) designed to streamline hospital operations, patient care, and HMO (Health Maintenance Organization) insurance processing. This system automates administrative workflows, enhances patient data management, and ensures seamless HMO claim approvals.🌍
