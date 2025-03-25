@@ -16,7 +16,7 @@ const DeleteTestModal: React.FC<TestModalProps> = ({ title, description, onConfi
       <div className={styles.deleteModalContent}>
         <div className=" bg-[#F5F8FA] p-4">
           <div className="flex items-center justify-between">
-            <h6 className="text-lg font-medium">Delete Department</h6>
+            <h6 className="text-lg font-medium">{title}</h6>
             <div className="m-1 cursor-pointer" onClick={onCancel}>
               <CancelDelete />
             </div>
