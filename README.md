@@ -1,7 +1,6 @@
-<img align="right" width="360px" height="410px" src="./.github/assets/project-logo-vertical.png">
+# Caregivers Hospital </br> [![GitHub Actions Workflow Status][check-workflow-badge]][check-workflow-badge-link] [![GitHub License][github-license-badge]][github-license-badge-link] ![Dekatron322][made-by-Dekatron322-badge]][made-by-Dekatron322-badge-link]
 
-# Caregivers Hospital </br> [![GitHub Actions Workflow Status][check-workflow-badge]][check-workflow-badge-link] [![GitHub License][github-license-badge]][github-license-badge-link] [![Dekatron][made-by-Dekatron-badge]][made-by-Dekatron-badge-link]
-
+[
 A comprehensive Hospital Management System (HMS) designed to streamline hospital operations, patient care, and HMO (Health Maintenance Organization) insurance processing. This system automates administrative workflows, enhances patient data management, and ensures seamless HMO claim approvals.🌍
 
 > [!NOTE] > **Dekatron** is a Next.js/Headless experts. Contact me at [cygnux696@gmail.com](https://cygnux696@gmail.com) if you’d like to talk about your project or just to have a chat with us
