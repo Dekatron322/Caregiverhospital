@@ -14,7 +14,7 @@ import { GoPlus } from "react-icons/go"
 import UpdateVitalsModal from "components/Modals/UpdateVitalsModal"
 import EditNoteIcon from "@mui/icons-material/EditNote"
 import UpdateAllergiesModal from "components/Modals/UpdateAllergiesModal"
-import { Toaster, toast } from "sonner"
+import { toast, Toaster } from "sonner"
 
 interface PatientDetail {
   id: string
