@@ -108,7 +108,7 @@ const IssueRequest = () => {
 
   // Server-side pagination for patients
   const [patientOffset, setPatientOffset] = useState(0)
-  const patientLimit = 100
+  const patientLimit = 250
   const [hasMorePatients, setHasMorePatients] = useState(true)
 
   const [isModalOpen, setIsModalOpen] = useState(false)
