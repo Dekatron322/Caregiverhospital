@@ -116,7 +116,10 @@ const DoctorsAppointments = () => {
   }
 
   const renderAppointmentDetails = (appointment: Appointment) => (
-    <div key={appointment.id} className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2">
+    <div
+      key={appointment.id}
+      className="sidebar flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
+    >
       <div className="flex w-full items-center gap-2">
         <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46ffa6] max-md:hidden">
           <p className="capitalize text-[#000000]">{appointment.patient_name.charAt(0)}</p>
@@ -174,11 +177,41 @@ const DoctorsAppointments = () => {
   return (
     <div className="flex w-full flex-col">
       {isLoading ? (
-        <div className="loading-text flex h-full items-center justify-center">
-          {"loading...".split("").map((letter, index) => (
-            <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>
-              {letter}
-            </span>
+        <div className="flex flex-col gap-2">
+          <div className="sidebar mb-8 flex w-[190px] flex-col items-start gap-3 rounded-lg p-1 md:flex-row md:items-start md:border">
+            <div className="flex gap-3 md:flex-row md:items-center">
+              {[...Array(2)].map((_, index) => (
+                <div key={index} className="h-8 w-20 animate-pulse rounded bg-gray-200"></div>
+              ))}
+            </div>
+          </div>
+
+          {/* Skeleton Loading for Search Bar */}
+          <div className="search-bg mb-4 h-8 w-full rounded-lg border p-2 md:w-[300px]">
+            <div className="h-4 w-full animate-pulse rounded bg-gray-200"></div>
+          </div>
+          {[...Array(5)].map((_, index) => (
+            <div key={index} className="sidebar flex w-full items-center justify-between rounded-lg border p-2">
+              <div className="flex w-full items-center gap-2">
+                <div className="h-8 w-8 animate-pulse rounded-full bg-gray-200"></div>
+                <div className="flex flex-col gap-1">
+                  <div className="h-4 w-24 animate-pulse rounded bg-gray-200"></div>
+                  <div className="h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+                </div>
+              </div>
+              <div className="flex w-full flex-col gap-1">
+                <div className="h-4 w-24 animate-pulse rounded bg-gray-200"></div>
+                <div className="h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+              </div>
+              <div className="flex w-full flex-col gap-1 max-md:hidden">
+                <div className="h-4 w-24 animate-pulse rounded bg-gray-200"></div>
+                <div className="h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+              </div>
+              <div className="flex gap-2">
+                <div className="h-6 w-6 animate-pulse rounded bg-gray-200"></div>
+                <div className="h-6 w-6 animate-pulse rounded bg-gray-200"></div>
+              </div>
+            </div>
           ))}
         </div>
       ) : (
