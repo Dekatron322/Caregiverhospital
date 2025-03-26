@@ -85,11 +85,120 @@ interface PatientDetailPageProps {
   params: { admissionId: string }
 }
 
+const PatientDetailSkeleton = () => {
+  return (
+    <div className="px-16 py-6">
+      <div className="animate-pulse">
+        {/* Back button skeleton */}
+        <div className="mb-10 h-6 w-24 rounded bg-gray-200"></div>
+
+        {/* Header skeleton */}
+        <div className="mt-10 flex items-center justify-between">
+          <div className="h-6 w-24 rounded bg-gray-200"></div>
+          <div className="h-10 w-40 rounded bg-gray-200"></div>
+        </div>
+
+        <div className="pt-10">
+          <div className="flex justify-between gap-4">
+            {/* Left sidebar skeleton */}
+            <div className="w-[30%]">
+              <div className="sidebar flex flex-col justify-center rounded-md border px-4 py-8">
+                <div className="flex items-center justify-center">
+                  <div className="h-10 w-10 rounded-full bg-gray-200"></div>
+                </div>
+                <div className="mx-auto mt-3 h-4 w-3/4 rounded bg-gray-200"></div>
+                <div className="mx-auto mt-2 h-3 w-5/6 rounded bg-gray-200"></div>
+                <div className="sidebar mt-2 flex items-center justify-center gap-2">
+                  <div className="h-4 w-4 rounded bg-gray-200"></div>
+                  <div className="h-3 w-24 rounded bg-gray-200"></div>
+                </div>
+                <div className="my-4 h-px w-full bg-gray-200"></div>
+                <div className="space-y-2">
+                  <div className="sidebar flex justify-between">
+                    <div className="h-3 w-16 rounded bg-gray-200"></div>
+                    <div className="h-3 w-24 rounded bg-gray-200"></div>
+                  </div>
+                  <div className="sidebar flex justify-between">
+                    <div className="h-3 w-16 rounded bg-gray-200"></div>
+                    <div className="h-3 w-24 rounded bg-gray-200"></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Allergies skeleton */}
+              <div className="py-2">
+                <div className="mb-1 h-4 w-24 rounded bg-gray-200"></div>
+                <div className="sidebar flex flex-wrap gap-2">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="h-6 w-16 rounded bg-gray-200"></div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Next of Kin skeleton */}
+              <div className="py-2">
+                <div className="mb-2 h-4 w-24 rounded bg-gray-200"></div>
+                <div className="flex justify-between">
+                  <div className="h-4 w-32 rounded bg-gray-200"></div>
+                  <div className="h-6 w-6 rounded bg-gray-200"></div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right content skeleton */}
+            <div className="mb-2 flex w-full flex-col">
+              <div className="w-[50%]">
+                <div className="mb-6 h-6 w-48 rounded bg-gray-200"></div>
+                <div className="mb-4 h-4 w-32 rounded bg-gray-200"></div>
+                {[...Array(2)].map((_, i) => (
+                  <div key={i} className="mb-4 h-4 w-full rounded bg-gray-200"></div>
+                ))}
+                <div className="mb-6 h-6 w-48 rounded bg-gray-200"></div>
+              </div>
+
+              {[...Array(3)].map((_, i) => (
+                <div
+                  key={i}
+                  className="sidebar mb-2 flex w-full animate-pulse items-center justify-between rounded-lg border p-2"
+                >
+                  <div className="flex w-full items-center gap-2">
+                    <div>
+                      <div className="h-3 w-16 rounded bg-gray-200"></div>
+                      <div className="mt-1 h-2 w-12 rounded bg-gray-200"></div>
+                    </div>
+                  </div>
+                  <div className="w-full">
+                    <div className="h-3 w-24 rounded bg-gray-200"></div>
+                    <div className="mt-1 h-2 w-20 rounded bg-gray-200"></div>
+                  </div>
+                  <div className="w-full">
+                    <div className="h-3 w-24 rounded bg-gray-200"></div>
+                    <div className="mt-1 h-2 w-20 rounded bg-gray-200"></div>
+                  </div>
+                  <div className="w-full">
+                    <div className="h-3 w-16 rounded bg-gray-200"></div>
+                    <div className="mt-1 h-2 w-20 rounded bg-gray-200"></div>
+                  </div>
+                  <div className="w-full">
+                    <div className="h-3 w-32 rounded bg-gray-200"></div>
+                    <div className="mt-1 h-2 w-24 rounded bg-gray-200"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function PatientDetailPage() {
   const [isAdmissionOpen, setIsAdmissionOpen] = useState(false)
   const [patientDetail, setPatientDetail] = useState<PatientDetail | null>(null)
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const [prescriptionUpdated, setPrescriptionUpdated] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
 
   const [searchQuery, setSearchQuery] = useState<string>("")
@@ -100,6 +209,7 @@ export default function PatientDetailPage() {
 
   const fetchPatientDetails = async () => {
     try {
+      setIsLoading(true)
       const admissionId = localStorage.getItem("selectedAdmissionId")
       if (!admissionId) {
         console.error("No admission ID found in localStorage.")
@@ -114,6 +224,8 @@ export default function PatientDetailPage() {
       setPatientDetail(data)
     } catch (error) {
       console.error("Error fetching patient details:", error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -155,7 +267,9 @@ export default function PatientDetailPage() {
           <div className="flex w-screen flex-col">
             <DoctorNav />
 
-            {patientDetail && (
+            {isLoading ? (
+              <PatientDetailSkeleton />
+            ) : patientDetail ? (
               <div className="px-16 py-6">
                 <button onClick={handleGoBack} className="redirect">
                   <IoMdArrowBack />
@@ -171,7 +285,7 @@ export default function PatientDetailPage() {
                 <div className="pt-10">
                   <div className="flex justify-between gap-4">
                     <div className="w-[30%]">
-                      <div className="flex flex-col justify-center rounded-md border px-4 py-8">
+                      <div className="sidebar flex flex-col justify-center rounded-md border px-4 py-8">
                         <div className="flex items-center justify-center">
                           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#46FFA6]">
                             <p className="capitalize text-[#000000] ">{patientDetail.name.charAt(0)}</p>
@@ -195,12 +309,6 @@ export default function PatientDetailPage() {
                             <p className="text-sm">D.O.B</p>
                             <p className="text-sm">{formatDate(patientDetail.dob)}</p>
                           </div>
-
-                          {/* <div className="mt-6 flex w-full gap-2">
-                            <button className="button-primary h-[40px] w-full whitespace-nowrap rounded-md max-sm:h-[40px]">
-                              Check Out
-                            </button>
-                          </div> */}
                         </div>
                       </div>
 
@@ -286,6 +394,10 @@ export default function PatientDetailPage() {
                     </div>
                   </div>
                 </div>
+              </div>
+            ) : (
+              <div className="flex h-full items-center justify-center">
+                <p>No patient data available</p>
               </div>
             )}
             <Footer />
