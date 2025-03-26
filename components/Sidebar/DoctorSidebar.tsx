@@ -11,7 +11,7 @@ const DoctorSideBar = () => {
     <div
       onMouseEnter={() => setIsCollapsed(false)}
       onMouseLeave={() => setIsCollapsed(true)}
-      className={clsx("sidebar flex h-full flex-col justify-between border-0 border-[#424343] max-sm:hidden", {
+      className={clsx("sidebar flex h-full flex-col justify-between border-r  border-[#E6E9EE] max-sm:hidden", {
         "w-20": isCollapsed,
         "w-60": !isCollapsed,
       })}

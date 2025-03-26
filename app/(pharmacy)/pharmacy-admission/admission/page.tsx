@@ -9,7 +9,7 @@ import { IoMdArrowBack } from "react-icons/io"
 import Link from "next/link"
 import { GoPlus } from "react-icons/go"
 import AdministerDrugModal from "components/Modals/AdministerDrugModal"
-import PharmacyNav from "components/Navbar/PharmacyNav"
+import { toast, Toaster } from "sonner"
 
 interface PatientDetail {
   id: string
@@ -83,7 +83,6 @@ interface PatientDetail {
 export default function PatientDetailPage() {
   const [isAdmissionOpen, setIsAdmissionOpen] = useState(false)
   const [patientDetail, setPatientDetail] = useState<PatientDetail | null>(null)
-  const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
@@ -94,6 +93,7 @@ export default function PatientDetailPage() {
 
   const fetchPatientDetails = async () => {
     try {
+      setLoading(true)
       const admissionId = localStorage.getItem("selectedAdmissionId")
       if (!admissionId) {
         console.error("No admission ID found in localStorage.")
@@ -108,6 +108,9 @@ export default function PatientDetailPage() {
       setPatientDetail(data)
     } catch (error) {
       console.error("Error fetching patient details:", error)
+      toast.error("Failed to load patient details")
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -124,10 +127,9 @@ export default function PatientDetailPage() {
   }
 
   const handleHmoSubmissionSuccess = () => {
-    setShowSuccessNotification(true)
+    toast.success("Drug administered successfully")
     setRefreshKey((prevKey) => prevKey + 1)
-    fetchPatientDetails() // Refetch patient details to update the drug list
-    setTimeout(() => setShowSuccessNotification(false), 5000)
+    fetchPatientDetails()
   }
 
   const formatDate = (dateString: string) => {
@@ -142,18 +144,98 @@ export default function PatientDetailPage() {
     return new Date(dateString).toLocaleDateString(undefined, options)
   }
 
+  if (loading) {
+    return (
+      <section className="h-full">
+        <div className="flex min-h-screen">
+          <div className="flex w-screen flex-col">
+            <DashboardNav />
+            <div className="flex h-full items-center justify-center px-16 py-6">
+              <div className="w-full animate-pulse">
+                <div className="mb-8 h-8 w-24 rounded bg-gray-200"></div>
+                <div className="flex justify-between gap-4">
+                  <div className="w-[30%]">
+                    <div className="sidebar rounded-md border px-4 py-8">
+                      <div className="flex items-center justify-center">
+                        <div className="h-10 w-10 rounded-full bg-gray-200"></div>
+                      </div>
+                      <div className="mx-auto mt-3 h-6 w-3/4 rounded bg-gray-200"></div>
+                      <div className="mt-2 h-4 w-full rounded bg-gray-200"></div>
+                      <div className="my-4 flex w-full border"></div>
+                      <div className="space-y-2">
+                        <div className="h-4 w-full rounded bg-gray-200"></div>
+                        <div className="h-4 w-full rounded bg-gray-200"></div>
+                        <div className="h-4 w-full rounded bg-gray-200"></div>
+                      </div>
+                      <div className="mt-6 h-10 w-full rounded bg-gray-200"></div>
+                    </div>
+                    <div className="mt-4 h-24 w-full rounded bg-gray-200"></div>
+                    <div className="mt-4 h-20 w-full rounded bg-gray-200"></div>
+                  </div>
+
+                  <div className="mb-2 flex w-full flex-col">
+                    <div className="w-full">
+                      <div className="mb-6 h-8 w-64 rounded bg-gray-200"></div>
+                      <div className="mb-4 h-6 w-48 rounded bg-gray-200"></div>
+                      <div className="mb-4 h-24 w-full rounded bg-gray-200"></div>
+                      <div className="mb-6 h-8 w-64 rounded bg-gray-200"></div>
+                    </div>
+                    <div className="grid gap-2">
+                      {[1, 2, 3, 4, 5, 6].map((_, index) => (
+                        <div
+                          key={index}
+                          className="sidebar flex w-full items-center justify-between rounded-lg border p-2"
+                        >
+                          <div className="flex items-center gap-1 text-sm font-bold md:w-[20%]">
+                            <div className="h-8 w-8 animate-pulse rounded-full bg-gray-200 max-sm:hidden"></div>
+                          </div>
+                          <div className="flex w-full items-center gap-1 text-sm font-bold">
+                            <div>
+                              <div className="h-4 w-24 animate-pulse rounded bg-gray-200"></div>
+                              <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+                            </div>
+                          </div>
+                          <div className="w-full max-md:hidden">
+                            <div className="h-4 w-16 animate-pulse rounded bg-gray-200"></div>
+                            <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+                          </div>
+                          <div className="w-full max-md:hidden">
+                            <div className="h-4 w-16 animate-pulse rounded bg-gray-200"></div>
+                            <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+                          </div>
+                          <div className="w-full">
+                            <div className="h-4 w-16 animate-pulse rounded bg-gray-200"></div>
+                            <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+                          </div>
+                          <div className="w-full max-md:hidden">
+                            <div className="h-4 w-16 animate-pulse rounded bg-gray-200"></div>
+                            <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+                          </div>
+                          <div className="w-full">
+                            <div className="h-4 w-16 animate-pulse rounded bg-gray-200"></div>
+                            <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
   if (!patientDetail) {
     return (
       <section className="h-full">
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
             <DashboardNav />
-            <div className="loading-text flex h-full items-center justify-center">
-              {"loading...".split("").map((letter, index) => (
-                <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>
-                  {letter}
-                </span>
-              ))}
+            <div className="flex h-full items-center justify-center">
+              <p className="text-gray-500">No patient data found</p>
             </div>
           </div>
         </div>
@@ -166,7 +248,8 @@ export default function PatientDetailPage() {
       <section className="h-full">
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
-            <PharmacyNav />
+            <DashboardNav />
+            <Toaster position="top-right" richColors />
 
             {patientDetail && (
               <div className="px-16 py-6">
@@ -174,17 +257,17 @@ export default function PatientDetailPage() {
                   <IoMdArrowBack />
                   <p className="capitalize">Go back</p>
                 </button>
-                <div className="mt-10 flex items-center justify-between">
+                {/* <div className="mt-10 flex items-center justify-between">
                   <h3 className="font-semibold">Details</h3>
-                  {/* <button onClick={openAdmissionModal} className="add-button">
+                  <button onClick={openAdmissionModal} className="add-button">
                     <p className="text-xs">Administer Drug</p>
                     <GoPlus />
-                  </button> */}
-                </div>
+                  </button>
+                </div> */}
                 <div className="pt-10">
                   <div className="flex justify-between gap-4">
                     <div className="w-[30%]">
-                      <div className="flex flex-col justify-center rounded-md border px-4 py-8">
+                      <div className="sidebar  flex flex-col justify-center rounded-md border px-4 py-8">
                         <div className="flex items-center justify-center">
                           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#46FFA6]">
                             <p className="capitalize text-[#000000]">{patientDetail.name.charAt(0)}</p>
@@ -266,7 +349,7 @@ export default function PatientDetailPage() {
                           {check.drugs.map((drug) => (
                             <div
                               key={drug.id}
-                              className="mb-2 flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
+                              className="sidebar mb-2 flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
                             >
                               <div className="flex w-full items-center gap-2">
                                 <div className="">
@@ -310,12 +393,6 @@ export default function PatientDetailPage() {
           onSubmitSuccess={handleHmoSubmissionSuccess}
           patientId={patientDetail.id}
         />
-      )}
-
-      {showSuccessNotification && (
-        <div className="fixed bottom-4 right-4 z-50 rounded bg-green-500 px-4 py-2 text-white shadow">
-          submission successful!
-        </div>
       )}
 
       <Footer />

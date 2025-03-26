@@ -55,7 +55,7 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({ options, selectedOption
         <MdKeyboardArrowDown />
       </div>
       {isOpen && (
-        <div className="dropdown absolute left-0 top-full z-10 max-h-40 w-full overflow-hidden overflow-y-scroll rounded-md">
+        <div className="search-bg absolute left-0 top-full z-10 max-h-40 w-full overflow-hidden overflow-y-scroll rounded-md">
           <div className={styles.searchContainer}>
             <Image className="icon-style" src="/icons.svg" width={16} height={16} alt="dekalo" />
             <Image className="dark-icon-style" src="/search-dark.svg" width={16} height={16} alt="dekalo" />

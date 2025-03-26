@@ -5,12 +5,12 @@ import axios from "axios"
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet"
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye"
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline"
-import IssueRequestModal from "components/Modals/IssueRequestModal"
-import ViewPrescriptionModal from "components/Modals/ViewPrescriptionModal"
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
-import DeleteTestModal from "components/Modals/DeleteTestModal"
 import Image from "next/image"
 import PaymentStatusModal from "components/Modals/PaymentStatusModal"
+import IssueRequestModal from "components/Modals/IssueRequestModal"
+import ViewPrescriptionModal from "components/Modals/ViewPrescriptionModal"
+import DeleteTestModal from "components/Modals/DeleteTestModal"
 import { toast, Toaster } from "sonner"
 
 interface Prescription {
@@ -109,6 +109,7 @@ const SkeletonLoader = () => {
 }
 
 const IssueRequest = () => {
+  // State variables
   const [activeTab, setActiveTab] = useState("pending")
   const [patients, setPatients] = useState<Patient[]>([])
   const [isLoading, setIsLoading] = useState(false)
@@ -116,15 +117,17 @@ const IssueRequest = () => {
   const [offset, setOffset] = useState(0)
   const limit = 100
   const [hasMore, setHasMore] = useState(true)
+  const [searchQuery, setSearchQuery] = useState("")
 
+  // Modal and selection states
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isPreModalOpen, setIsPreModalOpen] = useState(false)
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null)
   const [selectedPrescription, setSelectedPrescription] = useState<Prescription | null>(null)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [selectedPrescriptionId, setSelectedPrescriptionId] = useState<string | null>(null)
-  const [searchQuery, setSearchQuery] = useState("")
 
+  // Handlers for deletion and modals
   const handleDeleteClick = (id: string) => {
     setSelectedPrescriptionId(id)
     setIsDeleteModalOpen(true)
@@ -144,7 +147,7 @@ const IssueRequest = () => {
       })
       setIsDeleteModalOpen(false)
     } catch (error) {
-      console.error("Error deleting lab test:", error)
+      console.error("Error deleting prescription:", error)
       toast.error("Deletion Failed", {
         description: "Failed to delete the prescription. Please try again.",
         duration: 5000,
@@ -156,6 +159,7 @@ const IssueRequest = () => {
     }
   }
 
+  // Data fetching for patients and procedures
   const fetchPatientsPage = async () => {
     setIsLoading(true)
     try {
@@ -167,6 +171,7 @@ const IssueRequest = () => {
         setHasMore(false)
       } else {
         const newPatients = data.filter((newPatient) => !patients.some((p) => p.id === newPatient.id))
+        // For each patient, remove duplicate prescriptions and sort them (most recent first)
         newPatients.forEach((patient) => {
           const uniquePrescriptions = Array.from(new Map(patient.prescriptions.map((p) => [p.id, p])).values())
           patient.prescriptions = uniquePrescriptions.sort(
@@ -199,6 +204,7 @@ const IssueRequest = () => {
     fetchProcedures()
   }, [])
 
+  // Helper functions
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
       year: "numeric",
@@ -211,15 +217,7 @@ const IssueRequest = () => {
     return new Date(dateString).toLocaleDateString(undefined, options)
   }
 
-  const getProcedureDetails = (procedureName: string) => {
-    return proceduresMap.get(procedureName)
-  }
-
-  const handleIconClick = (patient: Patient, prescription: Prescription) => {
-    setSelectedPatient(patient)
-    setSelectedPrescription(prescription)
-    setIsModalOpen(true)
-  }
+  const getProcedureDetails = (procedureName: string) => proceduresMap.get(procedureName)
 
   const calculateAge = useCallback((dobString: string) => {
     const today = new Date()
@@ -232,17 +230,11 @@ const IssueRequest = () => {
     return age
   }, [])
 
-  const updateIssueStatus = async (prescriptionId: string) => {
-    try {
-      const response = await fetch(`https://api2.caregiverhospital.com/prescription/prescription/${prescriptionId}/`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ issue_status: true }),
-      })
-      if (!response.ok) throw new Error("Failed to update issue status")
-    } catch (error) {
-      console.error("Error updating issue status:", error)
-    }
+  // Modal trigger handlers
+  const handleIconClick = (patient: Patient, prescription: Prescription) => {
+    setSelectedPatient(patient)
+    setSelectedPrescription(prescription)
+    setIsModalOpen(true)
   }
 
   const handleRemoveRedEyeClick = (patient: Patient, prescription: Prescription) => {
@@ -255,10 +247,25 @@ const IssueRequest = () => {
     setSearchQuery(event.target.value)
   }
 
+  // Filter patients based on the search query
   const filteredPatients = useMemo(() => {
     return patients.filter((patient) => patient.name.toLowerCase().includes(searchQuery.toLowerCase()))
   }, [patients, searchQuery])
 
+  // Combine and sort prescriptions from all filtered patients
+  const getSortedPrescriptionsList = (filterFn: (prescription: Prescription) => boolean) => {
+    const prescriptionsList: Array<{ patient: Patient; prescription: Prescription }> = []
+    filteredPatients.forEach((patient) => {
+      patient.prescriptions.filter(filterFn).forEach((prescription) => {
+        prescriptionsList.push({ patient, prescription })
+      })
+    })
+    return prescriptionsList.sort(
+      (a, b) => new Date(b.prescription.pub_date).getTime() - new Date(a.prescription.pub_date).getTime()
+    )
+  }
+
+  // Rendering functions for prescription details
   const renderPrescriptionDetails = (patient: Patient, prescription: Prescription) => {
     const procedureDetails = getProcedureDetails(prescription.code)
     return (
@@ -297,42 +304,36 @@ const IssueRequest = () => {
           <small className="text-xs">Unit</small>
         </div>
         <div className="w-full max-sm:hidden">
-          <p className="text-xs font-bold">{formatDate(prescription?.pub_date || "")}</p>
+          <p className="text-xs font-bold">{formatDate(prescription.pub_date)}</p>
           <small className="text-xs">Date and Time</small>
         </div>
         <div className="flex w-full justify-end gap-2">
-          <>
-            <AccountBalanceWalletIcon onClick={() => handleIconClick(patient, prescription)} />
-            <RemoveRedEyeIcon
-              className="text-[#46FFA6]"
-              onClick={() => handleRemoveRedEyeClick(patient, prescription)}
-            />
-            <DeleteForeverIcon className="text-[#F2B8B5]" onClick={() => handleDeleteClick(prescription.id)} />
-          </>
+          <AccountBalanceWalletIcon onClick={() => handleIconClick(patient, prescription)} />
+          <RemoveRedEyeIcon className="text-[#46FFA6]" onClick={() => handleRemoveRedEyeClick(patient, prescription)} />
+          <DeleteForeverIcon className="text-[#F2B8B5]" onClick={() => handleDeleteClick(prescription.id)} />
         </div>
       </div>
     )
   }
 
-  const renderPendingRequests = () => (
-    <div className="flex flex-col gap-2">
-      {filteredPatients.map((patient) =>
-        patient.prescriptions
-          .filter((prescription) => !prescription.issue_status)
-          .map((prescription) => renderPrescriptionDetails(patient, prescription))
-      )}
-    </div>
-  )
+  // Render functions for pending and issued prescriptions
+  const renderPendingRequests = () => {
+    const pendingPrescriptions = getSortedPrescriptionsList((prescription) => !prescription.issue_status)
+    return (
+      <div className="flex flex-col gap-2">
+        {pendingPrescriptions.map(({ patient, prescription }) => renderPrescriptionDetails(patient, prescription))}
+      </div>
+    )
+  }
 
-  const renderIssuedRequests = () => (
-    <div className="flex flex-col gap-2">
-      {filteredPatients.map((patient) =>
-        patient.prescriptions
-          .filter((prescription) => prescription.issue_status)
-          .map((prescription) => renderPrescriptionDetails(patient, prescription))
-      )}
-    </div>
-  )
+  const renderIssuedRequests = () => {
+    const issuedPrescriptions = getSortedPrescriptionsList((prescription) => prescription.issue_status)
+    return (
+      <div className="flex flex-col gap-2">
+        {issuedPrescriptions.map(({ patient, prescription }) => renderPrescriptionDetails(patient, prescription))}
+      </div>
+    )
+  }
 
   return (
     <div className="flex w-full flex-col">
@@ -376,9 +377,20 @@ const IssueRequest = () => {
       </div>
 
       {hasMore && (
-        <div className="my-4 flex justify-center">
-          <button onClick={fetchPatientsPage} disabled={isLoading} className="btn">
-            {isLoading ? "Loading..." : "Load More"}
+        <div className="mt-4 flex justify-center">
+          <button
+            className="flex items-center justify-center rounded-md bg-blue-500 px-4 py-2 text-white disabled:opacity-50"
+            onClick={fetchPatientsPage}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <div className="flex items-center gap-2">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
+                Loading...
+              </div>
+            ) : (
+              "Load More Patients"
+            )}
           </button>
         </div>
       )}

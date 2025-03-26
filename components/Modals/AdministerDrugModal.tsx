@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react"
 import styles from "./modal.module.css"
 import { HiMiniStar } from "react-icons/hi2"
-import { LiaTimesSolid } from "react-icons/lia"
-import Image from "next/image"
-
 import axios from "axios"
 import CustomDropdown from "components/Patient/CustomDropdown"
+import { toast } from "sonner"
+import CancelDelete from "public/svgs/cancel-delete"
 
 interface RateIconProps {
   filled: boolean
@@ -165,6 +164,7 @@ const AdministerDrugModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSu
           }
         )
         if (response.status === 200 || response.status === 201) {
+          toast.success("Medication administered successfully!")
           onSubmitSuccess()
           onClose()
         } else {
@@ -172,7 +172,7 @@ const AdministerDrugModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSu
         }
       } catch (error) {
         console.error("Error prescribing medication:", error)
-        setError(`Error prescribing medication`)
+        toast.error("Error administering medication")
       }
     }
   }
@@ -189,8 +189,8 @@ const AdministerDrugModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSu
             <h6 className="text-lg font-medium">
               Administer Medication - Nurse. {userDetails?.username || "Loading..."}
             </h6>
-            <div className="hover:rounded-md hover:border">
-              <LiaTimesSolid className="m-1 cursor-pointer" onClick={onClose} />
+            <div className="m-1 cursor-pointer" onClick={onClose}>
+              <CancelDelete />
             </div>
           </div>
 

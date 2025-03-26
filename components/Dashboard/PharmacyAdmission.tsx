@@ -22,6 +22,7 @@ const PharmacyAdmission: React.FC = () => {
   const [activeTab, setActiveTab] = useState<"all" | "checkout" | "checkin">("all")
   const [admissions, setAdmissions] = useState<Admission[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [searchTerm, setSearchTerm] = useState("")
 
   useEffect(() => {
     const fetchAdmissions = async () => {
@@ -37,17 +38,19 @@ const PharmacyAdmission: React.FC = () => {
           patient.check_apps.map((admission: any) => ({
             id: admission.id,
             patient_id: patient.id,
-            name: patient.name, // Access patient's name here
-            image: admission.image || "", // Default to an empty string if image is missing
+            name: patient.name,
+            image: admission.image || "",
             ward: admission.ward,
             reason: admission.reason,
-            checkout_date: admission.checkout_date || "", // Use empty string if no checkout date
+            checkout_date: admission.checkout_date || "",
             pub_date: admission.pub_date,
             time: admission.time,
-            status: admission.checkout_date ? "checkout" : "checkin", // Set status based on checkout_date
+            status: admission.checkout_date ? "checkout" : "checkin",
           }))
         )
-        setAdmissions(formattedData)
+        // Sort by pub_date in descending order (newest first)
+        const sortedData = formattedData.sort((a, b) => new Date(b.pub_date).getTime() - new Date(a.pub_date).getTime())
+        setAdmissions(sortedData)
       } catch (error) {
         console.error("Error fetching admissions:", error)
       } finally {
@@ -79,7 +82,7 @@ const PharmacyAdmission: React.FC = () => {
       {appointments.map((appointment) => (
         <div
           key={appointment.id}
-          className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
+          className="sidebar flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
           onClick={() => handlePatientClick(appointment.patient_id)}
         >
           <div className="flex w-full items-center gap-2 text-sm font-bold">
@@ -115,38 +118,96 @@ const PharmacyAdmission: React.FC = () => {
     </div>
   )
 
-  const filteredAppointments = admissions.filter((appointment) =>
-    activeTab === "all"
-      ? true
-      : activeTab === "checkin"
-      ? appointment.status === "checkin"
-      : appointment.status === "checkout"
-  )
+  const filteredAppointments = admissions.filter((appointment) => {
+    // Filter by tab first
+    const tabFilter =
+      activeTab === "all"
+        ? true
+        : activeTab === "checkin"
+        ? appointment.status === "checkin"
+        : appointment.status === "checkout"
+
+    // Then filter by search term if it exists
+    const searchFilter =
+      searchTerm === "" ||
+      appointment.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      appointment.ward.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      appointment.reason.toLowerCase().includes(searchTerm.toLowerCase())
+
+    return tabFilter && searchFilter
+  })
 
   return (
     <div className="flex h-full flex-col">
       {isLoading ? (
-        <div className="loading-text flex h-full items-center justify-center">
-          {"loading...".split("").map((letter, index) => (
-            <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>
-              {letter}
-            </span>
+        <div className="grid gap-2">
+          <div className="flex justify-between">
+            <div className="h-10 w-64 animate-pulse rounded bg-gray-200"></div>
+            <div className="h-10 w-64 animate-pulse rounded bg-gray-200"></div>
+          </div>
+          {[1, 2, 3, 4, 5, 6].map((_, index) => (
+            <div key={index} className="sidebar flex w-full items-center justify-between rounded-lg border p-2">
+              <div className="flex items-center gap-1 text-sm font-bold md:w-[20%]">
+                <div className="h-8 w-8 animate-pulse rounded-full bg-gray-200 max-sm:hidden"></div>
+              </div>
+              <div className="flex w-full items-center gap-1 text-sm font-bold">
+                <div>
+                  <div className="h-4 w-24 animate-pulse rounded bg-gray-200"></div>
+                  <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+                </div>
+              </div>
+              <div className="w-full max-md:hidden">
+                <div className="h-4 w-16 animate-pulse rounded bg-gray-200"></div>
+                <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+              </div>
+              <div className="w-full max-md:hidden">
+                <div className="h-4 w-16 animate-pulse rounded bg-gray-200"></div>
+                <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+              </div>
+              <div className="w-full">
+                <div className="h-4 w-16 animate-pulse rounded bg-gray-200"></div>
+                <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+              </div>
+              <div className="w-full max-md:hidden">
+                <div className="h-6 w-16 animate-pulse rounded bg-gray-200"></div>
+              </div>
+              <div className="flex gap-2">
+                <div className="h-6 w-6 animate-pulse rounded bg-gray-200"></div>
+              </div>
+            </div>
           ))}
         </div>
       ) : (
         <>
-          <div className="tab-bg mb-8 flex w-[245px] items-center gap-3 rounded-lg p-1 md:border">
-            {["all", "checkin", "checkout"].map((tab) => (
-              <button
-                key={tab}
-                className={`${activeTab === tab ? "active-tab" : "inactive-tab"}`}
-                onClick={() => setActiveTab(tab as typeof activeTab)}
-              >
-                {tab === "all" ? "All" : tab.charAt(0).toUpperCase() + tab.slice(1)}
-              </button>
-            ))}
+          <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="tab-bg flex w-[245px] items-center gap-3 rounded-lg p-1 md:border">
+              {["all", "checkin", "checkout"].map((tab) => (
+                <button
+                  key={tab}
+                  className={`${activeTab === tab ? "active-tab" : "inactive-tab"}`}
+                  onClick={() => setActiveTab(tab as typeof activeTab)}
+                >
+                  {tab === "all" ? "All" : tab.charAt(0).toUpperCase() + tab.slice(1)}
+                </button>
+              ))}
+            </div>
+            <div className="w-full md:w-64">
+              <input
+                type="text"
+                placeholder="Search patients, wards, reasons..."
+                className="w-full rounded-lg border p-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#46ffa6]"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
           </div>
-          {renderAppointments(filteredAppointments)}
+          {filteredAppointments.length > 0 ? (
+            renderAppointments(filteredAppointments)
+          ) : (
+            <div className="flex h-32 items-center justify-center text-gray-500">
+              No admissions found matching your criteria
+            </div>
+          )}
         </>
       )}
     </div>

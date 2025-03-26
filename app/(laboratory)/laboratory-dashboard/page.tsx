@@ -55,7 +55,7 @@ export default function PharmacyDashboard() {
             </div>
 
             <div className="mb-3 grid w-full grid-cols-3 gap-2 px-16 max-sm:grid-cols-1 max-sm:px-3">
-              <div className="auth flex w-full flex-col items-center justify-center rounded border border-[#01A768] pt-2">
+              <div className="sidebar flex w-full flex-col items-center justify-center rounded border border-[#01A768] pt-2">
                 <Image src="/inventory-status.svg" height={40} width={40} alt="" />
                 <h3 className="py-2 font-bold capitalize">{totalTests}</h3>
                 <p>Total Test</p>
@@ -65,7 +65,7 @@ export default function PharmacyDashboard() {
                 </div>
               </div>
 
-              <div className="auth flex w-full flex-col items-center justify-center rounded border border-[#03A9F5] pt-2">
+              <div className="sidebar flex w-full flex-col items-center justify-center rounded border border-[#03A9F5] pt-2">
                 <Image src="/medicines-available.svg" height={40} width={40} alt="" />
                 <h3 className="py-2 font-bold">{approvedTests}</h3>
                 <p>Test Approved</p>
@@ -75,7 +75,7 @@ export default function PharmacyDashboard() {
                 </div>
               </div>
 
-              <div className="auth flex w-full flex-col items-center justify-center rounded border border-[#FED600] pt-2">
+              <div className="sidebar flex w-full flex-col items-center justify-center rounded border border-[#FED600] pt-2">
                 <Image src="/revenue.svg" height={38} width={38} alt="" />
                 <h3 className="py-2 font-bold">{notApprovedTests}</h3>
                 <p>Test Not Approved</p>

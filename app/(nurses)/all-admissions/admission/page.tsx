@@ -9,9 +9,7 @@ import { IoMdArrowBack } from "react-icons/io"
 import Link from "next/link"
 import { GoPlus } from "react-icons/go"
 import AdministerDrugModal from "components/Modals/AdministerDrugModal"
-
-import CheckoutPatientModal from "components/Modals/CheckoutPatientModal"
-import NursesNav from "components/Navbar/NursesNav"
+import { toast, Toaster } from "sonner"
 
 interface PatientDetail {
   id: string
@@ -82,15 +80,9 @@ interface PatientDetail {
   }[]
 }
 
-interface PatientDetailPageProps {
-  params: { admissionId: string }
-}
-
 export default function PatientDetailPage() {
-  const [isAdministerDrugModalOpen, setIsAdministerDrugModalOpen] = useState(false)
-  const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false)
+  const [isAdmissionOpen, setIsAdmissionOpen] = useState(false)
   const [patientDetail, setPatientDetail] = useState<PatientDetail | null>(null)
-  const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
@@ -101,6 +93,7 @@ export default function PatientDetailPage() {
 
   const fetchPatientDetails = async () => {
     try {
+      setLoading(true)
       const admissionId = localStorage.getItem("selectedAdmissionId")
       if (!admissionId) {
         console.error("No admission ID found in localStorage.")
@@ -115,6 +108,9 @@ export default function PatientDetailPage() {
       setPatientDetail(data)
     } catch (error) {
       console.error("Error fetching patient details:", error)
+      toast.error("Failed to load patient details")
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -122,27 +118,18 @@ export default function PatientDetailPage() {
     fetchPatientDetails()
   }, [refreshKey])
 
-  const openAdministerDrugModal = () => {
-    setIsAdministerDrugModalOpen(true)
+  const openAdmissionModal = () => {
+    setIsAdmissionOpen(true)
   }
 
-  const openCheckoutModal = () => {
-    setIsCheckoutModalOpen(true)
-  }
-
-  const closeAdministerDrugModal = () => {
-    setIsAdministerDrugModalOpen(false)
-  }
-
-  const closeCheckoutModal = () => {
-    setIsCheckoutModalOpen(false)
+  const closeAdmissionModal = () => {
+    setIsAdmissionOpen(false)
   }
 
   const handleHmoSubmissionSuccess = () => {
-    setShowSuccessNotification(true)
+    toast.success("Drug administered successfully")
     setRefreshKey((prevKey) => prevKey + 1)
-    fetchPatientDetails() // Refetch patient details to update the drug list
-    setTimeout(() => setShowSuccessNotification(false), 5000)
+    fetchPatientDetails()
   }
 
   const formatDate = (dateString: string) => {
@@ -157,18 +144,98 @@ export default function PatientDetailPage() {
     return new Date(dateString).toLocaleDateString(undefined, options)
   }
 
+  if (loading) {
+    return (
+      <section className="h-full">
+        <div className="flex min-h-screen">
+          <div className="flex w-screen flex-col">
+            <DashboardNav />
+            <div className="flex h-full items-center justify-center px-16 py-6">
+              <div className="w-full animate-pulse">
+                <div className="mb-8 h-8 w-24 rounded bg-gray-200"></div>
+                <div className="flex justify-between gap-4">
+                  <div className="w-[30%]">
+                    <div className="sidebar rounded-md border px-4 py-8">
+                      <div className="flex items-center justify-center">
+                        <div className="h-10 w-10 rounded-full bg-gray-200"></div>
+                      </div>
+                      <div className="mx-auto mt-3 h-6 w-3/4 rounded bg-gray-200"></div>
+                      <div className="mt-2 h-4 w-full rounded bg-gray-200"></div>
+                      <div className="my-4 flex w-full border"></div>
+                      <div className="space-y-2">
+                        <div className="h-4 w-full rounded bg-gray-200"></div>
+                        <div className="h-4 w-full rounded bg-gray-200"></div>
+                        <div className="h-4 w-full rounded bg-gray-200"></div>
+                      </div>
+                      <div className="mt-6 h-10 w-full rounded bg-gray-200"></div>
+                    </div>
+                    <div className="mt-4 h-24 w-full rounded bg-gray-200"></div>
+                    <div className="mt-4 h-20 w-full rounded bg-gray-200"></div>
+                  </div>
+
+                  <div className="mb-2 flex w-full flex-col">
+                    <div className="w-full">
+                      <div className="mb-6 h-8 w-64 rounded bg-gray-200"></div>
+                      <div className="mb-4 h-6 w-48 rounded bg-gray-200"></div>
+                      <div className="mb-4 h-24 w-full rounded bg-gray-200"></div>
+                      <div className="mb-6 h-8 w-64 rounded bg-gray-200"></div>
+                    </div>
+                    <div className="grid gap-2">
+                      {[1, 2, 3, 4, 5, 6].map((_, index) => (
+                        <div
+                          key={index}
+                          className="sidebar flex w-full items-center justify-between rounded-lg border p-2"
+                        >
+                          <div className="flex items-center gap-1 text-sm font-bold md:w-[20%]">
+                            <div className="h-8 w-8 animate-pulse rounded-full bg-gray-200 max-sm:hidden"></div>
+                          </div>
+                          <div className="flex w-full items-center gap-1 text-sm font-bold">
+                            <div>
+                              <div className="h-4 w-24 animate-pulse rounded bg-gray-200"></div>
+                              <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+                            </div>
+                          </div>
+                          <div className="w-full max-md:hidden">
+                            <div className="h-4 w-16 animate-pulse rounded bg-gray-200"></div>
+                            <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+                          </div>
+                          <div className="w-full max-md:hidden">
+                            <div className="h-4 w-16 animate-pulse rounded bg-gray-200"></div>
+                            <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+                          </div>
+                          <div className="w-full">
+                            <div className="h-4 w-16 animate-pulse rounded bg-gray-200"></div>
+                            <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+                          </div>
+                          <div className="w-full max-md:hidden">
+                            <div className="h-4 w-16 animate-pulse rounded bg-gray-200"></div>
+                            <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+                          </div>
+                          <div className="w-full">
+                            <div className="h-4 w-16 animate-pulse rounded bg-gray-200"></div>
+                            <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
   if (!patientDetail) {
     return (
       <section className="h-full">
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
-            <NursesNav />
-            <div className="loading-text flex h-full items-center justify-center">
-              {"loading...".split("").map((letter, index) => (
-                <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>
-                  {letter}
-                </span>
-              ))}
+            <DashboardNav />
+            <div className="flex h-full items-center justify-center">
+              <p className="text-gray-500">No patient data found</p>
             </div>
           </div>
         </div>
@@ -182,6 +249,7 @@ export default function PatientDetailPage() {
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
             <DashboardNav />
+            <Toaster position="top-right" richColors />
 
             {patientDetail && (
               <div className="px-16 py-6">
@@ -189,24 +257,24 @@ export default function PatientDetailPage() {
                   <IoMdArrowBack />
                   <p className="capitalize">Go back</p>
                 </button>
-                <div className="mt-10 flex items-center justify-between">
+                {/* <div className="mt-10 flex items-center justify-between">
                   <h3 className="font-semibold">Details</h3>
-                  <button onClick={openAdministerDrugModal} className="add-button">
+                  <button onClick={openAdmissionModal} className="add-button">
                     <p className="text-xs">Administer Drug</p>
                     <GoPlus />
                   </button>
-                </div>
+                </div> */}
                 <div className="pt-10">
                   <div className="flex justify-between gap-4">
                     <div className="w-[30%]">
-                      <div className="flex flex-col justify-center rounded-md border px-4 py-8">
+                      <div className="sidebar  flex flex-col justify-center rounded-md border px-4 py-8">
                         <div className="flex items-center justify-center">
                           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#46FFA6]">
                             <p className="capitalize text-[#000000]">{patientDetail.name.charAt(0)}</p>
                           </div>
                         </div>
-                        <h1 className="mt-3 text-center font-bold capitalize">{patientDetail.name}</h1>
-                        <p className="text-center text-sm font-bold">
+                        <h1 className="mt-3 text-center font-medium capitalize">{patientDetail.name}</h1>
+                        <p className="text-center text-sm font-medium">
                           Patient ID: <span className="font-normal">{patientDetail.policy_id}</span>
                         </p>
                         <div className="flex items-center justify-center gap-1">
@@ -220,15 +288,12 @@ export default function PatientDetailPage() {
                             <p className="text-sm">{patientDetail.phone_no}</p>
                           </div>
                           <div className="flex justify-between pb-2">
-                            <p className="text-sm">D.O.B</p>
-                            <p className="text-sm ">{formatDate(patientDetail.dob)}</p>
+                            <p className="text-sm">Date of Birth</p>
+                            <p className="text-sm">{formatDate(patientDetail.dob)}</p>
                           </div>
 
                           <div className="mt-6 flex w-full gap-2">
-                            <button
-                              onClick={openCheckoutModal}
-                              className="button-primary h-[40px] w-full whitespace-nowrap rounded-md max-sm:h-[40px]"
-                            >
+                            <button className="button-primary h-[40px] w-full whitespace-nowrap rounded-md max-sm:h-[40px]">
                               Check Out
                             </button>
                           </div>
@@ -255,8 +320,8 @@ export default function PatientDetailPage() {
                           <h4 className="mb-2 font-medium">Next of Kin</h4>
                           <div className="flex justify-between">
                             <p>{patientDetail.nok_name}</p>
-                            <Link href={patientDetail.nok_phone_no}>
-                              <Image src="/phone.svg" height={18} width={18} alt="" />
+                            <Link href={`tel:${patientDetail.nok_phone_no}`}>
+                              <Image src="/phone.svg" height={18} width={18} alt="call" />
                             </Link>
                           </div>
                         </div>
@@ -265,7 +330,7 @@ export default function PatientDetailPage() {
 
                     <div className="mb-2 flex w-full flex-col">
                       <div className="w-[50%]">
-                        <h3 className="mb-6 text-xl font-bold">Doctor&apos;s&apos; Prescription</h3>
+                        <h3 className="mb-6 text-xl font-bold">Doctor&apos;s Prescription</h3>
                         <p className="mb-4 font-semibold">Drugs to Administer</p>
                         {patientDetail.check_apps.map((check) => (
                           <div key={check.id}>
@@ -276,7 +341,6 @@ export default function PatientDetailPage() {
                             )}
                           </div>
                         ))}
-
                         <h3 className="mb-6 text-xl font-bold">Drugs Administered</h3>
                       </div>
 
@@ -285,7 +349,7 @@ export default function PatientDetailPage() {
                           {check.drugs.map((drug) => (
                             <div
                               key={drug.id}
-                              className="mb-2 flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
+                              className="sidebar mb-2 flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
                             >
                               <div className="flex w-full items-center gap-2">
                                 <div className="">
@@ -318,29 +382,15 @@ export default function PatientDetailPage() {
                 </div>
               </div>
             )}
-            <Footer />
           </div>
         </div>
+        <Footer />
       </section>
-      {showSuccessNotification && (
-        <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
-          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm text-[#0F920F]">Checkedout Successfully</span>
-        </div>
-      )}
-      {isAdministerDrugModalOpen && (
-        <AdministerDrugModal
-          isOpen={isAdministerDrugModalOpen}
-          onClose={closeAdministerDrugModal}
-          onSubmitSuccess={handleHmoSubmissionSuccess}
-          patientId={patientDetail.id}
-        />
-      )}
 
-      {isCheckoutModalOpen && (
-        <CheckoutPatientModal
-          isOpen={isCheckoutModalOpen}
-          onClose={closeCheckoutModal}
+      {isAdmissionOpen && (
+        <AdministerDrugModal
+          isOpen={isAdmissionOpen}
+          onClose={closeAdmissionModal}
           onSubmitSuccess={handleHmoSubmissionSuccess}
           patientId={patientDetail.id}
         />
