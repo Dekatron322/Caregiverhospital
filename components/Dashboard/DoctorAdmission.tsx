@@ -1,8 +1,8 @@
-"use client"
-
 import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { PiDotsThree } from "react-icons/pi"
+import { BsEyeFill } from "react-icons/bs"
+import { RiDeleteBin5Line } from "react-icons/ri"
+import CancelDelete from "public/svgs/cancel-delete"
 
 interface Admission {
   id: string
@@ -23,6 +23,8 @@ const AllAdmission: React.FC = () => {
   const [admissions, setAdmissions] = useState<Admission[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [admissionToDelete, setAdmissionToDelete] = useState<Admission | null>(null)
 
   useEffect(() => {
     const fetchAdmissions = async () => {
@@ -48,7 +50,6 @@ const AllAdmission: React.FC = () => {
             status: admission.checkout_date ? "checkout" : "checkin",
           }))
         )
-        // Sort by pub_date in descending order (newest first)
         const sortedData = formattedData.sort((a, b) => new Date(b.pub_date).getTime() - new Date(a.pub_date).getTime())
         setAdmissions(sortedData)
       } catch (error) {
@@ -64,6 +65,27 @@ const AllAdmission: React.FC = () => {
   const handlePatientClick = (admissionId: string) => {
     localStorage.setItem("selectedAdmissionId", admissionId)
     router.push(`/doctor-admission/admission`)
+  }
+
+  const handleDeleteAdmission = async () => {
+    if (!admissionToDelete) return
+
+    try {
+      const response = await fetch(`https://api2.caregiverhospital.com/check-app/check-app/${admissionToDelete.id}/`, {
+        method: "DELETE",
+      })
+
+      if (response.ok) {
+        setAdmissions(admissions.filter((admission) => admission.id !== admissionToDelete.id))
+        setShowDeleteModal(false)
+      } else {
+        console.error("Failed to delete admission")
+        // Handle error
+      }
+    } catch (error) {
+      console.error("Error deleting admission:", error)
+      // Handle error
+    }
   }
 
   const formatDate = (dateString: string) => {
@@ -83,7 +105,6 @@ const AllAdmission: React.FC = () => {
         <div
           key={appointment.id}
           className="sidebar flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
-          onClick={() => handlePatientClick(appointment.patient_id)}
         >
           <div className="flex w-full items-center gap-2 text-sm font-bold">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46ffa6]">
@@ -110,8 +131,14 @@ const AllAdmission: React.FC = () => {
             <p className="rounded py-[2px] text-xs font-semibold">{formatDate(appointment.checkout_date) || "N/A"}</p>
             <small className="text-xs">Check-out Date</small>
           </div>
-          <div>
-            <PiDotsThree />
+          <div className="flex items-center gap-1">
+            <BsEyeFill onClick={() => handlePatientClick(appointment.patient_id)} />
+            <RiDeleteBin5Line
+              onClick={() => {
+                setAdmissionToDelete(appointment)
+                setShowDeleteModal(true)
+              }}
+            />
           </div>
         </div>
       ))}
@@ -119,7 +146,6 @@ const AllAdmission: React.FC = () => {
   )
 
   const filteredAppointments = admissions.filter((appointment) => {
-    // Filter by tab first
     const tabFilter =
       activeTab === "all"
         ? true
@@ -127,7 +153,6 @@ const AllAdmission: React.FC = () => {
         ? appointment.status === "checkin"
         : appointment.status === "checkout"
 
-    // Then filter by search term if it exists
     const searchFilter =
       searchTerm === "" ||
       appointment.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -169,9 +194,11 @@ const AllAdmission: React.FC = () => {
                 <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
               </div>
               <div className="w-full max-md:hidden">
-                <div className="h-6 w-16 animate-pulse rounded bg-gray-200"></div>
+                <div className="h-4 w-16 animate-pulse rounded bg-gray-200"></div>
+                <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
               </div>
               <div className="flex gap-2">
+                <div className="h-6 w-6 animate-pulse rounded bg-gray-200"></div>
                 <div className="h-6 w-6 animate-pulse rounded bg-gray-200"></div>
               </div>
             </div>
@@ -209,6 +236,39 @@ const AllAdmission: React.FC = () => {
             </div>
           )}
         </>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && admissionToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="w-[376px] overflow-hidden rounded-lg  bg-white shadow-lg">
+            <div className="flex items-center justify-between bg-[#F5F8FA] p-4">
+              <h3 className="text-lg font-bold text-black">Confirm Deletion</h3>
+              <div className="m-1 cursor-pointer" onClick={handleDeleteAdmission}>
+                <CancelDelete />
+              </div>
+            </div>
+            <div className="p-4">
+              <p className="my-4 text-black">
+                Are you sure you want to delete the admission record for {admissionToDelete.name}?
+              </p>
+              <div className="flex w-full justify-end gap-4">
+                <button
+                  className="w-full rounded bg-gray-300 px-4 py-2 text-gray-800 hover:bg-gray-400"
+                  onClick={() => setShowDeleteModal(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="w-full rounded bg-red-500 px-4 py-2 text-white hover:bg-red-600"
+                  onClick={handleDeleteAdmission}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
