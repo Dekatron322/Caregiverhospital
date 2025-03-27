@@ -38,7 +38,7 @@ export default function Dashboard() {
                 <div className="mt-4 w-full px-16 max-md:w-full max-md:flex-col max-md:px-3 md:min-w-[650px]">
                   <p className="mb-4 font-semibold">Finance</p>
                   {Finance.map((finance) => (
-                    <div key={finance.id} className=" mb-4 w-full rounded border p-4 shadow-md">
+                    <div key={finance.id} className=" sidebar mb-4 w-full rounded border p-4 shadow-md">
                       <div className="mb-6 flex justify-between">
                         <h6 className="font-bold">{finance.name}</h6>
                         <Image src="/money-bag.svg" height={48} width={48} alt="pharmacy" />

@@ -63,12 +63,33 @@ const OutOfPocketComponent: React.FC<HmoComponentProps> = ({ refreshKey, openDel
 
   if (loading)
     return (
-      <div className="loading-text flex h-full items-center justify-center">
-        {"loading...".split("").map((letter, index) => (
-          <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>
-            {letter}
-          </span>
-        ))}
+      <div className=" flex h-full flex-col items-center justify-center">
+        <div className="flex justify-center">
+          <div className="flex flex-col items-center max-md:w-full">
+            <div className="mt-4 w-full max-md:flex-col max-md:px-3 md:min-w-[650px]">
+              <div className="mb-4 h-6 w-40 animate-pulse rounded bg-gray-200 font-semibold"></div>
+              <div className="grid gap-2">
+                {[1, 2, 3].map((_, index) => (
+                  <div key={index} className="sidebar flex w-full items-center justify-between rounded-lg border p-4">
+                    <div className="flex w-full items-center gap-1 text-sm font-bold">
+                      <div>
+                        <div className="flex gap-2">
+                          <div className="h-4 w-24 animate-pulse rounded bg-gray-200"></div>
+                          <div className="h-4 w-4 animate-pulse rounded bg-gray-200"></div>
+                        </div>
+                        <div className="mt-1 h-3 w-40 animate-pulse rounded bg-gray-200"></div>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <div className="h-6 w-6 animate-pulse rounded-full bg-gray-200"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     )
   if (error) return <p>{error}</p>

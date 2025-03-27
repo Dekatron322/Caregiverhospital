@@ -10,6 +10,7 @@ import Link from "next/link"
 import { GoPlus } from "react-icons/go"
 import AdministerDrugModal from "components/Modals/AdministerDrugModal"
 import { toast, Toaster } from "sonner"
+import CheckoutPatientModal from "components/Modals/CheckoutPatientModal"
 
 interface PatientDetail {
   id: string
@@ -81,6 +82,7 @@ interface PatientDetail {
 }
 
 export default function PatientDetailPage() {
+  const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false)
   const [isAdmissionOpen, setIsAdmissionOpen] = useState(false)
   const [patientDetail, setPatientDetail] = useState<PatientDetail | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
@@ -120,6 +122,10 @@ export default function PatientDetailPage() {
 
   const openAdmissionModal = () => {
     setIsAdmissionOpen(true)
+  }
+
+  const closeCheckoutModal = () => {
+    setIsCheckoutModalOpen(false)
   }
 
   const closeAdmissionModal = () => {
@@ -257,13 +263,13 @@ export default function PatientDetailPage() {
                   <IoMdArrowBack />
                   <p className="capitalize">Go back</p>
                 </button>
-                {/* <div className="mt-10 flex items-center justify-between">
+                <div className="mt-10 flex items-center justify-between">
                   <h3 className="font-semibold">Details</h3>
                   <button onClick={openAdmissionModal} className="add-button">
                     <p className="text-xs">Administer Drug</p>
                     <GoPlus />
                   </button>
-                </div> */}
+                </div>
                 <div className="pt-10">
                   <div className="flex justify-between gap-4">
                     <div className="w-[30%]">
@@ -391,6 +397,15 @@ export default function PatientDetailPage() {
         <AdministerDrugModal
           isOpen={isAdmissionOpen}
           onClose={closeAdmissionModal}
+          onSubmitSuccess={handleHmoSubmissionSuccess}
+          patientId={patientDetail.id}
+        />
+      )}
+
+      {isCheckoutModalOpen && (
+        <CheckoutPatientModal
+          isOpen={isCheckoutModalOpen}
+          onClose={closeCheckoutModal}
           onSubmitSuccess={handleHmoSubmissionSuccess}
           patientId={patientDetail.id}
         />

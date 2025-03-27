@@ -71,6 +71,7 @@ const AdministerDrugModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSu
   const [checkAppId, setCheckAppId] = useState<string | null>(null)
   const [categories, setCategories] = useState<Category[]>([])
   const [filteredMedicines, setFilteredMedicines] = useState<Medicine[]>([])
+  const [isSubmitting, setIsSubmitting] = useState(false) // New state for submission status
 
   useEffect(() => {
     fetchUserDetails()
@@ -146,6 +147,10 @@ const AdministerDrugModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSu
 
   const submitForm = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     event.preventDefault()
+    if (!isSubmitEnabled || isSubmitting) return // Prevent multiple submissions
+
+    setIsSubmitting(true) // Disable the button
+
     if (userDetails && checkAppId) {
       try {
         const response = await axios.post(
@@ -173,13 +178,18 @@ const AdministerDrugModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSu
       } catch (error) {
         console.error("Error prescribing medication:", error)
         toast.error("Error administering medication")
+      } finally {
+        setIsSubmitting(false) // Re-enable the button
       }
+    } else {
+      setIsSubmitting(false) // Re-enable the button if conditions aren't met
     }
   }
 
   if (!isOpen) return null
 
-  const isSubmitEnabled = selectedMedicineId.trim() !== "" && category.trim() !== "" && unit.trim() !== ""
+  const isSubmitEnabled =
+    selectedMedicineId.trim() !== "" && category.trim() !== "" && unit.trim() !== "" && !isSubmitting
 
   return (
     <div className={styles.modalOverlay}>
@@ -228,11 +238,13 @@ const AdministerDrugModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSu
           </div>
           <div className="mt-4 flex w-full gap-6">
             <button
-              className="button-primary h-[50px] w-full rounded-sm max-sm:h-[45px]"
+              className={`button-primary h-[50px] w-full rounded-sm max-sm:h-[45px] ${
+                isSubmitting ? "cursor-not-allowed opacity-50" : ""
+              }`}
               onClick={submitForm}
               disabled={!isSubmitEnabled}
             >
-              REGISTER
+              {isSubmitting ? "Processing..." : "REGISTER"}
             </button>
           </div>
         </div>

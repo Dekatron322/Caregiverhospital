@@ -1,27 +1,21 @@
 "use client"
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
-import { usePathname, useRouter } from "next/navigation"
-
-import Image from "next/image"
+import { useRouter } from "next/navigation"
+import { toast, Toaster } from "sonner"
 import { IoMdArrowBack } from "react-icons/io"
 import { GoPlus } from "react-icons/go"
-
 import HmoComponent from "components/Hmo/Hmo"
 import AddHmoCategoryModal from "components/Modals/AddHmoCategoryModal"
 import DeleteHmoCategoryModal from "components/Modals/DeleteHmoCategoryModal"
 
 const Dashboard: React.FC = () => {
-  const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const [isAddHmoOpen, setIsAddHmoOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [hmoToDelete, setHmoToDelete] = useState<string | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
   const router = useRouter()
-  const pathname = usePathname()
-  const [loading, setLoading] = useState(true)
-  setTimeout(() => setLoading(false), 5000)
 
   const handleGoBack = () => {
     router.back()
@@ -44,14 +38,13 @@ const Dashboard: React.FC = () => {
     setIsDeleteOpen(false)
   }
 
-  const handleHmoSubmissionSuccess = () => {
-    setShowSuccessNotification(true)
-    setRefreshKey((prevKey) => prevKey + 1) // Trigger refresh
-    setTimeout(() => setShowSuccessNotification(false), 5000)
+  const handleHmoSubmissionSuccess = (message: string = "Category Created Successfully") => {
+    setRefreshKey((prevKey) => prevKey + 1)
   }
 
   return (
     <>
+      <Toaster position="top-center" richColors />
       <section className="h-full">
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
@@ -80,21 +73,15 @@ const Dashboard: React.FC = () => {
         <AddHmoCategoryModal
           isOpen={isAddHmoOpen}
           onClose={closeHmoModal}
-          onSubmitSuccess={handleHmoSubmissionSuccess}
+          onSubmitSuccess={() => handleHmoSubmissionSuccess("Category Created Successfully")}
         />
         <DeleteHmoCategoryModal
           isOpen={isDeleteOpen}
           onClose={closeDeleteModal}
-          onSubmitSuccess={handleHmoSubmissionSuccess}
+          onSubmitSuccess={() => handleHmoSubmissionSuccess("Category Deleted Successfully")}
           hmoId={hmoToDelete}
         />
       </section>
-      {showSuccessNotification && (
-        <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
-          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm text-[#0F920F]">Category Created Successfully</span>
-        </div>
-      )}
     </>
   )
 }
