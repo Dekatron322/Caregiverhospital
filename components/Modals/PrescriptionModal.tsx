@@ -3,9 +3,10 @@ import styles from "./modal.module.css"
 import { LiaTimesSolid } from "react-icons/lia"
 import axios from "axios"
 import CustomDropdown from "components/Patient/CustomDropdown"
-
 import Image from "next/image"
 import Select from "react-select"
+import { toast } from "sonner"
+import CancelDelete from "public/svgs/cancel-delete"
 
 interface AddPrescription {
   id: string
@@ -108,16 +109,14 @@ const PrescriptionModal: React.FC<ModalProps> = ({ results, onClose, userId, onP
   const [error, setError] = useState<string | null>(null)
   const [mounted, setMounted] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [showSuccessNotification, setShowSuccessNotification] = useState(false)
-  const [showErrorNotification, setShowErrorNotification] = useState(false)
   const [procedureData, setProcedureData] = useState<Procedure[]>([])
   const [procedure, setProcedure] = useState<string>("")
   const [selectedOptions, setSelectedOptions] = useState<OptionType[]>([])
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   // Handle form submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    // Log selected options on submit
     console.log("Selected options:", selectedOptions)
   }
 
@@ -136,7 +135,7 @@ const PrescriptionModal: React.FC<ModalProps> = ({ results, onClose, userId, onP
         )
         if (response.data) {
           setUserDetails(response.data)
-          setDoctorName(response.data.username) // Set doctorName here
+          setDoctorName(response.data.username)
         } else {
           console.log("User details not found.")
         }
@@ -192,36 +191,35 @@ const PrescriptionModal: React.FC<ModalProps> = ({ results, onClose, userId, onP
   }
 
   const handleAddPrescription = async () => {
-    if (userDetails) {
-      setDoctorName(userDetails.username)
-    }
-
-    const selectedCategory = categories.find((cat) => cat.id === category)
-    const selectedMedicine = medicines.find((med) => med.id === name)
-
-    const selectedProceduce = procedureData.find((pro) => pro.id === procedure)
-    const procedureName = selectedProceduce ? selectedProceduce.name : ""
-
-    const selectedComplaints = selectedOptions.map((option) => option.label).join(", ")
-
-    const prescriptionData = {
-      doctor_name: doctorName,
-      category: selectedCategory ? selectedCategory.name : "",
-      name: selectedMedicine ? selectedMedicine.name : "",
-      dosage: selectedMedicine ? selectedMedicine.price : "",
-      complain: selectedComplaints,
-      code: procedureName,
-      unit,
-      payment_status: false,
-
-      rate,
-      usage,
-      note,
-      status: false,
-      pub_date: new Date().toISOString(),
-    }
+    setIsSubmitting(true)
 
     try {
+      if (userDetails) {
+        setDoctorName(userDetails.username)
+      }
+
+      const selectedCategory = categories.find((cat) => cat.id === category)
+      const selectedMedicine = medicines.find((med) => med.id === name)
+      const selectedProceduce = procedureData.find((pro) => pro.id === procedure)
+      const procedureName = selectedProceduce ? selectedProceduce.name : ""
+      const selectedComplaints = selectedOptions.map((option) => option.label).join(", ")
+
+      const prescriptionData = {
+        doctor_name: doctorName,
+        category: selectedCategory ? selectedCategory.name : "",
+        name: selectedMedicine ? selectedMedicine.name : "",
+        dosage: selectedMedicine ? selectedMedicine.price : "",
+        complain: selectedComplaints,
+        code: procedureName,
+        unit,
+        payment_status: false,
+        rate,
+        usage,
+        note,
+        status: false,
+        pub_date: new Date().toISOString(),
+      }
+
       console.log("Prescription data being sent:", prescriptionData)
 
       const response = await fetch(
@@ -241,14 +239,21 @@ const PrescriptionModal: React.FC<ModalProps> = ({ results, onClose, userId, onP
         throw new Error("Failed to add prescription")
       }
 
-      setShowSuccessNotification(true)
-      setTimeout(() => setShowSuccessNotification(false), 5000)
+      toast.success("Prescription Added Successfully", {
+        description: "The prescription has been successfully added to the patient's record.",
+        duration: 5000,
+      })
+
       onClose()
       onPrescriptionSubmit()
     } catch (error) {
       console.error("Error adding prescription:", error)
-      setShowErrorNotification(true)
-      setTimeout(() => setShowErrorNotification(false), 5000)
+      toast.error("Failed to Add Prescription", {
+        description: "There was an error adding the prescription. Please try again.",
+        duration: 5000,
+      })
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -259,8 +264,8 @@ const PrescriptionModal: React.FC<ModalProps> = ({ results, onClose, userId, onP
         <div className="px-6 py-6">
           <div className="mb-4 flex items-center justify-between">
             <p className="text-lg font-semibold">Add Prescription for {results.name}</p>
-            <div className="hover:rounded-md hover:border">
-              <LiaTimesSolid className="m-1 cursor-pointer" onClick={onClose} />
+            <div className="m-1 cursor-pointer" onClick={onClose}>
+              <CancelDelete />
             </div>
           </div>
 
@@ -372,26 +377,43 @@ const PrescriptionModal: React.FC<ModalProps> = ({ results, onClose, userId, onP
           </div>
           <div className="mt-4">
             <button
-              className={`button-primary h-[50px] w-full rounded-sm max-sm:h-[45px]`}
+              className={`button-primary h-[50px] w-full rounded-sm max-sm:h-[45px] ${
+                isSubmitting ? "cursor-not-allowed opacity-50" : ""
+              }`}
               onClick={handleAddPrescription}
+              disabled={isSubmitting}
             >
-              Add Prescription
+              {isSubmitting ? (
+                <span className="flex items-center justify-center">
+                  <svg
+                    className="-ml-1 mr-2 h-4 w-4 animate-spin text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Processing...
+                </span>
+              ) : (
+                "Add Prescription"
+              )}
             </button>
           </div>
         </div>
       </div>
-      {showSuccessNotification && (
-        <div className="animation-fade-in absolute bottom-16 m-5  flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514] md:right-16">
-          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm  text-[#0F920F]">Sent Successfully</span>
-        </div>
-      )}
-      {/* {showErrorNotification && (
-        <div className="animation-fade-in 0 absolute bottom-16  m-5 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#D14343] bg-[#FEE5E5] text-[#D14343] shadow-[#05420514] md:right-16">
-          <Image src="/check-circle-failed.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm  text-[#D14343]">Failed to add prescription</span>
-        </div>
-      )} */}
     </div>
   )
 }

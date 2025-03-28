@@ -12,6 +12,7 @@ import LabTestModal from "components/Modals/LabTestModal"
 import PrescriptionModal from "components/Modals/PrescriptionModal"
 import DoctorNav from "components/Navbar/DoctorNav"
 import NoteModal from "components/Modals/NoteModal"
+import { Toaster } from "sonner"
 
 interface Patient {
   id: any
@@ -203,37 +204,139 @@ export default function PatientDetailPage() {
 
   return (
     <>
+      <Toaster position="top-center" richColors />
       <section className="h-full">
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
             <DoctorNav />
 
-            {patient && (
+            {loading ? (
+              <div className="px-16 max-md:px-3 sm:py-10">
+                {/* Skeleton for back button */}
+                <div className="flex items-center gap-2">
+                  <div className="h-6 w-6 animate-pulse rounded-full bg-gray-200"></div>
+                  <div className="h-4 w-20 animate-pulse rounded bg-gray-200"></div>
+                </div>
+
+                <div className="pt-10">
+                  {/* Skeleton for vitals cards */}
+                  <div className="sidebar mb-3 grid w-full grid-cols-4 gap-2 max-sm:grid-cols-2">
+                    {[...Array(4)].map((_, i) => (
+                      <div key={i} className="flex w-full flex-col items-center justify-center rounded border py-3">
+                        <div className="h-10 w-10 animate-pulse rounded-full bg-gray-200"></div>
+                        <div className="my-2 h-4 w-24 animate-pulse rounded bg-gray-200"></div>
+                        <div className="h-4 w-16 animate-pulse rounded bg-gray-200"></div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex justify-between gap-2 max-md:flex-col">
+                    {/* Left sidebar skeleton */}
+                    <div className="md:w-1/4">
+                      <div className="sidebar flex flex-col justify-center rounded-md border px-4 py-8">
+                        <div className="flex items-center justify-center">
+                          <div className="h-14 w-14 animate-pulse rounded-full bg-gray-200"></div>
+                        </div>
+                        <div className="mt-3 h-6 w-full animate-pulse rounded bg-gray-200"></div>
+                        <div className="mt-2 h-4 w-full animate-pulse rounded bg-gray-200"></div>
+                        <div className="mt-2 flex items-center justify-center gap-2">
+                          <div className="h-4 w-4 animate-pulse rounded-full bg-gray-200"></div>
+                          <div className="h-4 w-32 animate-pulse rounded bg-gray-200"></div>
+                        </div>
+                        <div className="my-4 flex w-full border"></div>
+                        <div className="space-y-3">
+                          {[...Array(5)].map((_, i) => (
+                            <div key={i} className="flex justify-between">
+                              <div className="h-4 w-16 animate-pulse rounded bg-gray-200"></div>
+                              <div className="h-4 w-20 animate-pulse rounded bg-gray-200"></div>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="mt-6 flex w-full flex-col gap-2">
+                          {[...Array(3)].map((_, i) => (
+                            <div key={i} className="h-10 w-full animate-pulse rounded bg-gray-200"></div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Allergies skeleton */}
+                      <div className="py-2">
+                        <div className="mb-1 h-6 w-24 animate-pulse rounded bg-gray-200"></div>
+                        <div className="flex flex-wrap">
+                          {[...Array(2)].map((_, i) => (
+                            <div key={i} className="w-1/2">
+                              <div className="m-1 h-8 animate-pulse rounded bg-gray-200"></div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Next of kin skeleton */}
+                      <div className="py-2">
+                        <div className="mb-2 h-6 w-24 animate-pulse rounded bg-gray-200"></div>
+                        <div className="flex justify-between">
+                          <div className="h-4 w-32 animate-pulse rounded bg-gray-200"></div>
+                          <div className="h-5 w-5 animate-pulse rounded bg-gray-200"></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right content skeleton */}
+                    <div className="w-3/4">
+                      {/* Patient details skeleton */}
+                      <div className="sidebar rounded border p-4">
+                        <div className="h-8 w-48 animate-pulse rounded bg-gray-200"></div>
+                        <div className="mt-4 space-y-4">
+                          {[...Array(5)].map((_, i) => (
+                            <div key={i} className="space-y-2">
+                              <div className="h-4 w-24 animate-pulse rounded bg-gray-200"></div>
+                              <div className="h-6 w-full animate-pulse rounded bg-gray-200"></div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Notes section skeleton */}
+                      <div className="notes-section sidebar mb-4 mt-10 rounded border p-4">
+                        <div className="mb-4 h-8 w-48 animate-pulse rounded bg-gray-200"></div>
+                        {[...Array(2)].map((_, i) => (
+                          <div key={i} className="mb-4">
+                            <div className="h-4 w-full animate-pulse rounded bg-gray-200"></div>
+                            <div className="mt-2 h-3 w-48 animate-pulse rounded bg-gray-200"></div>
+                            <div className="my-5 h-[1px] w-full bg-gray-200"></div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : patient ? (
               <div className="px-16 max-md:px-3 sm:py-10">
                 <button onClick={handleGoBack} className="redirect">
                   <IoMdArrowBack />
                   <p className="capitalize">Go back</p>
                 </button>
                 <div className="pt-10">
-                  <div className="mb-3 grid w-full grid-cols-4 gap-2 max-sm:grid-cols-2">
-                    <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
+                  <div className=" mb-3 grid w-full grid-cols-4 gap-2 max-sm:grid-cols-2">
+                    <div className="sidebar flex w-full flex-col items-center justify-center rounded border py-3 ">
                       <Image src="/pt-dashboard-01.svg" height={40} width={40} alt="" />
                       <h3 className="py-2 font-bold">Heart Rate </h3>
                       <p>{patient.heart_rate || "N/A"}</p>
                     </div>
-                    <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
+                    <div className="sidebar flex w-full flex-col items-center justify-center rounded border py-3 ">
                       <Image src="/pt-dashboard-02.svg" height={40} width={40} alt="" />
                       <h3 className="py-2 font-bold">Body Temperature</h3>
                       <p>
                         {patient.body_temperature || "N/A"} <small>°C</small>
                       </p>
                     </div>
-                    <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
+                    <div className="sidebar flex w-full flex-col items-center justify-center rounded border py-3 ">
                       <Image src="/pt-dashboard-03.svg" height={40} width={40} alt="" />
                       <h3 className="py-2 font-bold">Glucose Level</h3>
                       <p>{patient.glucose_level || "N/A"} mg/dl</p>
                     </div>
-                    <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
+                    <div className="sidebar flex w-full flex-col items-center justify-center rounded border py-3 ">
                       <Image src="/pt-dashboard-04.svg" height={40} width={40} alt="" />
                       <h3 className="py-2 font-bold">Blood Pressure</h3>
                       <p>{patient.blood_pressure || "N/A"} mmHg</p>
@@ -241,12 +344,11 @@ export default function PatientDetailPage() {
                   </div>
                   <div className="flex justify-between gap-2 max-md:flex-col">
                     <div className="md:w-1/4">
-                      <div className="flex flex-col justify-center rounded-md border px-4 py-8">
+                      <div className="sidebar flex flex-col justify-center rounded-md border px-4 py-8">
                         <div className="flex items-center justify-center">
                           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#46FFA6]">
                             <p className="capitalize text-[#000000]">{patient.name.charAt(0)}</p>
                           </div>
-                          {/* <Image src="/default_patient_image.png" height={60} width={60} alt="Patient Image" /> */}
                         </div>
                         <h1 className="mt-3 text-center font-bold capitalize xl:text-sm">{patient.name}</h1>
                         <p className="text-center text-base font-bold xl:text-sm">
@@ -332,7 +434,7 @@ export default function PatientDetailPage() {
                       <PatientDetailsForDoctor patient={patient} />
 
                       {/* Notes Section */}
-                      <div className="notes-section mb-4 mt-10 rounded border p-4">
+                      <div className="notes-section sidebar mb-4 mt-10 rounded border p-4">
                         <h3 className="mb-4 text-xl font-bold">Patient Notes</h3>
                         {patient.notes.length > 0 ? (
                           patient.notes.map((note) => (
@@ -349,6 +451,10 @@ export default function PatientDetailPage() {
                     </div>
                   </div>
                 </div>
+              </div>
+            ) : (
+              <div className="flex h-64 items-center justify-center px-16 max-md:px-3">
+                <p>Failed to load patient data</p>
               </div>
             )}
             <Footer />

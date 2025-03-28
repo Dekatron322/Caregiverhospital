@@ -323,7 +323,7 @@ const PatientDetailsForDoctor: React.FC<PatientDetailsProps> = ({ patient }) => 
       {filteredList.map((appointment) => (
         <div
           key={appointment.id}
-          className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
+          className="sidebar flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
         >
           <div className="flex w-full items-center gap-1 text-sm font-bold">
             <div>
@@ -356,7 +356,7 @@ const PatientDetailsForDoctor: React.FC<PatientDetailsProps> = ({ patient }) => 
       {filteredPrescription.map((prescription) => (
         <div
           key={prescription.id}
-          className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
+          className="sidebar flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
         >
           {/* <div className="w-full">
             <p className="text-sm font-bold">{prescription.doctor_name}</p>
@@ -410,7 +410,10 @@ const PatientDetailsForDoctor: React.FC<PatientDetailsProps> = ({ patient }) => 
   const renderMedicalRecord = () => (
     <div className="flex flex-col gap-2">
       {filteredMedicalRecords.map((medical) => (
-        <div key={medical.id} className="flex w-full cursor-pointer items-center justify-between rounded-lg border p-2">
+        <div
+          key={medical.id}
+          className="sidebar flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
+        >
           <div className="flex w-full items-center gap-1 text-sm font-semibold">
             <div>
               <p>{medical.test_type}</p>

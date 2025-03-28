@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react"
 import styles from "./modal.module.css"
 import { LiaTimesSolid } from "react-icons/lia"
-
+import { toast } from "sonner"
 import Image from "next/image"
+import CancelDelete from "public/svgs/cancel-delete"
 
 interface Note {
   id: string
   detail: string
   title: string
 }
+
 interface ModalProps {
   results: Note
   onClose: () => void
@@ -20,14 +22,15 @@ const NoteModal: React.FC<ModalProps> = ({ results, onClose, userId }) => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [note, setNote] = useState<string>("")
-  const [showSuccessNotification, setShowSuccessNotification] = useState(false)
-  const [showErrorNotification, setShowErrorNotification] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
     setMounted(true)
   }, [])
 
   const handleAddNote = async () => {
+    setIsSubmitting(true)
+
     const noteData = {
       title: results.title,
       detail: note,
@@ -48,13 +51,20 @@ const NoteModal: React.FC<ModalProps> = ({ results, onClose, userId }) => {
         throw new Error("Failed to add note")
       }
 
-      setShowSuccessNotification(true)
-      setTimeout(() => setShowSuccessNotification(false), 5000)
+      toast.success("Note Added Successfully", {
+        description: "The note has been successfully added to the patient's record.",
+        duration: 5000,
+      })
+
       onClose()
     } catch (error) {
       console.error("Error adding note:", error)
-      setShowErrorNotification(true)
-      setTimeout(() => setShowErrorNotification(false), 5000)
+      toast.error("Failed to Add Note", {
+        description: "There was an error adding the note. Please try again.",
+        duration: 5000,
+      })
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -64,12 +74,12 @@ const NoteModal: React.FC<ModalProps> = ({ results, onClose, userId }) => {
         <div className="px-6 py-6">
           <div className="flex items-center justify-between">
             <p className="text-lg font-semibold">Add Note</p>
-            <div className="hover:rounded-md hover:border">
-              <LiaTimesSolid className="m-1 cursor-pointer" onClick={onClose} />
+            <div className="m-1 cursor-pointer" onClick={onClose}>
+              <CancelDelete />
             </div>
           </div>
 
-          <div className="mb-2 gap-3">
+          <div className="my-2 gap-3">
             <textarea
               id="note"
               className="search-bg h-[100px] w-full rounded border bg-transparent p-2 text-xs outline-none"
@@ -80,26 +90,43 @@ const NoteModal: React.FC<ModalProps> = ({ results, onClose, userId }) => {
           </div>
           <div className="mt-4 flex w-full gap-6">
             <button
-              className="button-primary h-[50px] w-full rounded-sm text-[#FFFFFF] max-sm:h-[45px]"
+              className={`button-primary h-[50px] w-full rounded-sm text-[#FFFFFF] max-sm:h-[45px] ${
+                isSubmitting ? "cursor-not-allowed opacity-50" : ""
+              }`}
               onClick={handleAddNote}
+              disabled={isSubmitting}
             >
-              Submit Note
+              {isSubmitting ? (
+                <span className="flex items-center justify-center">
+                  <svg
+                    className="-ml-1 mr-2 h-4 w-4 animate-spin text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Submitting...
+                </span>
+              ) : (
+                "Submit Note"
+              )}
             </button>
           </div>
         </div>
       </div>
-      {showSuccessNotification && (
-        <div className="animation-fade-in absolute bottom-16 m-5 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514] md:right-16">
-          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm text-[#0F920F]">Sent Successfully</span>
-        </div>
-      )}
-      {showErrorNotification && (
-        <div className="animation-fade-in 0 absolute bottom-16 m-5 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#D14343] bg-[#FEE5E5] text-[#D14343] shadow-[#05420514] md:right-16">
-          <Image src="/check-circle-failed.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm text-[#D14343]">Failed to add note</span>
-        </div>
-      )}
     </div>
   )
 }
