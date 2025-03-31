@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import styles from "./modal.module.css"
 import { LiaTimesSolid } from "react-icons/lia"
+import { toast } from "sonner" // Import Sonner toast
+import CancelDelete from "public/svgs/cancel-delete"
 
 interface DeleteModalProps {
   isOpen: boolean
@@ -13,19 +15,45 @@ const DeleteModal: React.FC<DeleteModalProps> = ({ isOpen, onClose, onSubmitSucc
   const [isLoading, setIsLoading] = useState(false)
 
   const submitForm = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): Promise<void> => {
-    if (!hmoId) return
+    if (!hmoId) {
+      toast.error("Error", {
+        description: "No HMO selected for deletion",
+      })
+      return
+    }
+
     setIsLoading(true)
+
     try {
       const response = await fetch(`https://api2.caregiverhospital.com/hmo/hmo/${hmoId}/`, {
         method: "DELETE",
       })
+
       if (!response.ok) {
-        throw new Error("Network response was not ok")
+        throw new Error("Failed to delete HMO")
       }
+
+      toast.success("Hmo deleted", {
+        description: "HMO deleted successfully",
+        duration: 5000,
+        cancel: {
+          label: "Close",
+          onClick: () => {},
+        },
+      })
+
       onSubmitSuccess()
       onClose()
     } catch (error) {
       console.error("Error deleting HMO:", error)
+      toast.error("Error", {
+        description: "Failed to delete HMO. Please try again.",
+        duration: 5000,
+        cancel: {
+          label: "Close",
+          onClick: () => {},
+        },
+      })
     } finally {
       setIsLoading(false)
     }
@@ -36,15 +64,16 @@ const DeleteModal: React.FC<DeleteModalProps> = ({ isOpen, onClose, onSubmitSucc
   return (
     <div className={styles.modalOverlay}>
       <div className={styles.deleteModalContent}>
-        <div className="px-6 py-6">
+        <div className=" bg-[#F5F8FA] p-4">
           <div className="flex items-center justify-between">
             <h6 className="text-lg font-medium">Delete HMO</h6>
-            <div className="border-black hover:rounded-md hover:border">
-              <LiaTimesSolid className="m-1 cursor-pointer" onClick={onClose} />
+            <div className="m-1 cursor-pointer" onClick={onClose}>
+              <CancelDelete />
             </div>
           </div>
-
-          <div className="my-6">
+        </div>
+        <div className="p-4">
+          <div className="mt-4">
             <p>Are you sure you want to delete this HMO? All Data from this HMO will be lost.</p>
           </div>
 

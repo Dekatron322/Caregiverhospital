@@ -1,8 +1,9 @@
 "use client"
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import styles from "./modal.module.css"
 import { LiaTimesSolid } from "react-icons/lia"
 import Image from "next/image"
+import { toast } from "sonner" // Import Sonner toast
 
 interface HmoModalProps {
   isOpen: boolean
@@ -51,10 +52,29 @@ const HmoModal: React.FC<HmoModalProps> = ({ isOpen, onClose, onSubmitSuccess, h
         throw new Error("Failed to add new HMO")
       }
 
+      // Show success toast
+      toast.success("HMO added successfully!", {
+        description: "The new HMO has been created.",
+        duration: 5000,
+        cancel: {
+          label: "Close",
+          onClick: () => {},
+        },
+      })
+
       onSubmitSuccess()
       onClose()
     } catch (error) {
       console.error("Error adding HMO:", error)
+      // Show error toast
+      toast.error("Failed to add HMO", {
+        description: "Please try again or check your input.",
+        duration: 5000,
+        cancel: {
+          label: "Close",
+          onClick: () => {},
+        },
+      })
     } finally {
       setLoading(false)
     }
@@ -68,6 +88,10 @@ const HmoModal: React.FC<HmoModalProps> = ({ isOpen, onClose, onSubmitSuccess, h
   const handleDropdownSelect = (state: React.SetStateAction<string>) => {
     setCategory(state)
     setShowDropdown(false)
+    toast.info("Department selected", {
+      description: `Selected: ${state}`,
+      duration: 3000,
+    })
   }
 
   const handleCancelSearch = () => {

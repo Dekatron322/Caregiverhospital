@@ -12,8 +12,8 @@ import Image from "next/image"
 import DeleteModal from "components/Modals/DeleteModal"
 import EditModal from "components/Modals/EditModal"
 import { IoAddCircleSharp, IoReceipt } from "react-icons/io5"
-
 import UpdateHmoStatusModal from "components/Modals/UpdateHmoStatusModal"
+import { Toaster } from "sonner"
 
 interface Hmo {
   id: string
@@ -50,11 +50,13 @@ export default function HmoDetailPage() {
   const [searchQuery, setSearchQuery] = useState<string>("")
   const [refreshKey, setRefreshKey] = useState(0)
   const [hmoToDelete, setHmoToDelete] = useState<string | null>(null)
-  const [hmoToUpdate, setHmoToUpdate] = useState<Hmo | null>(null) // Updated to Hmo
+  const [hmoToUpdate, setHmoToUpdate] = useState<Hmo | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
 
   const fetchHmoDetails = async () => {
     try {
+      setIsLoading(true)
       const hmoId = localStorage.getItem("selectedHmoId")
       if (!hmoId) {
         console.error("No admission ID found in localStorage.")
@@ -69,6 +71,8 @@ export default function HmoDetailPage() {
       setHmoDetail(data)
     } catch (error) {
       console.error("Error fetching HMO details:", error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -82,7 +86,6 @@ export default function HmoDetailPage() {
 
   const handleNavigateToInvoices = (hmoId: string) => {
     localStorage.setItem("selectedHmoId", hmoId)
-
     router.push(`/invoices`)
   }
 
@@ -138,11 +141,52 @@ export default function HmoDetailPage() {
 
   return (
     <>
+      <Toaster position="top-center" richColors /> {/* Add Toaster component */}
       <section className="h-full">
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
             <DashboardNav />
-            {filteredList.length === 0 ? (
+
+            {isLoading ? (
+              // Loading Skeleton State
+              <div className="px-16 py-3 max-md:px-3">
+                <div className="flex justify-between pt-4">
+                  <div className="h-8 w-24 animate-pulse rounded bg-gray-200"></div>
+                  <div className="h-10 w-32 animate-pulse rounded bg-gray-200"></div>
+                </div>
+
+                <div className="pt-10">
+                  <div className="flex items-center justify-between">
+                    <div className="h-6 w-1/4 animate-pulse rounded bg-gray-200"></div>
+                    <div className="h-10 w-64 animate-pulse rounded bg-gray-200"></div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4 pt-6 md:grid-cols-3">
+                    {[...Array(6)].map((_, index) => (
+                      <div key={index} className="sidebar rounded-lg border p-6 shadow-sm">
+                        <div className="flex justify-between">
+                          <div className="space-y-3">
+                            <div className="h-5 w-3/4 animate-pulse rounded bg-gray-200"></div>
+                            <div className="h-4 w-full animate-pulse rounded bg-gray-200"></div>
+                          </div>
+                          <div className="h-6 w-16 animate-pulse rounded bg-gray-200"></div>
+                        </div>
+
+                        <div className="pt-8">
+                          <div className="flex items-center justify-between">
+                            <div className="h-10 w-24 animate-pulse rounded bg-gray-200 max-md:hidden"></div>
+                            <div className="flex items-center gap-2">
+                              <div className="h-10 w-10 animate-pulse rounded bg-gray-200"></div>
+                              <div className="h-10 w-10 animate-pulse rounded bg-gray-200"></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : filteredList.length === 0 ? (
               <>
                 <div className="flex h-full w-full items-center justify-center">
                   <div>
@@ -155,7 +199,6 @@ export default function HmoDetailPage() {
                       </div>
                     </div>
                   </div>
-                  <div></div>
                 </div>
                 <Footer />
               </>
@@ -195,9 +238,9 @@ export default function HmoDetailPage() {
                           />
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 gap-2 pt-4 md:grid-cols-3">
+                      <div className="grid grid-cols-2 gap-4 pt-6 md:grid-cols-3">
                         {filteredList.map((item) => (
-                          <div key={item.id} className="rounded-md border p-6 max-md:p-3">
+                          <div key={item.id} className="sidebar rounded-md border p-6 max-md:p-3">
                             <div className="flex justify-between">
                               <div>
                                 <h3 className="font-semibold max-md:text-sm">{item.name}</h3>
@@ -285,12 +328,6 @@ export default function HmoDetailPage() {
         />
         <EditModal isOpen={isEditOpen} onClose={closeEditModal} onSubmitSuccess={handleHmoSubmissionSuccess} />
       </section>
-      {showSuccessNotification && (
-        <div className="animation-fade-in absolute bottom-16  right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
-          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
-          <span className="clash-font text-sm  text-[#0F920F]">HMO added successfully</span>
-        </div>
-      )}
     </>
   )
 }
