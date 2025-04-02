@@ -6,7 +6,7 @@ import Image from "next/image"
 import Navbar from "components/Navbar/Navbar"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { toast, Toaster } from "sonner" // Import sonner
+import { toast, Toaster } from "sonner"
 
 interface RateIconProps {
   filled: boolean
@@ -25,7 +25,6 @@ const RateIcon: React.FC<RateIconProps> = ({ filled, onClick }) => {
   )
 }
 
-// Define a union type for the departments
 type Department = "Admin" | "Doctors" | "Pharmacy" | "Laboratory" | "Nurses" | "Cashier"
 
 const Page: React.FC = () => {
@@ -37,7 +36,7 @@ const Page: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
   const departments: Department[] = ["Admin", "Doctors", "Pharmacy", "Laboratory", "Nurses", "Cashier"]
 
-  const router = useRouter() // Initialize the router
+  const router = useRouter()
 
   const departmentRoutes: { [key in Department]: string } = {
     Admin: "/dashboard",
@@ -83,26 +82,22 @@ const Page: React.FC = () => {
         department: searchTerm,
       })
 
-      // Log the posted data
       console.log("Data posted:", {
         username: username,
         password: password,
         department: searchTerm,
       })
 
-      // Handle the response as needed
       console.log("Login successful:", response.data)
 
       const userId = response.data.id
       localStorage.setItem("id", userId.toString())
-      console.log("User ID set in localStorage:", localStorage.getItem("id")) // Log the value to confirm
+      console.log("User ID set in localStorage:", localStorage.getItem("id"))
 
-      // Redirect based on department
       if (searchTerm) {
         const route = departmentRoutes[searchTerm]
         router.push(route)
 
-        // Display success toast
         toast.success("Login Successful", {
           description: "You have successfully logged in.",
           duration: 5000,
@@ -116,7 +111,6 @@ const Page: React.FC = () => {
       setError("Login failed. Please try again.")
       console.error("Login error:", error)
 
-      // Display error toast
       toast.error("Login Failed", {
         description: "Please check your credentials and try again.",
         duration: 5000,
@@ -132,12 +126,30 @@ const Page: React.FC = () => {
 
   return (
     <>
+      <div className="fixed inset-0 -z-10 overflow-hidden">
+        <Image
+          src="/2493e163-a190-44e0-88af-aed2aaa79ee5 (1).webp"
+          alt="Background"
+          layout="fill"
+          objectFit="cover"
+          quality={100}
+          priority
+          className=" brightness-50"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-black/70"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] opacity-15"></div>
+      </div>
+
       <Navbar />
-      <Toaster position="top-center" richColors /> {/* Add Toaster component */}
-      <div className="flex h-screen w-full items-center justify-center">
-        <div className="auth flex rounded-lg max-sm:w-full xl:min-w-[498px]">
-          <div className="w-full justify-center px-6 py-6">
-            <h6 className="mb-6 text-center text-lg font-medium">Sign In</h6>
+      <Toaster position="top-center" richColors />
+      <div className="flex h-screen w-full items-center justify-center px-4">
+        <div className="auth flex rounded-lg bg-white/95 shadow-xl backdrop-blur-sm max-sm:w-full xl:min-w-[498px]">
+          <div className="w-full justify-center px-6 py-8">
+            <div className="mb-8 text-center">
+              <h1 className="text-2xl font-bold text-gray-800">Welcome Back</h1>
+              <p className="mt-2 text-gray-600">Sign in to your account</p>
+            </div>
+
             <form onSubmit={handleSubmit}>
               <div className="relative">
                 <div className="search-bg mb-3 flex h-[50px] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2 max-sm:w-full xl:w-[450px]">
@@ -161,7 +173,7 @@ const Page: React.FC = () => {
                   )}
                 </div>
                 {showDropdown && (
-                  <div className="dropdown absolute left-0 top-full z-10 w-full rounded-md">
+                  <div className="dropdown absolute left-0 top-full z-10 w-full rounded-md bg-white shadow-lg">
                     {departments
                       .filter((department) => department.toLowerCase().includes(searchTerm.toLowerCase()))
                       .map((department, index) => (

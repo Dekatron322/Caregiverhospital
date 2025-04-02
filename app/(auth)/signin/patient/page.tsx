@@ -38,7 +38,7 @@ const Page: React.FC = () => {
   const [showSuccessNotification, setShowSuccessNotification] = useState(false)
   const [showErrorNotification, setShowErrorNotification] = useState(false)
 
-  const router = useRouter() // Initialize the router
+  const router = useRouter()
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen)
@@ -83,18 +83,16 @@ const Page: React.FC = () => {
         password: password,
       })
 
-      // Log the posted data
       console.log("Data posted:", {
         email_address: email,
         password: password,
       })
 
-      // Handle the response as needed
       console.log("Login successful:", response.data)
 
       const userId = response.data.id
       localStorage.setItem("id", userId.toString())
-      console.log("User ID set in localStorage:", localStorage.getItem("id")) // Log the value to confirm
+      console.log("User ID set in localStorage:", localStorage.getItem("id"))
 
       router.push("/patient-dashboard")
       setShowSuccessNotification(true)
@@ -112,11 +110,29 @@ const Page: React.FC = () => {
 
   return (
     <>
+      <div className="fixed inset-0 -z-10 overflow-hidden">
+        <Image
+          src="/2493e163-a190-44e0-88af-aed2aaa79ee5 (1).webp"
+          alt="Background"
+          layout="fill"
+          objectFit="cover"
+          quality={100}
+          priority
+          className="brightness-75"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/50 to-black/70"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] opacity-15"></div>
+      </div>
+
       <Navbar />
-      <div className="flex h-screen w-full items-center justify-center">
-        <div className="auth flex rounded-lg max-sm:w-full xl:min-w-[498px]">
-          <div className="w-full justify-center px-6 py-6">
-            <h6 className="mb-6 text-center text-lg font-medium">Sign In</h6>
+      <div className="flex h-screen w-full items-center justify-center px-4">
+        <div className="auth flex rounded-lg bg-white/95 shadow-xl backdrop-blur-sm max-sm:w-full xl:min-w-[498px]">
+          <div className="w-full justify-center px-6 py-8">
+            <div className="mb-8 text-center">
+              <h1 className="text-2xl font-bold text-gray-800">Patient Login</h1>
+              <p className="mt-2 text-gray-600">Access your medical records and services</p>
+            </div>
+
             <form onSubmit={handleSubmit}>
               <div className="search-bg mb-3 flex h-[50px] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2 xl:w-[450px]">
                 <input
