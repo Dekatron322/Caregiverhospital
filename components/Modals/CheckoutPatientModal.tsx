@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react"
 import styles from "./modal.module.css"
 import { LiaTimesSolid } from "react-icons/lia"
-
 import axios from "axios"
+import { toast } from "sonner"
 
 interface ReviewModalProps {
   isOpen: boolean
@@ -72,6 +72,9 @@ const CheckoutPatientModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onS
     event.preventDefault()
     if (userDetails && checkAppId) {
       try {
+        // Show loading toast
+        const toastId = toast.loading("Processing checkout...")
+
         const response = await axios.put(
           `https://api2.caregiverhospital.com/check-app/check-app/${checkAppId}/`,
           {
@@ -83,7 +86,11 @@ const CheckoutPatientModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onS
             },
           }
         )
+
         if (response.status === 200 || response.status === 201) {
+          // Update toast to success
+          console.log("Patient checked out successfully")
+          toast.success("Patient checked out successfully!", { id: toastId })
           onSubmitSuccess()
           onClose()
         } else {
@@ -91,8 +98,12 @@ const CheckoutPatientModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onS
         }
       } catch (error) {
         console.error("Error checking out patient:", error)
+        // Show error toast
+        toast.error("Failed to check out patient. Please try again.")
         setError(`Error checking out patient`)
       }
+    } else {
+      toast.error("Missing required information for checkout")
     }
   }
 
@@ -110,10 +121,15 @@ const CheckoutPatientModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onS
           </div>
           <p>Are you sure you want to check out this patient?</p>
           <div className="mt-4 flex w-full gap-6">
-            <button className="button-primary h-[50px] w-full rounded-sm max-sm:h-[45px]" onClick={submitForm}>
-              CONFIRM CHECKOUT
+            <button
+              className="button-primary h-[50px] w-full rounded-sm max-sm:h-[45px]"
+              onClick={submitForm}
+              disabled={loading}
+            >
+              {loading ? "PROCESSING..." : "CONFIRM CHECKOUT"}
             </button>
           </div>
+          {error && <div className="mt-2 text-sm text-red-500">{error}</div>}
         </div>
       </div>
     </div>

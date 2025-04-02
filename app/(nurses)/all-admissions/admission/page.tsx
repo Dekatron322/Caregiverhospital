@@ -124,6 +124,10 @@ export default function PatientDetailPage() {
     setIsAdmissionOpen(true)
   }
 
+  const openCheckoutModal = () => {
+    setIsCheckoutModalOpen(true)
+  }
+
   const closeCheckoutModal = () => {
     setIsCheckoutModalOpen(false)
   }
@@ -132,10 +136,13 @@ export default function PatientDetailPage() {
     setIsAdmissionOpen(false)
   }
 
+  const [isCheckedOut, setIsCheckedOut] = useState(false)
+
   const handleHmoSubmissionSuccess = () => {
-    toast.success("Drug administered successfully")
+    toast.success("Patient checked out successfully!")
     setRefreshKey((prevKey) => prevKey + 1)
     fetchPatientDetails()
+    setIsCheckedOut(true) // Disable the checkout button
   }
 
   const formatDate = (dateString: string) => {
@@ -153,6 +160,7 @@ export default function PatientDetailPage() {
   if (loading) {
     return (
       <section className="h-full">
+        <Toaster position="top-center" richColors /> {/* Add Toaster component */}
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
             <DashboardNav />
@@ -299,8 +307,14 @@ export default function PatientDetailPage() {
                           </div>
 
                           <div className="mt-6 flex w-full gap-2">
-                            <button className="button-primary h-[40px] w-full whitespace-nowrap rounded-md max-sm:h-[40px]">
-                              Check Out
+                            <button
+                              onClick={openCheckoutModal}
+                              className={`button-primary h-[40px] w-full whitespace-nowrap rounded-md max-sm:h-[40px] ${
+                                isCheckedOut ? "cursor-not-allowed opacity-50" : ""
+                              }`}
+                              disabled={isCheckedOut}
+                            >
+                              {isCheckedOut ? "Checked Out" : "Check Out"}
                             </button>
                           </div>
                         </div>
@@ -406,7 +420,10 @@ export default function PatientDetailPage() {
         <CheckoutPatientModal
           isOpen={isCheckoutModalOpen}
           onClose={closeCheckoutModal}
-          onSubmitSuccess={handleHmoSubmissionSuccess}
+          onSubmitSuccess={() => {
+            handleHmoSubmissionSuccess()
+            closeCheckoutModal()
+          }}
           patientId={patientDetail.id}
         />
       )}
