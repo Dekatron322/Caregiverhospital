@@ -113,7 +113,7 @@ const IssueRequest = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [proceduresMap, setProceduresMap] = useState<Map<string, Procedure>>(new Map())
   const [offset, setOffset] = useState(0)
-  const limit = 1000
+  const limit = 500
   const [hasMore, setHasMore] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
 
