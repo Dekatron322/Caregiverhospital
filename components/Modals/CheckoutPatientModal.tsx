@@ -59,7 +59,9 @@ const CheckoutPatientModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onS
       const response = await axios.get(`https://api2.caregiverhospital.com/patient/patient/get/detail/${patientId}/`)
       const patient = response.data
       if (patient && patient.check_apps && patient.check_apps.length > 0) {
-        setCheckAppId(patient.check_apps[0].id)
+        // Get the last element of the check_apps array
+        const lastIndex = patient.check_apps.length - 1
+        setCheckAppId(patient.check_apps[lastIndex].id)
       } else {
         console.log("Check App ID not found.")
       }
