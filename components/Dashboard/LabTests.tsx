@@ -98,86 +98,84 @@ const SkeletonLoader = () => (
   </div>
 )
 
-const ResultCard = React.memo(
-  ({
-    result,
-    diagnosisData,
-    onCardClick,
-    onPaymentClick,
-    onDeleteClick,
-  }: {
-    result: LabTestResult
-    diagnosisData: Diagnosis[]
-    onCardClick: (result: LabTestResult) => void
-    onPaymentClick: (result: LabTestResult) => void
-    onDeleteClick: (id: string) => void
-  }) => {
-    const diagnosis = diagnosisData.find((diag) => diag.name === result.diagnosis_code)
+const ResultCard = React.memo(function ResultCard({
+  result,
+  diagnosisData,
+  onCardClick,
+  onPaymentClick,
+  onDeleteClick,
+}: {
+  result: LabTestResult
+  diagnosisData: Diagnosis[]
+  onCardClick: (result: LabTestResult) => void
+  onPaymentClick: (result: LabTestResult) => void
+  onDeleteClick: (id: string) => void
+}) {
+  const diagnosis = diagnosisData.find((diag) => diag.name === result.diagnosis_code)
 
-    const formatDate = (dateString: string) => {
-      const options: Intl.DateTimeFormatOptions = {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-      }
-      return new Date(dateString).toLocaleDateString(undefined, options)
+  const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
     }
+    return new Date(dateString).toLocaleDateString(undefined, options)
+  }
 
-    return (
-      <div className="sidebar flex w-full cursor-pointer items-center justify-between rounded-lg border p-2">
-        <div className="w-full">
-          <div className="flex items-center gap-2 text-sm font-bold">
-            <span className="max-sm:hidden">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#46ffa6]">
-                <p className="capitalize text-[#000000]">{result.doctor_name.charAt(0)}</p>
-              </div>
-            </span>
-            <div>
-              <p className="text-sm">Patient: {result.patient_name}</p>
-              <p className="text-sm">Doctor: {result.doctor_name}</p>
-              <p className="text-xs">Test Type: {result.test_type || "N/A"}</p>
+  return (
+    <div className="sidebar flex w-full cursor-pointer items-center justify-between rounded-lg border p-2">
+      <div className="w-full">
+        <div className="flex items-center gap-2 text-sm font-bold">
+          <span className="max-sm:hidden">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#46ffa6]">
+              <p className="capitalize text-[#000000]">{result.doctor_name.charAt(0)}</p>
             </div>
+          </span>
+          <div>
+            <p className="text-sm">Patient: {result.patient_name}</p>
+            <p className="text-sm">Doctor: {result.doctor_name}</p>
+            <p className="text-xs">Test Type: {result.test_type || "N/A"}</p>
           </div>
         </div>
-        <div className="w-full max-sm:hidden">
-          <p className="text-sm">{diagnosis?.name || "N/A"}</p>
-          <p className="text-xs font-bold">Code: {diagnosis?.code || "N/A"}</p>
-        </div>
-        <div className="w-full max-sm:hidden">
-          <p className="text-sm">₦ {diagnosis?.price || "N/A"}</p>
-          <p className="text-xs font-bold">Diagnosis Price</p>
-        </div>
-        <div className="w-full max-sm:hidden">
-          <p className="text-sm">{result.discount_value || "N/A"}</p>
-          <p className="text-xs font-bold">Discount</p>
-        </div>
-        <div className="w-full">
-          {result.payment_status ? (
-            <p className="w-32 rounded bg-[#000000] px-2 py-[6px] text-center text-xs text-[#46FFA6]">Paid</p>
-          ) : (
-            <p className="w-32 rounded bg-[#F2B8B5] px-2 py-[6px] text-center text-xs">Not Paid</p>
-          )}
-        </div>
-        <div className="w-full max-sm:hidden">
-          <p className="text-sm font-bold">{formatDate(result.pub_date)}</p>
-          <p className="text-xs font-bold">Date Requested</p>
-        </div>
-        <div className="flex gap-2">
-          {result.payment_status ? (
-            <RemoveRedEyeIcon className="text-[#46FFA6]" onClick={() => onCardClick(result)} />
-          ) : (
-            <p>-</p>
-          )}
-          <AccountBalanceWalletIcon onClick={() => onPaymentClick(result)} />
-          <DeleteForeverIcon className="text-[#F2B8B5]" onClick={() => onDeleteClick(result.id)} />
-        </div>
       </div>
-    )
-  }
-)
+      <div className="w-full max-sm:hidden">
+        <p className="text-sm">{diagnosis?.name || "N/A"}</p>
+        <p className="text-xs font-bold">Code: {diagnosis?.code || "N/A"}</p>
+      </div>
+      <div className="w-full max-sm:hidden">
+        <p className="text-sm">₦ {diagnosis?.price || "N/A"}</p>
+        <p className="text-xs font-bold">Diagnosis Price</p>
+      </div>
+      <div className="w-full max-sm:hidden">
+        <p className="text-sm">{result.discount_value || "N/A"}</p>
+        <p className="text-xs font-bold">Discount</p>
+      </div>
+      <div className="w-full">
+        {result.payment_status ? (
+          <p className="w-32 rounded bg-[#000000] px-2 py-[6px] text-center text-xs text-[#46FFA6]">Paid</p>
+        ) : (
+          <p className="w-32 rounded bg-[#F2B8B5] px-2 py-[6px] text-center text-xs">Not Paid</p>
+        )}
+      </div>
+      <div className="w-full max-sm:hidden">
+        <p className="text-sm font-bold">{formatDate(result.pub_date)}</p>
+        <p className="text-xs font-bold">Date Requested</p>
+      </div>
+      <div className="flex gap-2">
+        {result.payment_status ? (
+          <RemoveRedEyeIcon className="text-[#46FFA6]" onClick={() => onCardClick(result)} />
+        ) : (
+          <p>-</p>
+        )}
+        <AccountBalanceWalletIcon onClick={() => onPaymentClick(result)} />
+        <DeleteForeverIcon className="text-[#F2B8B5]" onClick={() => onDeleteClick(result.id)} />
+      </div>
+    </div>
+  )
+})
 
 const LabTests = () => {
   const router = useRouter()
