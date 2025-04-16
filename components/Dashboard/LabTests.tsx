@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState, useCallback, lazy, Suspense } from "react"
+import React, { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react"
 import axios from "axios"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
