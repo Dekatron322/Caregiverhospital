@@ -28,29 +28,38 @@ const NursesAdmission: React.FC = () => {
     const fetchAdmissions = async () => {
       try {
         const response = await fetch(
-          "https://api2.caregiverhospital.com/patient/patient-with-admission/0/100/admission/"
+          "https://api2.caregiverhospital.com/patient/patient-with-admission/0/300/admission/"
         )
         if (!response.ok) {
           throw new Error("Failed to fetch data")
         }
-        const data = (await response.json()) as Admission[]
+        const data = (await response.json()) as any[]
+
+        // Flatten and map into Admission[]
         const formattedData: Admission[] = data.flatMap((patient: any) =>
-          patient.check_apps.map((admission: any) => ({
-            id: admission.id,
+          patient.check_apps.map((adm: any) => ({
+            id: adm.id,
             patient_id: patient.id,
             name: patient.name,
-            image: admission.image || "",
-            ward: admission.ward,
-            reason: admission.reason,
-            checkout_date: admission.checkout_date || "",
-            pub_date: admission.pub_date,
-            time: admission.time,
-            status: admission.checkout_date ? "checkout" : "checkin",
+            image: adm.image || "",
+            ward: adm.ward,
+            reason: adm.reason,
+            checkout_date: adm.checkout_date || "",
+            pub_date: adm.pub_date,
+            time: adm.time,
+            status: adm.checkout_date ? "checkout" : "checkin",
           }))
         )
-        // Sort by pub_date in descending order (newest first)
+
+        // Sort by pub_date descending (newest first)
         const sortedData = formattedData.sort((a, b) => new Date(b.pub_date).getTime() - new Date(a.pub_date).getTime())
-        setAdmissions(sortedData)
+
+        // Keep only the most recent admission per patient_id
+        const uniqueMostRecent = sortedData.filter(
+          (adm, idx, arr) => arr.findIndex((a) => a.patient_id === adm.patient_id) === idx
+        )
+
+        setAdmissions(uniqueMostRecent)
       } catch (error) {
         console.error("Error fetching admissions:", error)
       } finally {
@@ -61,8 +70,8 @@ const NursesAdmission: React.FC = () => {
     fetchAdmissions()
   }, [])
 
-  const handlePatientClick = (admissionId: string) => {
-    localStorage.setItem("selectedAdmissionId", admissionId)
+  const handlePatientClick = (patientId: string) => {
+    localStorage.setItem("selectedAdmissionId", patientId)
     router.push(`/all-admissions/admission`)
   }
 
@@ -107,7 +116,9 @@ const NursesAdmission: React.FC = () => {
             <small className="text-xs">Reason for Check-in</small>
           </div>
           <div className="w-full max-md:hidden">
-            <p className="rounded py-[2px] text-xs font-semibold">{formatDate(appointment.checkout_date) || "N/A"}</p>
+            <p className="rounded py-[2px] text-xs font-semibold">
+              {appointment.checkout_date ? formatDate(appointment.checkout_date) : "N/A"}
+            </p>
             <small className="text-xs">Check-out Date</small>
           </div>
           <div>
@@ -119,7 +130,6 @@ const NursesAdmission: React.FC = () => {
   )
 
   const filteredAppointments = admissions.filter((appointment) => {
-    // Filter by tab first
     const tabFilter =
       activeTab === "all"
         ? true
@@ -127,7 +137,6 @@ const NursesAdmission: React.FC = () => {
         ? appointment.status === "checkin"
         : appointment.status === "checkout"
 
-    // Then filter by search term if it exists
     const searchFilter =
       searchTerm === "" ||
       appointment.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -145,8 +154,8 @@ const NursesAdmission: React.FC = () => {
             <div className="h-10 w-64 animate-pulse rounded bg-gray-200"></div>
             <div className="h-10 w-64 animate-pulse rounded bg-gray-200"></div>
           </div>
-          {[1, 2, 3, 4, 5, 6].map((_, index) => (
-            <div key={index} className="sidebar flex w-full items-center justify-between rounded-lg border p-2">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="sidebar flex w-full items-center justify-between rounded-lg border p-2">
               <div className="flex items-center gap-1 text-sm font-bold md:w-[20%]">
                 <div className="h-8 w-8 animate-pulse rounded-full bg-gray-200 max-sm:hidden"></div>
               </div>

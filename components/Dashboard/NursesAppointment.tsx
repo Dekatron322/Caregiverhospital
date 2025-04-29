@@ -32,7 +32,7 @@ const NursesAppointments = () => {
 
   const handleAppointmentClick = (appointmentId: number) => {
     localStorage.setItem("selectedAppointmentId", appointmentId.toString())
-    router.push(`/all-appointments/appointments/`)
+    router.push(`/pharmacy-appointments/appointments/`)
   }
 
   const fetchAppointments = async () => {
