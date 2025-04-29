@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import styles from "./modal.module.css"
 import { Patient } from "utils"
-import { toast } from "sonner" // Import Sonner toast
+import { toast } from "sonner"
 import CustomDropdown from "components/Patient/CustomDropdown"
 import CancelDelete from "public/svgs/cancel-delete"
 
@@ -20,7 +20,6 @@ const wardOptions = [
   { id: "12", name: "Amenity 4" },
 ]
 
-// Define or import PatientDetail type
 interface PatientDetail {
   id: string
   name: string
@@ -75,12 +74,12 @@ interface ReviewModalProps {
   isOpen: boolean
   onSubmitSuccess: () => void
   onClose: () => void
-  patientDetail: PatientDetail // Add this line
+  patientDetail: PatientDetail
   patientId: string
 }
 
 const AdmissionModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitSuccess, patientId, patientDetail }) => {
-  const [ward, setWard] = useState<string>("")
+  const [wardId, setWardId] = useState<string>("")
   const [reason, setReason] = useState<string>("")
   const [loading, setLoading] = useState(false)
 
@@ -89,7 +88,10 @@ const AdmissionModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitS
   const submitForm = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): Promise<void> => {
     event.preventDefault()
     setLoading(true)
+
     try {
+      const wardName = wardOptions.find((option) => option.id === wardId)?.name || ""
+
       const response = await fetch(
         `https://api2.caregiverhospital.com/patient/add-check-app-to-patient/${patientId}/`,
         {
@@ -98,7 +100,7 @@ const AdmissionModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitS
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            ward,
+            ward: wardName,
             reason,
           }),
         }
@@ -114,7 +116,7 @@ const AdmissionModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitS
             label: "Close",
             onClick: () => {},
           },
-        }) // Sonner success toast
+        })
       } else {
         console.error("Failed to submit form")
         toast.error("Admission failed", {
@@ -124,7 +126,7 @@ const AdmissionModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitS
             label: "Close",
             onClick: () => {},
           },
-        }) // Sonner error toast
+        })
       }
     } catch (error) {
       console.error("Error submitting form", error)
@@ -135,7 +137,7 @@ const AdmissionModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitS
           label: "Close",
           onClick: () => {},
         },
-      }) // Sonner error toast
+      })
     } finally {
       setLoading(false)
     }
@@ -146,7 +148,7 @@ const AdmissionModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitS
       <div className={styles.modalContent}>
         <div className="px-6 py-6">
           <div className="flex items-center justify-between">
-            <h6 className="text-lg font-medium">Admission </h6>
+            <h6 className="text-lg font-medium">Admission</h6>
             <div className="m-1 cursor-pointer" onClick={onClose}>
               <CancelDelete />
             </div>
@@ -155,11 +157,11 @@ const AdmissionModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitS
 
           <div className="my-4">
             <p className="mb-1 text-sm">Ward</p>
-            <div className="search-bg mt-1 flex h-[50px] w-[100%] items-center justify-between gap-3 rounded  py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+            <div className="search-bg mt-1 flex h-[50px] w-[100%] items-center justify-between gap-3 rounded py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
               <CustomDropdown
                 options={wardOptions}
-                selectedOption={ward}
-                onChange={(selected) => setWard(wardOptions.find((option) => option.id === selected)?.name || "")}
+                selectedOption={wardId}
+                onChange={(selected) => setWardId(selected)}
                 placeholder="Select a ward"
               />
             </div>
@@ -171,7 +173,7 @@ const AdmissionModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitS
               <input
                 type="text"
                 id="reason"
-                placeholder="reason"
+                placeholder="Reason for admission"
                 className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
@@ -183,7 +185,7 @@ const AdmissionModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitS
             <button
               className="button-primary h-[50px] w-full rounded-sm max-sm:h-[45px]"
               onClick={submitForm}
-              disabled={!ward || !reason}
+              disabled={!wardId || !reason}
             >
               {loading ? "Registering..." : "REGISTER"}
             </button>
