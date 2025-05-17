@@ -6,6 +6,10 @@ import { useRouter } from "next/navigation"
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
 import DeleteTestModal from "components/Modals/DeleteTestModal"
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye"
+import { DatePicker } from "@mui/x-date-pickers/DatePicker"
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
+import dayjs, { Dayjs } from "dayjs"
 
 interface Appointment {
   id: string
@@ -28,13 +32,19 @@ const Appointments = () => {
   const [selectedLabTestId, setSelectedLabTestId] = useState<string | null>(null)
   const [notification, setNotification] = useState<"success" | "payment" | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
+  const [startDate, setStartDate] = useState<Dayjs | null>(dayjs().subtract(1, "day"))
+  const [endDate, setEndDate] = useState<Dayjs | null>(dayjs())
 
   useEffect(() => {
     const controller = new AbortController()
 
     const fetchAppointments = async () => {
       try {
-        const response = await fetch(`https://api2.caregiverhospital.com/appointment/all/0/100/`, {
+        const start = startDate ? startDate.format("YYYY-MM-DD") : ""
+        const end = endDate ? endDate.format("YYYY-MM-DD") : ""
+
+        const url = `https://api2.caregiverhospital.com/appointment/all/${start}/${end}/`
+        const response = await fetch(url, {
           signal: controller.signal,
         })
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
@@ -49,7 +59,7 @@ const Appointments = () => {
 
     fetchAppointments()
     return () => controller.abort() // Cleanup fetch on unmount
-  }, [])
+  }, [startDate, endDate])
 
   const handleAppointmentClick = useCallback(
     (appointmentId: string) => {
@@ -201,13 +211,35 @@ const Appointments = () => {
             </div>
           </div>
 
-          <input
-            type="text"
-            placeholder="Search by patient name..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-bg mb-4 w-full rounded-lg border p-2 md:w-[300px]"
-          />
+          <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center md:gap-6">
+            <input
+              type="text"
+              placeholder="Search by patient name..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-bg mb-4 w-full rounded-lg border p-2 md:w-[300px]"
+            />
+            <div className="bg-white p-4">
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <div className="flex flex-col gap-4 md:flex-row md:items-center">
+                  <DatePicker
+                    label="Start Date"
+                    value={startDate}
+                    onChange={(newValue) => setStartDate(newValue)}
+                    maxDate={endDate || undefined}
+                    className="w-full"
+                  />
+                  <DatePicker
+                    label="End Date"
+                    value={endDate}
+                    onChange={(newValue) => setEndDate(newValue)}
+                    minDate={startDate || undefined}
+                    className="w-full"
+                  />
+                </div>
+              </LocalizationProvider>
+            </div>
+          </div>
 
           {renderAppointments}
         </>
