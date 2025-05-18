@@ -1,3 +1,5 @@
+"use client"
+
 import React, { lazy, Suspense, useCallback, useEffect, useMemo, useState } from "react"
 import axios from "axios"
 import { useRouter } from "next/navigation"
@@ -7,6 +9,10 @@ import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet"
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft"
 import ChevronRightIcon from "@mui/icons-material/ChevronRight"
+import { DatePicker } from "@mui/x-date-pickers/DatePicker"
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
+import dayjs, { Dayjs } from "dayjs"
 
 // Lazy load modals
 const TestModal = lazy(() => import("components/Modals/TestModal"))
@@ -65,35 +71,35 @@ const filterLogic = {
 }
 
 const SkeletonLoader = () => (
-  <div className="sidebar flex w-full items-center justify-between rounded-lg border p-2">
+  <div className="flex w-full animate-pulse items-center justify-between rounded-lg border border-gray-200 p-2 dark:border-gray-700">
     <div className="flex items-center gap-1 text-sm font-bold md:w-[20%]">
-      <div className="h-8 w-8 animate-pulse rounded-full bg-gray-200 max-sm:hidden"></div>
+      <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-600 max-sm:hidden"></div>
     </div>
     <div className="flex w-full items-center gap-1 text-sm font-bold">
       <div>
-        <div className="h-4 w-24 animate-pulse rounded bg-gray-200"></div>
-        <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+        <div className="h-4 w-24 rounded bg-gray-200 dark:bg-gray-600"></div>
+        <div className="mt-1 h-3 w-16 rounded bg-gray-200 dark:bg-gray-600"></div>
       </div>
     </div>
     <div className="w-full max-md:hidden">
-      <div className="h-4 w-16 animate-pulse rounded bg-gray-200"></div>
-      <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+      <div className="h-4 w-16 rounded bg-gray-200 dark:bg-gray-600"></div>
+      <div className="mt-1 h-3 w-16 rounded bg-gray-200 dark:bg-gray-600"></div>
     </div>
     <div className="w-full max-md:hidden">
-      <div className="h-4 w-16 animate-pulse rounded bg-gray-200"></div>
-      <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+      <div className="h-4 w-16 rounded bg-gray-200 dark:bg-gray-600"></div>
+      <div className="mt-1 h-3 w-16 rounded bg-gray-200 dark:bg-gray-600"></div>
     </div>
     <div className="w-full">
-      <div className="h-4 w-16 animate-pulse rounded bg-gray-200"></div>
-      <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+      <div className="h-4 w-16 rounded bg-gray-200 dark:bg-gray-600"></div>
+      <div className="mt-1 h-3 w-16 rounded bg-gray-200 dark:bg-gray-600"></div>
     </div>
     <div className="w-full max-md:hidden">
-      <div className="h-6 w-16 animate-pulse rounded bg-gray-200"></div>
+      <div className="h-6 w-16 rounded bg-gray-200 dark:bg-gray-600"></div>
     </div>
     <div className="flex gap-2">
-      <div className="h-6 w-6 animate-pulse rounded-full bg-gray-200"></div>
-      <div className="h-6 w-6 animate-pulse rounded-full bg-gray-200"></div>
-      <div className="h-6 w-6 animate-pulse rounded-full bg-gray-200"></div>
+      <div className="h-6 w-6 rounded-full bg-gray-200 dark:bg-gray-600"></div>
+      <div className="h-6 w-6 rounded-full bg-gray-200 dark:bg-gray-600"></div>
+      <div className="h-6 w-6 rounded-full bg-gray-200 dark:bg-gray-600"></div>
     </div>
   </div>
 )
@@ -126,7 +132,7 @@ const ResultCard = React.memo(function ResultCard({
   }
 
   return (
-    <div className="sidebar flex w-full cursor-pointer items-center justify-between rounded-lg border p-2">
+    <div className="flex w-full cursor-pointer items-center justify-between rounded-lg border border-gray-200 p-2 dark:border-gray-700">
       <div className="w-full">
         <div className="flex items-center gap-2 text-sm font-bold">
           <span className="max-sm:hidden">
@@ -135,43 +141,52 @@ const ResultCard = React.memo(function ResultCard({
             </div>
           </span>
           <div>
-            <p className="text-sm">Patient: {result.patient_name}</p>
-            <p className="text-sm">Doctor: {result.doctor_name}</p>
-            <p className="text-xs">Test Type: {result.test_type || "N/A"}</p>
+            <p className="text-sm ">Patient: {result.patient_name}</p>
+            <p className="text-sm ">Doctor: {result.doctor_name}</p>
+            <p className="text-xs ">Test Type: {result.test_type || "N/A"}</p>
           </div>
         </div>
       </div>
       <div className="w-full max-sm:hidden">
-        <p className="text-sm">{diagnosis?.name || "N/A"}</p>
-        <p className="text-xs font-bold">Code: {diagnosis?.code || "N/A"}</p>
+        <p className="text-sm ">{diagnosis?.name || "N/A"}</p>
+        <p className="text-xs font-bold ">Code: {diagnosis?.code || "N/A"}</p>
       </div>
       <div className="w-full max-sm:hidden">
-        <p className="text-sm">₦ {diagnosis?.price || "N/A"}</p>
-        <p className="text-xs font-bold">Diagnosis Price</p>
+        <p className="text-sm ">₦ {diagnosis?.price || "N/A"}</p>
+        <p className="text-xs font-bold ">Diagnosis Price</p>
       </div>
       <div className="w-full max-sm:hidden">
-        <p className="text-sm">{result.discount_value || "N/A"}</p>
-        <p className="text-xs font-bold">Discount</p>
+        <p className="text-sm ">{result.discount_value || "N/A"}</p>
+        <p className="text-xs font-bold ">Discount</p>
       </div>
       <div className="w-full">
         {result.payment_status ? (
           <p className="w-32 rounded bg-[#000000] px-2 py-[6px] text-center text-xs text-[#46FFA6]">Paid</p>
         ) : (
-          <p className="w-32 rounded bg-[#F2B8B5] px-2 py-[6px] text-center text-xs">Not Paid</p>
+          <p className="w-32 rounded bg-[#F2B8B5] px-2 py-[6px] text-center text-xs text-black">Not Paid</p>
         )}
       </div>
       <div className="w-full max-sm:hidden">
-        <p className="text-sm font-bold">{formatDate(result.pub_date)}</p>
-        <p className="text-xs font-bold">Date Requested</p>
+        <p className="text-sm font-bold ">{formatDate(result.pub_date)}</p>
+        <p className="text-xs font-bold ">Date Requested</p>
       </div>
       <div className="flex gap-2">
         {result.payment_status ? (
-          <RemoveRedEyeIcon className="text-[#46FFA6]" onClick={() => onCardClick(result)} />
+          <RemoveRedEyeIcon
+            className="text-gray-500 hover:text-[#46ffa6] dark:text-gray-400 dark:hover:text-[#46ffa6]"
+            onClick={() => onCardClick(result)}
+          />
         ) : (
-          <p>-</p>
+          <p className="">-</p>
         )}
-        <AccountBalanceWalletIcon onClick={() => onPaymentClick(result)} />
-        <DeleteForeverIcon className="text-[#F2B8B5]" onClick={() => onDeleteClick(result.id)} />
+        <AccountBalanceWalletIcon
+          className=" hover:text-blue-500 dark:text-gray-400 dark:hover:text-blue-400"
+          onClick={() => onPaymentClick(result)}
+        />
+        <DeleteForeverIcon
+          className=" hover:text-[#F2B8B5] dark:text-gray-400 dark:hover:text-[#F2B8B5]"
+          onClick={() => onDeleteClick(result.id)}
+        />
       </div>
     </div>
   )
@@ -194,9 +209,11 @@ const LabTests = () => {
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("")
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [selectedLabTestId, setSelectedLabTestId] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState<ActiveTab>("all")
+  const [startDate, setStartDate] = useState<Dayjs | null>(dayjs().subtract(1, "day"))
+  const [endDate, setEndDate] = useState<Dayjs | null>(dayjs())
   const resultsPerPage = 20
   const maxVisiblePages = 5
-  const [activeTab, setActiveTab] = useState<ActiveTab>("all")
 
   // Debounce search input
   useEffect(() => {
@@ -221,8 +238,11 @@ const LabTests = () => {
               cancelToken: cancelTokenSource.token,
             })
 
+      const start = startDate ? startDate.format("YYYY-MM-DD") : ""
+      const end = endDate ? endDate.format("YYYY-MM-DD") : ""
+
       const [labTestResponse, diagnosisResponse] = await Promise.all([
-        axios.get("https://api2.caregiverhospital.com/lab-test/lab-test/", {
+        axios.get(`https://api2.caregiverhospital.com/lab-test/filter-lab-test/${start}/${end}/`, {
           params: { page: currentPage, limit: resultsPerPage },
           cancelToken: cancelTokenSource.token,
         }),
@@ -253,7 +273,7 @@ const LabTests = () => {
     }
 
     return () => cancelTokenSource.cancel()
-  }, [currentPage, diagnosisData.length, refresh])
+  }, [currentPage, diagnosisData.length, refresh, startDate, endDate])
 
   useEffect(() => {
     fetchData()
@@ -381,7 +401,9 @@ const LabTests = () => {
               onClick={() => handlePageChange(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
               className={`flex items-center gap-1 rounded px-3 py-1 text-sm ${
-                currentPage === 1 ? "cursor-not-allowed text-gray-400" : "text-[#1E1E1E] hover:bg-gray-100"
+                currentPage === 1
+                  ? "cursor-not-allowed text-gray-400"
+                  : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
               }`}
             >
               <ChevronLeftIcon fontSize="small" />
@@ -390,7 +412,7 @@ const LabTests = () => {
             <div className="flex items-center gap-1">
               {visiblePages.map((page, index) =>
                 page === "..." ? (
-                  <span key={index} className="px-2 py-1">
+                  <span key={index} className="px-2 py-1 text-gray-700 dark:text-gray-300">
                     ...
                   </span>
                 ) : (
@@ -398,7 +420,9 @@ const LabTests = () => {
                     key={index}
                     onClick={() => handlePageChange(Number(page))}
                     className={`h-8 w-8 rounded-full text-sm ${
-                      currentPage === page ? "bg-[#131414] text-white" : "bg-[#F1FFF0] text-[#1E1E1E] hover:bg-gray-200"
+                      currentPage === page
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
                     }`}
                   >
                     {page}
@@ -410,7 +434,9 @@ const LabTests = () => {
               onClick={() => handlePageChange(Math.min(totalPages, currentPage + 1))}
               disabled={currentPage === totalPages}
               className={`flex items-center gap-1 rounded px-3 py-1 text-sm ${
-                currentPage === totalPages ? "cursor-not-allowed text-gray-400" : "text-[#1E1E1E] hover:bg-gray-100"
+                currentPage === totalPages
+                  ? "cursor-not-allowed text-gray-400"
+                  : "text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
               }`}
             >
               Next
@@ -433,35 +459,49 @@ const LabTests = () => {
           </div>
         ) : (
           <div>
-            <div className="tab-bg mb-4 flex items-center gap-3 rounded-lg p-1 md:w-[260px] md:border">
-              <button
-                onClick={() => setActiveTab("all")}
-                className={activeTab === "all" ? "active-tab" : "inactive-tab"}
-              >
-                All
-              </button>
-              <button
-                onClick={() => setActiveTab("approved")}
-                className={activeTab === "approved" ? "active-tab" : "inactive-tab"}
-              >
-                Approved
-              </button>
-              <button
-                onClick={() => setActiveTab("notApproved")}
-                className={activeTab === "notApproved" ? "active-tab" : "inactive-tab"}
-              >
-                Not Approved
-              </button>
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+              <div className="tab-bg mb-4 flex w-[260px] items-center gap-3 rounded-lg border border-gray-200 p-1 dark:border-gray-700">
+                <button
+                  onClick={() => setActiveTab("all")}
+                  className={`${
+                    activeTab === "all"
+                      ? "active-tab bg-blue-500 text-white"
+                      : "inactive-tab text-gray-700 dark:text-gray-300"
+                  }`}
+                >
+                  All
+                </button>
+                <button
+                  onClick={() => setActiveTab("approved")}
+                  className={`${
+                    activeTab === "approved"
+                      ? "active-tab bg-blue-500 text-white"
+                      : "inactive-tab text-gray-700 dark:text-gray-300"
+                  }`}
+                >
+                  Approved
+                </button>
+                <button
+                  onClick={() => setActiveTab("notApproved")}
+                  className={`${
+                    activeTab === "notApproved"
+                      ? "active-tab bg-blue-500 text-white"
+                      : "inactive-tab text-gray-700 dark:text-gray-300"
+                  }`}
+                >
+                  Not Approved
+                </button>
+              </div>
             </div>
-            <div>
-              <div className="search-bg mb-4 flex h-10 items-center justify-between gap-2 rounded border border-[#CFDBD5] px-3 py-1 max-md:w-[180px] lg:w-[300px]">
-                <Image className="icon-style" src="/icons.svg" width={16} height={16} alt="dekalo" priority />
+            <div className="flex w-full flex-col justify-between gap-4 md:flex-row md:items-center">
+              <div className="search-bg flex h-10 items-center justify-between gap-2 rounded border border-gray-300 bg-white px-3 py-1 dark:border-gray-600 dark:bg-gray-700 max-md:w-[180px] lg:w-[300px]">
+                <Image className="icon-style" src="/icons.svg" width={16} height={16} alt="search" priority />
                 <Image
                   className="dark-icon-style"
                   src="/search-dark.svg"
                   width={16}
                   height={16}
-                  alt="dekalo"
+                  alt="search"
                   priority
                 />
                 <input
@@ -469,11 +509,29 @@ const LabTests = () => {
                   placeholder="Search..."
                   value={searchQuery}
                   onChange={handleSearchChange}
-                  className="w-full bg-transparent text-xs outline-none focus:outline-none"
+                  className="w-full bg-transparent text-xs text-gray-900 outline-none focus:outline-none dark:text-white"
                 />
               </div>
-              {renderResults(filterLogic[activeTab])}
+              <div className="bg-white p-4">
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <div className="flex flex-col gap-4 md:flex-row md:items-center">
+                    <DatePicker
+                      label="Start Date"
+                      value={startDate}
+                      onChange={(newValue) => setStartDate(newValue)}
+                      maxDate={endDate || undefined}
+                    />
+                    <DatePicker
+                      label="End Date"
+                      value={endDate}
+                      onChange={(newValue) => setEndDate(newValue)}
+                      minDate={startDate || undefined}
+                    />
+                  </div>
+                </LocalizationProvider>
+              </div>
             </div>
+            {renderResults(filterLogic[activeTab])}
           </div>
         )}
       </div>
@@ -495,14 +553,14 @@ const LabTests = () => {
 
       {showSuccessNotification && (
         <div className="animation-fade-in absolute bottom-16 m-5 flex h-[50px] w-[339px] items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514] md:right-16">
-          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" priority />
-          <span className="clash-font text-sm text-[#0F920F]">Result Submitted</span>
+          <Image src="/check-circle.svg" width={16} height={16} alt="success" priority />
+          <span className="text-sm text-[#0F920F]">Result Submitted</span>
         </div>
       )}
       {showPaymentSuccessNotification && (
         <div className="animation-fade-in absolute bottom-16 m-5 flex h-[50px] w-[339px] items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514] md:right-16">
-          <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" priority />
-          <span className="clash-font text-sm text-[#0F920F]">Invoice Sent</span>
+          <Image src="/check-circle.svg" width={16} height={16} alt="success" priority />
+          <span className="text-sm text-[#0F920F]">Invoice Sent</span>
         </div>
       )}
     </>
