@@ -247,7 +247,7 @@ const DoctorsAppointments: React.FC = () => {
                 placeholder="Search patients..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 bg-white p-2 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                className="w-full rounded-lg border border-gray-300 bg-white p-2  focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
               />
             </div>
             <div className="bg-white p-4">
@@ -283,10 +283,10 @@ const DoctorsAppointments: React.FC = () => {
           <div className={`${styles.deleteModalContent} bg-white dark:bg-gray-800`}>
             <div className="px-6 py-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white">Confirm Completion</h2>
+                <h2 className="text-xl font-bold  dark:text-white">Confirm Completion</h2>
                 <div className="border-black hover:rounded-md hover:border">
                   <LiaTimesSolid
-                    className="m-1 cursor-pointer text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+                    className="hover: m-1 cursor-pointer text-gray-700 dark:text-gray-300 dark:hover:text-white"
                     onClick={() => setIsModalVisible(false)}
                   />
                 </div>

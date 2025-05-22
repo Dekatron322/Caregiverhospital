@@ -358,7 +358,7 @@ const IssueRequest = () => {
         </div>
 
         <div className="flex w-full flex-col justify-between gap-4 md:flex-row md:items-center">
-          <div className="search-bg flex h-10 items-center justify-between gap-2 rounded border border-gray-300 bg-white px-3 py-1 dark:border-gray-600 dark:bg-gray-700 max-md:w-[180px] lg:w-[300px]">
+          <div className="search-bg flex h-10 items-center justify-between gap-2 rounded border border-gray-300 bg-white px-3 py-1  max-md:w-[180px] lg:w-[300px]">
             <Image className="icon-style" src="/icons.svg" width={16} height={16} alt="search" />
             <Image className="dark-icon-style" src="/search-dark.svg" width={16} height={16} alt="search" />
             <input
@@ -366,7 +366,7 @@ const IssueRequest = () => {
               placeholder="Search..."
               value={searchQuery}
               onChange={handleSearchChange}
-              className="w-full bg-transparent text-xs text-gray-900 outline-none focus:outline-none dark:text-white"
+              className="w-full bg-transparent text-xs  outline-none focus:outline-none dark:text-white"
             />
           </div>
           <div className="bg-white p-4">

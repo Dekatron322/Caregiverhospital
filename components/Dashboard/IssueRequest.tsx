@@ -411,7 +411,7 @@ const IssueRequest = () => {
               placeholder="Search by name, membership or policy ID..."
               value={searchQuery}
               onChange={handleSearchChange}
-              className="w-full bg-transparent text-xs text-gray-900 outline-none focus:outline-none dark:text-white"
+              className="w-full bg-transparent text-xs  outline-none focus:outline-none dark:text-white"
             />
           </div>
           <div className="bg-white p-4">
