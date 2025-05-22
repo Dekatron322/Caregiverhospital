@@ -5,6 +5,10 @@ import { useRouter } from "next/navigation"
 import { BsEyeFill } from "react-icons/bs"
 import { RiDeleteBin5Line } from "react-icons/ri"
 import CancelDelete from "public/svgs/cancel-delete"
+import { DatePicker } from "@mui/x-date-pickers/DatePicker"
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
+import dayjs, { Dayjs } from "dayjs"
 
 interface Admission {
   id: string
@@ -27,12 +31,17 @@ const AllAdmission: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [admissionToDelete, setAdmissionToDelete] = useState<Admission | null>(null)
+  const [startDate, setStartDate] = useState<Dayjs | null>(dayjs().subtract(1, "month"))
+  const [endDate, setEndDate] = useState<Dayjs | null>(dayjs())
 
   useEffect(() => {
     const fetchAdmissions = async () => {
       try {
+        const start = startDate ? startDate.format("YYYY-MM-DD") : ""
+        const end = endDate ? endDate.format("YYYY-MM-DD") : ""
+
         const response = await fetch(
-          "https://api2.caregiverhospital.com/patient/patient-with-admission/0/300/admission/"
+          `https://api2.caregiverhospital.com/patient/filter/patient-with-admission/${start}/${end}/admission/`
         )
         if (!response.ok) {
           throw new Error("Failed to fetch data")
@@ -72,7 +81,7 @@ const AllAdmission: React.FC = () => {
     }
 
     fetchAdmissions()
-  }, [])
+  }, [startDate, endDate])
 
   const handlePatientClick = (patientId: string) => {
     localStorage.setItem("selectedAdmissionId", patientId)
@@ -144,8 +153,12 @@ const AllAdmission: React.FC = () => {
             <small className="text-xs">Check-out Date</small>
           </div>
           <div className="flex items-center gap-2">
-            <BsEyeFill onClick={() => handlePatientClick(app.patient_id)} />
+            <BsEyeFill
+              className="cursor-pointer text-gray-600 hover:text-blue-500"
+              onClick={() => handlePatientClick(app.patient_id)}
+            />
             <RiDeleteBin5Line
+              className="cursor-pointer text-gray-600 hover:text-red-500"
               onClick={() => {
                 setAdmissionToDelete(app)
                 setShowDeleteModal(true)
@@ -214,7 +227,7 @@ const AllAdmission: React.FC = () => {
         </div>
       ) : (
         <>
-          <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-col gap-4 md:justify-between">
             <div className="tab-bg flex w-[245px] items-center gap-3 rounded-lg p-1 md:border">
               {["all", "checkin", "checkout"].map((tab) => (
                 <button
@@ -226,14 +239,36 @@ const AllAdmission: React.FC = () => {
                 </button>
               ))}
             </div>
-            <div className="w-full md:w-64">
-              <input
-                type="text"
-                placeholder="Search patients, wards, reasons..."
-                className="w-full rounded-lg border p-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#46ffa6]"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+            <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+              <div className="w-full md:w-64">
+                <input
+                  type="text"
+                  placeholder="Search patients, wards, reasons..."
+                  className="w-full rounded-lg border p-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#46ffa6]"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <div className="bg-white p-4">
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <div className="flex flex-col gap-2 md:flex-row">
+                    <DatePicker
+                      label="Start Date"
+                      value={startDate}
+                      onChange={(newValue) => setStartDate(newValue)}
+                      maxDate={endDate || undefined}
+                      slotProps={{ textField: { size: "small" } }}
+                    />
+                    <DatePicker
+                      label="End Date"
+                      value={endDate}
+                      onChange={(newValue) => setEndDate(newValue)}
+                      minDate={startDate || undefined}
+                      slotProps={{ textField: { size: "small" } }}
+                    />
+                  </div>
+                </LocalizationProvider>
+              </div>
             </div>
           </div>
           {filteredAdmissions.length > 0 ? (
