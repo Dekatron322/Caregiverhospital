@@ -11,6 +11,10 @@ import IssueRequestModal from "components/Modals/IssueRequestModal"
 import ViewPrescriptionModal from "components/Modals/ViewPrescriptionModal"
 import DeleteTestModal from "components/Modals/DeleteTestModal"
 import { toast, Toaster } from "sonner"
+import { DatePicker } from "@mui/x-date-pickers/DatePicker"
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
+import dayjs, { Dayjs } from "dayjs"
 
 interface Prescription {
   id: string
@@ -71,35 +75,38 @@ const SkeletonLoader = () => {
   return (
     <div className="flex flex-col gap-2">
       {[1, 2, 3, 4, 5, 6].map((_, index) => (
-        <div key={index} className="sidebar flex w-full items-center justify-between rounded-lg border p-2">
+        <div
+          key={index}
+          className="flex w-full animate-pulse items-center justify-between rounded-lg border border-gray-200 p-2 dark:border-gray-700"
+        >
           <div className="flex items-center gap-1 text-sm font-bold md:w-[20%]">
-            <div className="h-8 w-8 animate-pulse rounded-full bg-gray-200 max-sm:hidden"></div>
+            <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-600 max-sm:hidden"></div>
           </div>
           <div className="flex w-full items-center gap-1 text-sm font-bold">
             <div>
-              <div className="h-4 w-24 animate-pulse rounded bg-gray-200"></div>
-              <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+              <div className="h-4 w-24 rounded bg-gray-200 dark:bg-gray-600"></div>
+              <div className="mt-1 h-3 w-16 rounded bg-gray-200 dark:bg-gray-600"></div>
             </div>
           </div>
           <div className="w-full max-md:hidden">
-            <div className="h-4 w-16 animate-pulse rounded bg-gray-200"></div>
-            <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+            <div className="h-4 w-16 rounded bg-gray-200 dark:bg-gray-600"></div>
+            <div className="mt-1 h-3 w-16 rounded bg-gray-200 dark:bg-gray-600"></div>
           </div>
           <div className="w-full max-md:hidden">
-            <div className="h-4 w-16 animate-pulse rounded bg-gray-200"></div>
-            <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+            <div className="h-4 w-16 rounded bg-gray-200 dark:bg-gray-600"></div>
+            <div className="mt-1 h-3 w-16 rounded bg-gray-200 dark:bg-gray-600"></div>
           </div>
           <div className="w-full">
-            <div className="h-4 w-16 animate-pulse rounded bg-gray-200"></div>
-            <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
+            <div className="h-4 w-16 rounded bg-gray-200 dark:bg-gray-600"></div>
+            <div className="mt-1 h-3 w-16 rounded bg-gray-200 dark:bg-gray-600"></div>
           </div>
           <div className="w-full max-md:hidden">
-            <div className="h-6 w-16 animate-pulse rounded bg-gray-200"></div>
+            <div className="h-6 w-16 rounded bg-gray-200 dark:bg-gray-600"></div>
           </div>
           <div className="flex gap-2">
-            <div className="h-6 w-6 animate-pulse rounded-full bg-gray-200"></div>
-            <div className="h-6 w-6 animate-pulse rounded-full bg-gray-200"></div>
-            <div className="h-6 w-6 animate-pulse rounded-full bg-gray-200"></div>
+            <div className="h-6 w-6 rounded-full bg-gray-200 dark:bg-gray-600"></div>
+            <div className="h-6 w-6 rounded-full bg-gray-200 dark:bg-gray-600"></div>
+            <div className="h-6 w-6 rounded-full bg-gray-200 dark:bg-gray-600"></div>
           </div>
         </div>
       ))}
@@ -112,10 +119,9 @@ const IssueRequest = () => {
   const [patients, setPatients] = useState<Patient[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [proceduresMap, setProceduresMap] = useState<Map<string, Procedure>>(new Map())
-  const [offset, setOffset] = useState(0)
-  const limit = 500
-  const [hasMore, setHasMore] = useState(true)
   const [searchQuery, setSearchQuery] = useState("")
+  const [startDate, setStartDate] = useState<Dayjs | null>(dayjs().subtract(1, "day"))
+  const [endDate, setEndDate] = useState<Dayjs | null>(dayjs())
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isPreModalOpen, setIsPreModalOpen] = useState(false)
@@ -124,45 +130,36 @@ const IssueRequest = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [selectedPrescriptionId, setSelectedPrescriptionId] = useState<string | null>(null)
 
-  const fetchPatientsPage = async () => {
+  const fetchPatients = async () => {
     setIsLoading(true)
     try {
+      const start = startDate ? startDate.format("YYYY-MM-DD") : ""
+      const end = endDate ? endDate.format("YYYY-MM-DD") : ""
       const response = await fetch(
-        `https://api2.caregiverhospital.com/patient/patient-with-prescription/${offset}/${offset + limit}/prescription/`
+        `https://api2.caregiverhospital.com/patient/filter/patient-with-prescription/${start}/${end}/prescription/`
       )
       const data = (await response.json()) as ApiResponse
 
-      if (data.length === 0) {
-        setHasMore(false)
-      } else {
-        // Create a set of existing patient IDs to avoid duplicates
-        const existingPatientIds = new Set(patients.map((p) => p.id))
+      // Process patients and remove duplicate prescriptions for each patient
+      const processedPatients = data.map((patient) => {
+        const prescriptionMap = new Map<string, Prescription>()
+        patient.prescriptions.forEach((p) => {
+          if (!prescriptionMap.has(p.id)) {
+            prescriptionMap.set(p.id, p)
+          }
+        })
 
-        // Process new patients and remove duplicate prescriptions for each patient
-        const newPatients = data.reduce((acc: Patient[], patient) => {
-          if (existingPatientIds.has(patient.id)) return acc
+        const uniquePrescriptions = Array.from(prescriptionMap.values()).sort(
+          (a, b) => new Date(b.pub_date).getTime() - new Date(a.pub_date).getTime()
+        )
 
-          const prescriptionMap = new Map<string, Prescription>()
-          patient.prescriptions.forEach((p) => {
-            if (!prescriptionMap.has(p.id)) {
-              prescriptionMap.set(p.id, p)
-            }
-          })
+        return {
+          ...patient,
+          prescriptions: uniquePrescriptions,
+        }
+      })
 
-          const uniquePrescriptions = Array.from(prescriptionMap.values()).sort(
-            (a, b) => new Date(b.pub_date).getTime() - new Date(a.pub_date).getTime()
-          )
-
-          acc.push({
-            ...patient,
-            prescriptions: uniquePrescriptions,
-          })
-          return acc
-        }, [])
-
-        setPatients((prev) => [...prev, ...newPatients])
-        setOffset((prev) => prev + limit)
-      }
+      setPatients(processedPatients)
     } catch (error) {
       console.error("Error fetching patients:", error)
     } finally {
@@ -182,9 +179,9 @@ const IssueRequest = () => {
   }
 
   useEffect(() => {
-    fetchPatientsPage()
+    fetchPatients()
     fetchProcedures()
-  }, [])
+  }, [startDate, endDate])
 
   const handleDeleteClick = (id: string) => {
     setSelectedPrescriptionId(id)
@@ -273,7 +270,6 @@ const IssueRequest = () => {
     )
   }, [patients, searchQuery])
 
-  // Build a list of prescription items without duplicates based on patient and prescription IDs
   const getSortedPrescriptionsList = (filterFn: (prescription: Prescription) => boolean) => {
     const prescriptionsMap = new Map<string, { patient: Patient; prescription: Prescription }>()
     filteredPatients.forEach((patient) => {
@@ -294,53 +290,53 @@ const IssueRequest = () => {
     return (
       <div
         key={`${patient.id}-${prescription.id}`}
-        className="sidebar mb-2 flex w-full items-center justify-between gap-3 rounded-lg border p-2"
+        className="mb-2 flex w-full items-center justify-between gap-3 rounded-lg border border-gray-200 p-2 dark:border-gray-700"
       >
-        <div className="flex  w-full items-center gap-2">
+        <div className="flex w-full items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46ffa6] max-md:hidden">
             <p className="capitalize text-[#000000]">{patient.name.charAt(0)}</p>
           </div>
           <div>
-            <p className="text-xs font-bold">
+            <p className="text-xs font-bold ">
               {patient.name} - ({calculateAge(patient.dob)}yrs)
             </p>
-            <p className="text-xs">Doctor: {prescription.doctor_name}</p>
-            <p className="text-xs">HMO ID: {patient.policy_id}</p>
+            <p className="text-xs ">Doctor: {prescription.doctor_name}</p>
+            <p className="text-xs ">HMO ID: {patient.policy_id}</p>
           </div>
         </div>
         <div className="flex w-full flex-col max-sm:hidden">
-          <p className="text-xs font-bold">Procedure: {procedureDetails?.name}</p>
-          <p className="text-xs font-medium">Price: ₦{procedureDetails?.price}</p>
-          <p className="text-xs font-medium">Code: {procedureDetails?.code}</p>
+          <p className="text-xs font-bold ">Procedure: {procedureDetails?.name}</p>
+          <p className="text-xs font-medium ">Price: ₦{procedureDetails?.price}</p>
+          <p className="text-xs font-medium ">Code: {procedureDetails?.code}</p>
         </div>
         <div className="flex w-full flex-col">
-          <p className="text-xs font-bold">{prescription.name}</p>
-          <p className="text-xs">₦{prescription.dosage}</p>
-          <small className="text-xs">Medicine Name</small>
+          <p className="text-xs font-bold ">{prescription.name}</p>
+          <p className="text-xs ">₦{prescription.dosage}</p>
+          <small className="text-xs ">Medicine Name</small>
         </div>
         <div className="flex w-full flex-col max-sm:hidden">
-          <div className="flex gap-1 text-xs font-bold">{prescription.category}</div>
-          <small className="text-xs">Category Name</small>
+          <div className="flex gap-1 text-xs font-bold ">{prescription.category}</div>
+          <small className="text-xs ">Category Name</small>
         </div>
         <div className="flex w-full flex-col max-sm:hidden">
-          <div className="flex gap-1 text-xs font-bold">{prescription.unit}</div>
-          <small className="text-xs">Unit</small>
+          <div className="flex gap-1 text-xs font-bold ">{prescription.unit}</div>
+          <small className="text-xs ">Unit</small>
         </div>
         <div className="flex w-full flex-col max-sm:hidden">
-          <p className="text-xs font-bold">{formatDate(prescription.pub_date)}</p>
-          <small className="text-xs">Date and Time</small>
+          <p className="text-xs font-bold ">{formatDate(prescription.pub_date)}</p>
+          <small className="text-xs ">Date and Time</small>
         </div>
         <div className="flex w-full justify-end gap-2">
           <AccountBalanceWalletIcon
-            className="cursor-pointer hover:text-blue-500"
+            className="cursor-pointer text-gray-500 hover:text-blue-500  dark:hover:text-blue-400"
             onClick={() => handleIconClick(patient, prescription)}
           />
           <RemoveRedEyeIcon
-            className="cursor-pointer text-[#46FFA6] hover:text-green-700"
+            className="cursor-pointer text-gray-500 hover:text-[#46FFA6]  dark:hover:text-[#46FFA6]"
             onClick={() => handleRemoveRedEyeClick(patient, prescription)}
           />
           <DeleteForeverIcon
-            className="cursor-pointer text-[#F2B8B5] hover:text-red-700"
+            className="cursor-pointer text-gray-500 hover:text-[#F2B8B5]  dark:hover:text-[#F2B8B5]"
             onClick={() => handleDeleteClick(prescription.id)}
           />
         </div>
@@ -356,7 +352,7 @@ const IssueRequest = () => {
           pendingPrescriptions.map(({ patient, prescription }) => renderPrescriptionDetails(patient, prescription))
         ) : (
           <div className="flex items-center justify-center p-4">
-            <p className="text-gray-500">No pending prescriptions found</p>
+            <p className="">No pending prescriptions found</p>
           </div>
         )}
       </div>
@@ -371,7 +367,7 @@ const IssueRequest = () => {
           issuedPrescriptions.map(({ patient, prescription }) => renderPrescriptionDetails(patient, prescription))
         ) : (
           <div className="flex items-center justify-center p-4">
-            <p className="text-gray-500">No issued prescriptions found</p>
+            <p className="">No issued prescriptions found</p>
           </div>
         )}
       </div>
@@ -382,60 +378,70 @@ const IssueRequest = () => {
     <div className="flex w-full flex-col">
       <Toaster position="top-center" richColors />
 
-      <div className="tab-bg mb-8 flex w-[160px] items-center gap-3 rounded-lg p-1 md:border">
-        <button
-          className={`${activeTab === "pending" ? "active-tab" : "inactive-tab"}`}
-          onClick={() => setActiveTab("pending")}
-        >
-          Pending
-        </button>
-        <button
-          className={`${activeTab === "issued" ? "active-tab" : "inactive-tab"}`}
-          onClick={() => setActiveTab("issued")}
-        >
-          Issued
-        </button>
-      </div>
-
-      <div className="tab-content">
-        <div className="search-bg mb-4 flex h-10 items-center justify-between gap-2 rounded border border-[#CFDBD5] px-3 py-1 max-md:w-[180px] lg:w-[300px]">
-          <Image className="icon-style" src="/icons.svg" width={16} height={16} alt="dekalo" />
-          <Image className="dark-icon-style" src="/search-dark.svg" width={16} height={16} alt="dekalo" />
-          <input
-            type="text"
-            placeholder="Search by name, membership or policy ID..."
-            value={searchQuery}
-            onChange={handleSearchChange}
-            className="w-full bg-transparent text-xs outline-none focus:outline-none"
-          />
-        </div>
-        {isLoading && patients.length === 0 ? (
-          <SkeletonLoader />
-        ) : (
-          <>
-            {activeTab === "pending" && renderPendingRequests()}
-            {activeTab === "issued" && renderIssuedRequests()}
-          </>
-        )}
-      </div>
-
-      {hasMore && (
-        <div className="mt-4 flex justify-center">
+      <div className="flex w-full flex-col  gap-4 md:justify-between">
+        <div className="tab-bg mb-4 flex w-[160px] items-center gap-3 rounded-lg border border-gray-200 p-1 dark:border-gray-700">
           <button
-            className="flex items-center justify-center rounded-md bg-blue-500 px-4 py-2 text-white disabled:opacity-50"
-            onClick={fetchPatientsPage}
-            disabled={isLoading}
+            className={`${
+              activeTab === "pending"
+                ? "active-tab bg-blue-500 text-white"
+                : "inactive-tab text-gray-700 dark:text-gray-300"
+            }`}
+            onClick={() => setActiveTab("pending")}
           >
-            {isLoading ? (
-              <div className="flex items-center gap-2">
-                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
-                Loading...
-              </div>
-            ) : (
-              "Load More Patients"
-            )}
+            Pending
+          </button>
+          <button
+            className={`${
+              activeTab === "issued"
+                ? "active-tab bg-blue-500 text-white"
+                : "inactive-tab text-gray-700 dark:text-gray-300"
+            }`}
+            onClick={() => setActiveTab("issued")}
+          >
+            Issued
           </button>
         </div>
+
+        <div className="flex w-full flex-col justify-between gap-4 md:flex-row md:items-center">
+          <div className="search-bg flex h-10 items-center justify-between gap-2 rounded border border-gray-300 bg-white px-3 py-1 dark:border-gray-600 dark:bg-gray-700 max-md:w-[180px] lg:w-[300px]">
+            <Image className="icon-style" src="/icons.svg" width={16} height={16} alt="search" />
+            <Image className="dark-icon-style" src="/search-dark.svg" width={16} height={16} alt="search" />
+            <input
+              type="text"
+              placeholder="Search by name, membership or policy ID..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+              className="w-full bg-transparent text-xs text-gray-900 outline-none focus:outline-none dark:text-white"
+            />
+          </div>
+          <div className="bg-white p-4">
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <div className="flex flex-col gap-4 md:flex-row md:items-center">
+                <DatePicker
+                  label="Start Date"
+                  value={startDate}
+                  onChange={(newValue) => setStartDate(newValue)}
+                  maxDate={endDate || undefined}
+                />
+                <DatePicker
+                  label="End Date"
+                  value={endDate}
+                  onChange={(newValue) => setEndDate(newValue)}
+                  minDate={startDate || undefined}
+                />
+              </div>
+            </LocalizationProvider>
+          </div>
+        </div>
+      </div>
+
+      {isLoading && patients.length === 0 ? (
+        <SkeletonLoader />
+      ) : (
+        <>
+          {activeTab === "pending" && renderPendingRequests()}
+          {activeTab === "issued" && renderIssuedRequests()}
+        </>
       )}
 
       <PaymentStatusModal
