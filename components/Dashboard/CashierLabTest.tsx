@@ -5,6 +5,11 @@ import TestModal from "components/Modals/TestModal"
 import Image from "next/image"
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet"
 import PaymentModal from "components/Modals/PaymentModal"
+import { DatePicker } from "@mui/x-date-pickers/DatePicker"
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
+import dayjs, { Dayjs } from "dayjs"
+import { Pagination } from "@mui/material"
 
 interface HMO {
   id: string
@@ -22,7 +27,7 @@ interface LabTestResult {
   status_note: string
   pub_date: string
   patient_name: string
-  patient_id: string // Added field for patient ID
+  patient_id: string
   policy_id: string
   diagnosis_code: string
   discount_value: string
@@ -51,7 +56,6 @@ interface ModalProps {
 const CashierLabTests = () => {
   const router = useRouter()
   const [isDone, setIsDone] = useState<boolean>(false)
-
   const [clickedCard, setClickedCard] = useState<LabTestResult | null>(null)
   const [paymentCard, setPaymentCard] = useState<LabTestResult | null>(null)
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
@@ -66,17 +70,22 @@ const CashierLabTests = () => {
   const [searchQuery, setSearchQuery] = useState("")
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [selectedLabTestId, setSelectedLabTestId] = useState<string | null>(null)
+  const [startDate, setStartDate] = useState<Dayjs | null>(dayjs().subtract(1, "day"))
+  const [endDate, setEndDate] = useState<Dayjs | null>(dayjs())
   const resultsPerPage = 20
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true)
       try {
-        // Fetch lab test results
-        const labTestResponse = await axios.get("https://api2.caregiverhospital.com/lab-test/lab-test/")
+        const formattedStartDate = startDate?.format("YYYY-MM-DD") || ""
+        const formattedEndDate = endDate?.format("YYYY-MM-DD") || ""
+
+        const labTestResponse = await axios.get(
+          `https://api2.caregiverhospital.com/lab-test/filter-lab-test/${formattedStartDate}/${formattedEndDate}/`
+        )
         const labTestData = labTestResponse.data
 
-        // Fetch diagnosis data
         const diagnosisResponse = await axios.get("https://api2.caregiverhospital.com/diagnosis/diagnosis/")
         const fetchedDiagnosisData = diagnosisResponse.data
         setDiagnosisData(fetchedDiagnosisData)
@@ -89,7 +98,6 @@ const CashierLabTests = () => {
               diagnosis,
             }
           })
-
           setLabTestResults(tests)
         } else {
           console.error("Unexpected response format for lab test results")
@@ -102,7 +110,7 @@ const CashierLabTests = () => {
     }
 
     fetchData()
-  }, [refresh])
+  }, [refresh, startDate, endDate])
 
   const handlePaymentClick = (results: LabTestResult) => {
     const diagnosis = diagnosisData.find((diag) => diag.code === results.diagnosis_code)
@@ -110,6 +118,7 @@ const CashierLabTests = () => {
     setPaymentCard(resultWithDiagnosis)
     setIsPaymentModalOpen(true)
   }
+
   const handleModalClose = () => {
     setIsModalOpen(false)
     setClickedCard(null)
@@ -118,7 +127,7 @@ const CashierLabTests = () => {
   const handlePaymentModalClose = (isSuccess: boolean) => {
     if (isSuccess) {
       setShowPaymentSuccessNotification(true)
-      setRefresh(!refresh) // Trigger a refresh
+      setRefresh(!refresh)
       setTimeout(() => setShowPaymentSuccessNotification(false), 5000)
     }
     setIsPaymentModalOpen(false)
@@ -136,12 +145,13 @@ const CashierLabTests = () => {
     return new Date(dateString).toLocaleDateString(undefined, options)
   }
 
-  const handlePageChange = (page: number) => {
+  const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
     setCurrentPage(page)
   }
 
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(event.target.value)
+    setCurrentPage(1) // Reset to first page when searching
   }
 
   const filteredResults = labTestResults.filter(
@@ -158,9 +168,9 @@ const CashierLabTests = () => {
   const totalPages = Math.ceil(filteredResults.length / resultsPerPage)
 
   const filterLogic = {
-    all: () => true, // Show all results
-    approved: (results: LabTestResult) => results.payment_status === true, // Paid
-    notApproved: (results: LabTestResult) => results.payment_status === false, // Not Paid
+    all: () => true,
+    approved: (results: LabTestResult) => results.payment_status === true,
+    notApproved: (results: LabTestResult) => results.payment_status === false,
   }
 
   type ActiveTab = keyof typeof filterLogic
@@ -168,9 +178,10 @@ const CashierLabTests = () => {
   const [activeTab, setActiveTab] = useState<ActiveTab>("all")
 
   const renderResults = (filter: (results: LabTestResult) => boolean) => {
+    const filtered = currentResults.filter(filter)
     return (
       <div className="flex flex-col gap-2">
-        {currentResults.filter(filter).map((results) => {
+        {filtered.map((results) => {
           const diagnosis = diagnosisData.find((diag) => diag.name === results.diagnosis_code)
           return (
             <div
@@ -222,21 +233,33 @@ const CashierLabTests = () => {
             </div>
           )
         })}
-        <div className="mb-4 flex items-center justify-end max-sm:px-3 md:mt-4">
-          {Array.from({ length: totalPages }, (_, index) => (
-            <button
-              key={index + 1}
-              onClick={() => handlePageChange(index + 1)}
-              className={`pagination-button ${
-                currentPage === index + 1
-                  ? "active h-6 w-6 rounded-full bg-[#131414] text-sm text-[#ffffff] shadow"
-                  : "h-6 w-6 rounded-full bg-[#F1F1F1] text-sm"
-              }`}
-            >
-              {index + 1}
-            </button>
-          ))}
-        </div>
+
+        {/* Material-UI Pagination */}
+        {filteredResults.length > 0 && (
+          <div className="mb-4 flex items-center justify-center max-sm:px-3 md:mt-4">
+            <Pagination
+              count={totalPages}
+              page={currentPage}
+              onChange={handlePageChange}
+              color="primary"
+              size="medium"
+              showFirstButton
+              showLastButton
+              sx={{
+                "& .MuiPaginationItem-root": {
+                  color: "#46ffae",
+                  "&.Mui-selected": {
+                    backgroundColor: "#131414",
+                    color: "#fff",
+                    "&:hover": {
+                      backgroundColor: "#131414",
+                    },
+                  },
+                },
+              }}
+            />
+          </div>
+        )}
       </div>
     )
   }
@@ -275,7 +298,7 @@ const CashierLabTests = () => {
                   Not Approved
                 </button>
               </div>
-              <div>
+              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div className="search-bg mb-4 flex h-10 items-center justify-between gap-2 rounded border border-[#CFDBD5] px-3 py-1 max-md:w-[180px] lg:w-[300px]">
                   <Image className="icon-style" src="/icons.svg" width={16} height={16} alt="dekalo" />
                   <Image className="dark-icon-style" src="/search-dark.svg" width={16} height={16} alt="dekalo" />
@@ -287,8 +310,36 @@ const CashierLabTests = () => {
                     className="w-full bg-transparent text-xs outline-none focus:outline-none"
                   />
                 </div>
-                {renderResults(filterLogic[activeTab])}
+                <div className="bg-white p-4">
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <div className="flex items-center gap-2">
+                      <DatePicker
+                        label="Start Date"
+                        value={startDate}
+                        onChange={(newValue) => setStartDate(newValue)}
+                        format="YYYY-MM-DD"
+                        slotProps={{
+                          textField: {
+                            size: "small",
+                          },
+                        }}
+                      />
+                      <DatePicker
+                        label="End Date"
+                        value={endDate}
+                        onChange={(newValue) => setEndDate(newValue)}
+                        format="YYYY-MM-DD"
+                        slotProps={{
+                          textField: {
+                            size: "small",
+                          },
+                        }}
+                      />
+                    </div>
+                  </LocalizationProvider>
+                </div>
               </div>
+              {renderResults(filterLogic[activeTab])}
             </div>
           </>
         )}
