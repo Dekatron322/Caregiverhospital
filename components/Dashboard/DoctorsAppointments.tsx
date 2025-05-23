@@ -247,7 +247,7 @@ const DoctorsAppointments: React.FC = () => {
                 placeholder="Search patients..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 bg-white p-2  focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500"
+                className="w-full rounded-lg border border-gray-300  p-2  focus:border-blue-500 focus:ring-blue-500"
               />
             </div>
             <div className="bg-white p-4">
