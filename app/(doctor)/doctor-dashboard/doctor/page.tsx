@@ -202,6 +202,41 @@ export default function PatientDetailPage() {
     await fetchPatientDetails()
   }
 
+  // Function to download patient notes
+  const downloadNotes = () => {
+    if (!patient || !patient.notes || patient.notes.length < 1) {
+      alert("No notes available to download")
+      return
+    }
+
+    // Create a formatted text file content
+    let content = `Patient Name: ${patient.name}\n`
+    content += `Patient ID: ${patient.policy_id}\n`
+    content += `Date of Birth: ${formatDate(patient.dob)}\n`
+    content += `\n=== PATIENT NOTES ===\n\n`
+
+    patient.notes.forEach((note, index) => {
+      content += `Note ${index + 1}:\n`
+      content += `Date: ${formatDate(note.pub_date)}\n`
+      content += `Details: ${note.detail}\n\n`
+    })
+
+    // Create a Blob with the content
+    const blob = new Blob([content], { type: "text/plain" })
+    const url = URL.createObjectURL(blob)
+
+    // Create a temporary anchor element to trigger the download
+    const a = document.createElement("a")
+    a.href = url
+    a.download = `${patient.name.replace(/\s+/g, "_")}_Notes_${new Date().toISOString().split("T")[0]}.txt`
+    document.body.appendChild(a)
+    a.click()
+
+    // Clean up
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <>
       <Toaster position="top-center" richColors />
@@ -435,7 +470,15 @@ export default function PatientDetailPage() {
 
                       {/* Notes Section */}
                       <div className="notes-section sidebar mb-4 mt-10 rounded border p-4">
-                        <h3 className="mb-4 text-xl font-bold">Patient Notes</h3>
+                        <div className="flex justify-between">
+                          <h3 className="mb-4 text-xl font-bold">Patient Notes</h3>
+                          <button
+                            onClick={downloadNotes}
+                            className="button-primary h-[40px] whitespace-nowrap rounded-md px-4 max-sm:h-[40px] xl:text-sm"
+                          >
+                            Download Notes
+                          </button>
+                        </div>
                         {patient.notes.length > 0 ? (
                           patient.notes.map((note) => (
                             <div key={note.id} className="">
