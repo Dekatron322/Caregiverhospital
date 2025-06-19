@@ -6,6 +6,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { IoMdArrowBack } from "react-icons/io"
 import { MdLocationPin } from "react-icons/md"
+import jsPDF from "jspdf"
 
 import PatientDetailsForDoctor from "components/Patient/PatientDetailsForDoctor"
 import LabTestModal from "components/Modals/LabTestModal"
@@ -87,15 +88,13 @@ interface Patient {
     detail: string
     test_range: string
   }[]
-  notes: [
-    {
-      id: string
-      title: string
-      detail: string
-      status: string
-      pub_date: any
-    },
-  ]
+  notes: {
+    id: string
+    title: string
+    detail: string
+    status: string
+    pub_date: any
+  }[]
 }
 
 interface AddPrescription {
@@ -157,6 +156,7 @@ export default function PatientDetailPage() {
       setLoading(false)
     }
   }
+
   const handleGoBack = () => {
     router.back()
   }
@@ -198,43 +198,71 @@ export default function PatientDetailPage() {
   }
 
   const refreshPatientDetails = async () => {
-    setLoading(true) // Optionally show a loading spinner
+    setLoading(true)
     await fetchPatientDetails()
   }
 
-  // Function to download patient notes
-  const downloadNotes = () => {
-    if (!patient || !patient.notes || patient.notes.length < 1) {
+  const generatePDF = () => {
+    if (!patient || !patient.notes || patient.notes.length === 0) {
       alert("No notes available to download")
       return
     }
 
-    // Create a formatted text file content
-    let content = `Patient Name: ${patient.name}\n`
-    content += `Patient ID: ${patient.policy_id}\n`
-    content += `Date of Birth: ${formatDate(patient.dob)}\n`
-    content += `\n=== PATIENT NOTES ===\n\n`
+    const doc = new jsPDF()
 
+    // Add header
+    doc.setFontSize(20)
+    doc.setTextColor(40, 40, 40)
+    doc.text("Caregiver Hospital - Patient Notes", 105, 20, { align: "center" })
+
+    // Add patient info
+    doc.setFontSize(12)
+    doc.text(`Patient: ${patient.name}`, 14, 35)
+    doc.text(`ID: ${patient.policy_id}`, 14, 43)
+    doc.text(`DOB: ${formatDate(patient.dob)}`, 14, 51)
+    doc.text(`Blood Group: ${patient.blood_group || "N/A"}`, 14, 59)
+    doc.text(`Allergies: ${patient.allergies || "None"}`, 14, 67)
+
+    // Add separator
+    doc.setDrawColor(200, 200, 200)
+    doc.line(14, 75, 196, 75)
+
+    // Add notes title
+    doc.setFontSize(16)
+    doc.text("Clinical Notes", 105, 85, { align: "center" })
+
+    // Add notes content
+    let yPosition = 95
     patient.notes.forEach((note, index) => {
-      content += `Note ${index + 1}:\n`
-      content += `Date: ${formatDate(note.pub_date)}\n`
-      content += `Details: ${note.detail}\n\n`
+      if (yPosition > 260) {
+        doc.addPage()
+        yPosition = 20
+      }
+
+      doc.setFontSize(12)
+      doc.setTextColor(40, 40, 40)
+      doc.setFont("Inter", "bold")
+      doc.text(`Note ${index + 1} - ${formatDate(note.pub_date)}`, 14, yPosition)
+
+      doc.setFont("Inter", "normal")
+      const splitText = doc.splitTextToSize(note.detail, 180)
+      doc.text(splitText, 14, yPosition + 8)
+
+      doc.line(14, yPosition + 8 + splitText.length * 6 + 5, 196, yPosition + 8 + splitText.length * 6 + 5)
+      yPosition += 8 + splitText.length * 6 + 10
     })
 
-    // Create a Blob with the content
-    const blob = new Blob([content], { type: "text/plain" })
-    const url = URL.createObjectURL(blob)
+    // Add footer
+    const totalPages = doc.getNumberOfPages()
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i)
+      doc.setFontSize(10)
+      doc.setTextColor(150, 150, 150)
+      doc.text(`Page ${i} of ${totalPages}`, 105, 285, { align: "center" })
+      doc.text(`Generated: ${new Date().toLocaleDateString()}`, 105, 290, { align: "center" })
+    }
 
-    // Create a temporary anchor element to trigger the download
-    const a = document.createElement("a")
-    a.href = url
-    a.download = `${patient.name.replace(/\s+/g, "_")}_Notes_${new Date().toISOString().split("T")[0]}.txt`
-    document.body.appendChild(a)
-    a.click()
-
-    // Clean up
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
+    doc.save(`${patient.name.replace(/\s+/g, "_")}_Notes_${new Date().toISOString().split("T")[0]}.pdf`)
   }
 
   return (
@@ -247,14 +275,12 @@ export default function PatientDetailPage() {
 
             {loading ? (
               <div className="px-16 max-md:px-3 sm:py-10">
-                {/* Skeleton for back button */}
                 <div className="flex items-center gap-2">
                   <div className="h-6 w-6 animate-pulse rounded-full bg-gray-200"></div>
                   <div className="h-4 w-20 animate-pulse rounded bg-gray-200"></div>
                 </div>
 
                 <div className="pt-10">
-                  {/* Skeleton for vitals cards */}
                   <div className="sidebar mb-3 grid w-full grid-cols-4 gap-2 max-sm:grid-cols-2">
                     {[...Array(4)].map((_, i) => (
                       <div key={i} className="flex w-full flex-col items-center justify-center rounded border py-3">
@@ -266,7 +292,6 @@ export default function PatientDetailPage() {
                   </div>
 
                   <div className="flex justify-between gap-2 max-md:flex-col">
-                    {/* Left sidebar skeleton */}
                     <div className="md:w-1/4">
                       <div className="sidebar flex flex-col justify-center rounded-md border px-4 py-8">
                         <div className="flex items-center justify-center">
@@ -294,7 +319,6 @@ export default function PatientDetailPage() {
                         </div>
                       </div>
 
-                      {/* Allergies skeleton */}
                       <div className="py-2">
                         <div className="mb-1 h-6 w-24 animate-pulse rounded bg-gray-200"></div>
                         <div className="flex flex-wrap">
@@ -306,7 +330,6 @@ export default function PatientDetailPage() {
                         </div>
                       </div>
 
-                      {/* Next of kin skeleton */}
                       <div className="py-2">
                         <div className="mb-2 h-6 w-24 animate-pulse rounded bg-gray-200"></div>
                         <div className="flex justify-between">
@@ -316,9 +339,7 @@ export default function PatientDetailPage() {
                       </div>
                     </div>
 
-                    {/* Right content skeleton */}
                     <div className="w-3/4">
-                      {/* Patient details skeleton */}
                       <div className="sidebar rounded border p-4">
                         <div className="h-8 w-48 animate-pulse rounded bg-gray-200"></div>
                         <div className="mt-4 space-y-4">
@@ -331,7 +352,6 @@ export default function PatientDetailPage() {
                         </div>
                       </div>
 
-                      {/* Notes section skeleton */}
                       <div className="notes-section sidebar mb-4 mt-10 rounded border p-4">
                         <div className="mb-4 h-8 w-48 animate-pulse rounded bg-gray-200"></div>
                         {[...Array(2)].map((_, i) => (
@@ -468,15 +488,14 @@ export default function PatientDetailPage() {
                     <div className="w-3/4">
                       <PatientDetailsForDoctor patient={patient} />
 
-                      {/* Notes Section */}
                       <div className="notes-section sidebar mb-4 mt-10 rounded border p-4">
                         <div className="flex justify-between">
                           <h3 className="mb-4 text-xl font-bold">Patient Notes</h3>
                           <button
-                            onClick={downloadNotes}
+                            onClick={generatePDF}
                             className="button-primary h-[40px] whitespace-nowrap rounded-md px-4 max-sm:h-[40px] xl:text-sm"
                           >
-                            Download Notes
+                            Download Notes (PDF)
                           </button>
                         </div>
                         {patient.notes.length > 0 ? (
