@@ -1,6 +1,7 @@
 "use client"
 import React, { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import jsPDF from "jspdf"
 
 import Footer from "components/Footer/Footer"
 import Image from "next/image"
@@ -193,6 +194,17 @@ const PatientDetailSkeleton = () => {
   )
 }
 
+const formatDate = (dateString: string) => {
+  const options: Intl.DateTimeFormatOptions = {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }
+  return new Date(dateString).toLocaleDateString(undefined, options)
+}
+
 export default function PatientDetailPage() {
   const [isAdmissionOpen, setIsAdmissionOpen] = useState(false)
   const [patientDetail, setPatientDetail] = useState<PatientDetail | null>(null)
@@ -251,13 +263,88 @@ export default function PatientDetailPage() {
     setTimeout(() => setShowSuccessNotification(false), 5000)
   }
 
-  const formatDate = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
+  const generatePrescriptionsPDF = () => {
+    if (
+      !patientDetail ||
+      patientDetail.check_apps.length === 0 ||
+      !patientDetail.check_apps.some((check) => check.doctor_prescription)
+    ) {
+      alert("No doctor prescriptions available to download")
+      return
     }
-    return new Date(dateString).toLocaleDateString(undefined, options)
+
+    const doc = new jsPDF()
+
+    // Add header
+    doc.setFontSize(20)
+    doc.setTextColor(40, 40, 40)
+    doc.text("Caregiver Hospital - Doctor Prescriptions", 105, 20, { align: "center" })
+
+    // Add patient info
+    doc.setFontSize(12)
+    doc.text(`Patient: ${patientDetail.name}`, 14, 35)
+    doc.text(`ID: ${patientDetail.policy_id}`, 14, 43)
+    doc.text(`DOB: ${formatDate(patientDetail.dob)}`, 14, 51)
+    doc.text(`Blood Group: ${patientDetail.blood_group || "N/A"}`, 14, 59)
+    doc.text(`Allergies: ${patientDetail.allergies || "None"}`, 14, 67)
+
+    // Add separator
+    doc.setDrawColor(200, 200, 200)
+    doc.line(14, 75, 196, 75)
+
+    // Add prescriptions title
+    doc.setFontSize(16)
+    doc.text("Doctor Prescriptions", 105, 85, { align: "center" })
+
+    let yPosition = 95
+    let prescriptionCount = 0
+
+    patientDetail.check_apps.forEach((check) => {
+      if (check.doctor_prescription) {
+        prescriptionCount++
+
+        if (yPosition > 260) {
+          doc.addPage()
+          yPosition = 20
+        }
+
+        doc.setFontSize(12)
+        doc.setTextColor(40, 40, 40)
+        doc.setFont("helvetica", "bold")
+        doc.text(`Prescription #${prescriptionCount}`, 14, yPosition)
+        doc.setFont("helvetica", "normal")
+        yPosition += 10
+
+        doc.text(`Doctor: ${check.doctor_prescription.doctor_name}`, 14, yPosition)
+        yPosition += 10
+
+        doc.text(`Date: ${formatDate(check.doctor_prescription.pub_date)}`, 14, yPosition)
+        yPosition += 10
+
+        // Split prescription text into multiple lines if needed
+        const splitText = doc.splitTextToSize(check.doctor_prescription.prescription, 180)
+        doc.text(splitText, 14, yPosition)
+        yPosition += splitText.length * 7 + 15
+
+        // Add separator between prescriptions
+        doc.setDrawColor(200, 200, 200)
+        doc.line(14, yPosition - 5, 196, yPosition - 5)
+      }
+    })
+
+    // Add footer
+    const totalPages = doc.getNumberOfPages()
+    for (let i = 1; i <= totalPages; i++) {
+      doc.setPage(i)
+      doc.setFontSize(10)
+      doc.setTextColor(150, 150, 150)
+      doc.text(`Page ${i} of ${totalPages}`, 105, 285, { align: "center" })
+      doc.text(`Generated: ${new Date().toLocaleDateString()}`, 105, 290, { align: "center" })
+    }
+
+    doc.save(
+      `${patientDetail.name.replace(/\s+/g, "_")}_Doctor_Prescriptions_${new Date().toISOString().split("T")[0]}.pdf`
+    )
   }
 
   return (
@@ -342,14 +429,26 @@ export default function PatientDetailPage() {
                     </div>
 
                     <div className="mb-2 flex w-full flex-col">
-                      <div className="w-[50%]">
-                        <h3 className="mb-6 text-xl font-bold">Doctor&apos;s Prescription</h3>
+                      <div className="w-[100%]">
+                        <div className="flex justify-between">
+                          <h3 className="mb-6 text-xl font-bold">Doctor&apos;s Prescription</h3>
+                          <button
+                            onClick={generatePrescriptionsPDF}
+                            className="button-primary h-[40px] whitespace-nowrap rounded-md px-4 text-sm max-sm:h-[40px]"
+                          >
+                            Download Prescriptions (PDF)
+                          </button>
+                        </div>
                         <p className="mb-4 font-semibold">Drugs to Administer</p>
                         {patientDetail.check_apps.map((check) => (
                           <div key={check.id}>
                             {check.doctor_prescription && (
                               <div className="mb-4">
-                                <p>{check.doctor_prescription.prescription}</p>
+                                <p className="font-medium">Prescribed by: {check.doctor_prescription.doctor_name}</p>
+                                <p className="text-sm text-gray-600">
+                                  {formatDate(check.doctor_prescription.pub_date)}
+                                </p>
+                                <p className="mt-2">{check.doctor_prescription.prescription}</p>
                               </div>
                             )}
                           </div>
