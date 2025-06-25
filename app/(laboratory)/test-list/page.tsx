@@ -12,7 +12,8 @@ import DeleteCategoryModal from "components/Modals/DeleteCategoryModal"
 import EditCategoryModal from "components/Modals/EditCategoryModal"
 import AddTestModal from "components/Modals/AddTestModal"
 import LaboratoryNav from "components/Navbar/LaboratoryNav"
-import EditTestModal from "components/Modals/EditTestModal"
+import EditTestModal from "components/Modals/EditTestList"
+
 // Define types
 interface Medicine {
   id: string
@@ -29,6 +30,7 @@ interface MedicineCategory {
   parameters: Medicine[]
   title: string
   detail: string
+  test_range: string
   status: boolean
   test_price: string
   pub_date: string
@@ -47,10 +49,7 @@ export default function MedicineCategories() {
   const [categoryToDelete, setCategoryToDelete] = useState<string | null>(null)
   const router = useRouter()
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false)
-
   const [categoryToEdit, setCategoryToEdit] = useState<MedicineCategory | null>(null)
-
-  // Function to open the edit modal
 
   useEffect(() => {
     fetchCategories()
@@ -81,7 +80,6 @@ export default function MedicineCategories() {
     setIsDeleteModalOpen(true)
   }
 
-  // Function to close delete modal
   const closeDeleteModal = () => {
     setIsDeleteModalOpen(false)
     setCategoryToDelete(null)
@@ -114,7 +112,6 @@ export default function MedicineCategories() {
     setIsEditModalOpen(true)
   }
 
-  // Function to close edit modal
   const closeEditModal = () => {
     setIsEditModalOpen(false)
     setCategoryToEdit(null)
@@ -140,8 +137,7 @@ export default function MedicineCategories() {
   }
 
   const handleEditSuccess = () => {
-    // Refresh the category list or update the specific category in the state
-    fetchCategories() // Function to reload categories
+    fetchCategories()
   }
 
   const handleDeleteCategory = async () => {
@@ -152,13 +148,12 @@ export default function MedicineCategories() {
         method: "DELETE",
       })
 
-      const responseBody = await response.text() // or response.json() if it's JSON
+      const responseBody = await response.text()
 
       if (!response.ok) {
         throw new Error(`Failed to delete category: ${response.status} - ${responseBody}`)
       }
 
-      // Refresh categories after successful deletion
       fetchCategories()
     } catch (error) {
       console.error("Error deleting category:", error)

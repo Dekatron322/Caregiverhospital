@@ -15,6 +15,8 @@ import { IoAddCircleSharp } from "react-icons/io5"
 import DeletePatientModal from "components/Modals/DeletePatientModal"
 import EditPatientModal from "components/Modals/EditPatientModal"
 import { toast, Toaster } from "sonner" // Import Sonner
+import MedicalServicesOutlinedIcon from "@mui/icons-material/MedicalServicesOutlined"
+import EditHmoModal from "components/Modals/EditHmoModal"
 
 export interface Patients {
   id: string
@@ -61,6 +63,9 @@ export default function Patients() {
   const [patientToDelete, setPatientToDelete] = useState<Patients | null>(null)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [patientToEdit, setPatientToEdit] = useState<Patients | null>(null)
+
+  const [isHmoModalOpen, setIsHmoModalOpen] = useState(false)
+  const [patientToEditHmo, setPatientToEditHmo] = useState<Patients | null>(null)
 
   const patientsPerPage = 100
 
@@ -287,6 +292,22 @@ export default function Patients() {
     return nameMatch || emailMatch || membershipMatch || namePartsMatch
   })
 
+  const handleEditHmoClick = useCallback((patient: Patients) => {
+    setPatientToEditHmo(patient)
+    setIsHmoModalOpen(true)
+  }, [])
+
+  const closeHmoModal = useCallback(() => {
+    setPatientToEditHmo(null)
+    setIsHmoModalOpen(false)
+  }, [])
+
+  const handleHmoUpdateSuccess = useCallback((updatedPatient: Patients) => {
+    setPatients((prevPatients) =>
+      prevPatients.map((patient) => (patient.id === updatedPatient.id ? updatedPatient : patient))
+    )
+  }, [])
+
   return (
     <section>
       <div className="h-full">
@@ -419,6 +440,7 @@ export default function Patients() {
                         <div className="flex gap-2">
                           <RemoveRedEyeIcon className="text-[#46FFA6]" onClick={() => handlePatientClick(patient.id)} />
                           <BorderColorOutlinedIcon onClick={() => handleEditClick(patient)} />
+                          <MedicalServicesOutlinedIcon onClick={() => handleEditHmoClick(patient)} />
                           <DeleteForeverIcon className="text-[#F2B8B5]" onClick={() => openModal(patient)} />
                         </div>
                       </div>
@@ -458,6 +480,14 @@ export default function Patients() {
             onClose={closeEditModal}
             onConfirm={confirmEdit}
             patient={patientToEdit}
+          />
+        )}
+        {patientToEditHmo && (
+          <EditHmoModal
+            isOpen={isHmoModalOpen}
+            onClose={closeHmoModal}
+            patient={patientToEditHmo}
+            onUpdateSuccess={handleHmoUpdateSuccess}
           />
         )}
         <Toaster position="top-center" richColors /> {/* Add Toaster component */}
