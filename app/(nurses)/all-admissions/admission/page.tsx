@@ -11,6 +11,7 @@ import { GoPlus } from "react-icons/go"
 import AdministerDrugModal from "components/Modals/AdministerDrugModal"
 import { toast, Toaster } from "sonner"
 import CheckoutPatientModal from "components/Modals/CheckoutPatientModal"
+import UpdateVitalsModal from "components/Modals/UpdateVitalsModal"
 
 interface PatientDetail {
   id: string
@@ -87,6 +88,7 @@ export default function PatientDetailPage() {
   const [patientDetail, setPatientDetail] = useState<PatientDetail | null>(null)
   const [refreshKey, setRefreshKey] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [isUpdateVitalsOpen, setIsUpdateVitalsOpen] = useState(false)
   const router = useRouter()
 
   const handleGoBack = () => {
@@ -114,6 +116,19 @@ export default function PatientDetailPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const refreshPatientDetails = () => {
+    setRefreshKey((prevKey) => prevKey + 1)
+    toast.success("Patient vitals updated successfully")
+  }
+
+  const openUpdateVitalsModal = () => {
+    setIsUpdateVitalsOpen(true)
+  }
+
+  const closeUpdateVitalsModal = () => {
+    setIsUpdateVitalsOpen(false)
   }
 
   useEffect(() => {
@@ -273,12 +288,42 @@ export default function PatientDetailPage() {
                 </button>
                 <div className="mt-10 flex items-center justify-between">
                   <h3 className="font-semibold">Details</h3>
-                  <button onClick={openAdmissionModal} className="add-button">
-                    <p className="text-xs">Administer Drug</p>
-                    <GoPlus />
-                  </button>
+                  <div className="flex gap-4">
+                    <button onClick={openAdmissionModal} className="add-button">
+                      <p className="text-xs">Administer Drug</p>
+                      <GoPlus />
+                    </button>
+                    <button className="add-button" onClick={openUpdateVitalsModal}>
+                      <p className="text-xs">Update Vitals</p>
+                      <GoPlus />
+                    </button>
+                  </div>
                 </div>
                 <div className="pt-10">
+                  <div className="mb-5 grid w-full grid-cols-4 gap-2 max-sm:grid-cols-2">
+                    <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
+                      <Image src="/pt-dashboard-01.svg" height={40} width={40} alt="" />
+                      <h3 className="py-2 font-bold">Heart Rate</h3>
+                      <p>{patientDetail.heart_rate || "N/A"} bpm</p>
+                    </div>
+                    <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
+                      <Image src="/pt-dashboard-02.svg" height={40} width={40} alt="" />
+                      <h3 className="py-2 font-bold">Body Temperature</h3>
+                      <p>
+                        {patientDetail.body_temperature || "N/A"} <small>°C</small>
+                      </p>
+                    </div>
+                    <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
+                      <Image src="/pt-dashboard-03.svg" height={40} width={40} alt="" />
+                      <h3 className="py-2 font-bold">Glucose Level</h3>
+                      <p>{patientDetail.glucose_level || "N/A"} mg/dl</p>
+                    </div>
+                    <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
+                      <Image src="/pt-dashboard-04.svg" height={40} width={40} alt="" />
+                      <h3 className="py-2 font-bold">Blood Pressure</h3>
+                      <p>{patientDetail.blood_pressure || "N/A"} mmHg</p>
+                    </div>
+                  </div>
                   <div className="flex justify-between gap-4">
                     <div className="w-[30%]">
                       <div className="sidebar  flex flex-col justify-center rounded-md border px-4 py-8">
@@ -415,6 +460,13 @@ export default function PatientDetailPage() {
           patientId={patientDetail.id}
         />
       )}
+
+      <UpdateVitalsModal
+        isOpen={isUpdateVitalsOpen}
+        onClose={closeUpdateVitalsModal}
+        onSubmitSuccess={refreshPatientDetails}
+        patientId={patientDetail.id}
+      />
 
       {isCheckoutModalOpen && (
         <CheckoutPatientModal
