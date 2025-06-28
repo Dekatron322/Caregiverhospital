@@ -370,6 +370,30 @@ export default function PatientDetailPage() {
                   </button>
                 </div>
                 <div className="pt-10">
+                  <div className="mb-5 grid w-full grid-cols-4 gap-2 max-sm:grid-cols-2">
+                    <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
+                      <Image src="/pt-dashboard-01.svg" height={40} width={40} alt="" />
+                      <h3 className="py-2 font-bold">Heart Rate</h3>
+                      <p>{patientDetail.heart_rate || "N/A"} bpm</p>
+                    </div>
+                    <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
+                      <Image src="/pt-dashboard-02.svg" height={40} width={40} alt="" />
+                      <h3 className="py-2 font-bold">Body Temperature</h3>
+                      <p>
+                        {patientDetail.body_temperature || "N/A"} <small>°C</small>
+                      </p>
+                    </div>
+                    <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
+                      <Image src="/pt-dashboard-03.svg" height={40} width={40} alt="" />
+                      <h3 className="py-2 font-bold">Glucose Level</h3>
+                      <p>{patientDetail.glucose_level || "N/A"} mg/dl</p>
+                    </div>
+                    <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
+                      <Image src="/pt-dashboard-04.svg" height={40} width={40} alt="" />
+                      <h3 className="py-2 font-bold">Blood Pressure</h3>
+                      <p>{patientDetail.blood_pressure || "N/A"} mmHg</p>
+                    </div>
+                  </div>
                   <div className="flex justify-between gap-4">
                     <div className="w-[30%]">
                       <div className="sidebar flex flex-col justify-center rounded-md border px-4 py-8">
