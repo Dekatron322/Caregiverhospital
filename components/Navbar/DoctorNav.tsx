@@ -1,4 +1,5 @@
-import { Skeleton, Tooltip } from "@mui/material"
+"use client"
+import { Skeleton, Tooltip, Popover } from "@mui/material"
 import React, { useEffect, useRef, useState } from "react"
 import axios from "axios"
 import Image from "next/image"
@@ -15,6 +16,21 @@ import FormatAlignLeftIcon from "@mui/icons-material/FormatAlignLeft"
 import Link from "next/link"
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"
 
+interface Notification {
+  id: string
+  title: string
+  detail: string
+  status: boolean
+  pub_date: string
+}
+
+interface Message {
+  id: string
+  content: string
+  is_read: boolean
+  created_at: string
+}
+
 interface UserDetails {
   id: number
   username: string
@@ -22,6 +38,7 @@ interface UserDetails {
   phone_number: string
   address: string
   account_type: string
+  notifications: Notification[]
 }
 
 const DoctorNav: React.FC = () => {
@@ -37,8 +54,11 @@ const DoctorNav: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
   const [isNavOpen, setIsNavOpen] = useState(false)
   const [isUtilitiesOpen, setIsUtilitiesOpen] = useState(false)
-
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false)
+  const [notificationAnchorEl, setNotificationAnchorEl] = useState<HTMLElement | null>(null)
+  const [messages, setMessages] = useState<Message[]>([])
+  const [hasUnreadMessages, setHasUnreadMessages] = useState(false)
+  const [messagePollingInterval, setMessagePollingInterval] = useState<NodeJS.Timeout>()
 
   const dropdownRef = useRef<HTMLDivElement>(null)
   const navRef = useRef<HTMLDivElement>(null)
@@ -50,7 +70,38 @@ const DoctorNav: React.FC = () => {
   useEffect(() => {
     setMounted(true)
     fetchUserDetails()
+    startMessagePolling()
+
+    return () => {
+      if (messagePollingInterval) {
+        clearInterval(messagePollingInterval)
+      }
+    }
   }, [])
+
+  const startMessagePolling = () => {
+    fetchMessages()
+    const interval = setInterval(fetchMessages, 30000)
+    setMessagePollingInterval(interval)
+  }
+
+  const fetchMessages = async () => {
+    try {
+      const userId = localStorage.getItem("id")
+      if (userId) {
+        const response = await axios.get<Message[]>(
+          `https://api2.caregiverhospital.com/app_user/get-messages/${userId}/`
+        )
+        if (response.data) {
+          setMessages(response.data)
+          const unread = response.data.some((message) => !message.is_read)
+          setHasUnreadMessages(unread)
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching messages:", error)
+    }
+  }
 
   const fetchUserDetails = async () => {
     try {
@@ -94,6 +145,39 @@ const DoctorNav: React.FC = () => {
     }
   }, [isDropdownOpen, isNavOpen])
 
+  const markNotificationAsRead = async (notificationId: string) => {
+    try {
+      // Optimistically update the UI first
+      if (userDetails) {
+        const updatedNotifications = userDetails.notifications.map((notification) =>
+          notification.id === notificationId ? { ...notification, status: false } : notification
+        )
+
+        setUserDetails({
+          ...userDetails,
+          notifications: updatedNotifications,
+        })
+      }
+
+      // Then make the API call
+      await axios.put(`https://api2.caregiverhospital.com/notification/notification/${notificationId}/`, {
+        title: "Updated Notification",
+        detail: "Marked as read",
+        status: false,
+        pub_date: new Date().toISOString(),
+      })
+    } catch (error) {
+      console.error("Error marking notification as read:", error)
+      // Revert the UI change if the API call fails
+      if (userDetails) {
+        setUserDetails({
+          ...userDetails,
+          notifications: userDetails.notifications,
+        })
+      }
+    }
+  }
+
   if (!mounted) {
     return null
   }
@@ -116,7 +200,7 @@ const DoctorNav: React.FC = () => {
 
   const handleLogoutClick = () => {
     setIsLogoutModalOpen(true)
-    closeDropdown() // Close the dropdown when the logout is clicked
+    closeDropdown()
   }
 
   const handleLogoutConfirm = () => {
@@ -145,6 +229,29 @@ const DoctorNav: React.FC = () => {
     return pathname === path ? activeSrc : defaultSrc
   }
 
+  const handleNotificationClick = (event: React.MouseEvent<HTMLElement>) => {
+    setNotificationAnchorEl(event.currentTarget)
+  }
+
+  const handleNotificationClose = () => {
+    setNotificationAnchorEl(null)
+  }
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    })
+  }
+
+  const notificationOpen = Boolean(notificationAnchorEl)
+  const notificationId = notificationOpen ? "notifications-popover" : undefined
+
+  // Get only unread notifications (status: true)
+  const unreadNotifications = userDetails?.notifications?.filter((n) => n.status) || []
+
   return (
     <>
       <nav className="hidden border-b px-16 py-4 md:block">
@@ -156,13 +263,66 @@ const DoctorNav: React.FC = () => {
           </div>
           <div className="flex items-center gap-2">
             <Tooltip title="Notifications">
-              <div className="flex h-8 cursor-pointer items-center rounded border border-[#CFDBD5] px-2 py-1">
+              <div
+                className={`flex h-8 cursor-pointer items-center rounded border px-2 py-1 ${
+                  unreadNotifications.length > 0 ? "border-[#D82E2E] bg-[#D82E2E]" : "border-[#CFDBD5]"
+                }`}
+                onClick={handleNotificationClick}
+              >
                 <IoIosNotificationsOutline />
               </div>
             </Tooltip>
 
-            <Tooltip title="messages">
-              <div className="flex h-8 cursor-pointer items-center rounded border border-[#CFDBD5] px-2 py-1">
+            <Popover
+              id={notificationId}
+              open={notificationOpen}
+              anchorEl={notificationAnchorEl}
+              onClose={handleNotificationClose}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "right",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "right",
+              }}
+            >
+              <div className="w-64 ">
+                <div className="border-b pb-2">
+                  <h3 className="p-2 text-center font-semibold">Notifications</h3>
+                </div>
+                <div className="max-h-60 overflow-y-auto ">
+                  {unreadNotifications.length > 0 ? (
+                    unreadNotifications.map((notification) => (
+                      <div key={notification.id} className="border-b bg-[#27AE6026] px-2 py-2">
+                        <div className="flex justify-between">
+                          <h4 className="font-medium">{notification.title}</h4>
+                          <span className="text-xs text-gray-500">{formatDate(notification.pub_date)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <p className="text-sm">{notification.detail}</p>
+                          <button
+                            className="text-sm text-blue-600 hover:underline"
+                            onClick={() => markNotificationAsRead(notification.id)}
+                          >
+                            Mark as read
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="py-4 text-center text-sm text-gray-500">No new notifications</div>
+                  )}
+                </div>
+              </div>
+            </Popover>
+
+            <Tooltip title="Messages">
+              <div
+                className={`flex h-8 cursor-pointer items-center rounded border px-2 py-1 ${
+                  hasUnreadMessages ? "border-[#D82E2E] bg-[#D82E2E]" : "border-[#CFDBD5]"
+                }`}
+              >
                 <BiMessageDetail />
               </div>
             </Tooltip>
@@ -179,7 +339,7 @@ const DoctorNav: React.FC = () => {
           </div>
         </div>
       </nav>
-      <nav className="] block border-b px-16 py-4 max-md:px-3 md:hidden">
+      <nav className="block border-b px-16 py-4 max-md:px-3 md:hidden">
         <div className="flex items-center justify-between">
           <FormatAlignLeftIcon onClick={toggleNav} style={{ cursor: "pointer" }} />
           <Link href="/" className="icon-style content-center">
