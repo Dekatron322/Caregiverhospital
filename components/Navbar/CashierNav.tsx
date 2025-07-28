@@ -332,7 +332,7 @@ const CashierNav: React.FC = () => {
                 horizontal: "right",
               }}
             >
-              <div className="w-64">
+              <div className="w-[500px]">
                 <div className="border-b pb-2">
                   <div className="flex items-center justify-between p-2">
                     <h3 className="font-semibold">Notifications</h3>
