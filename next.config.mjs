@@ -5,7 +5,7 @@ import { env } from "./env.mjs"
 /**
  * @type {import('next').NextConfig}
  */
-const config = withPlugins([[withBundleAnalyzer({ enabled: env.ANALYZE })]], {
+const nextConfig = {
   reactStrictMode: true,
   logging: {
     fetches: {
@@ -21,6 +21,23 @@ const config = withPlugins([[withBundleAnalyzer({ enabled: env.ANALYZE })]], {
       { source: "/ping", destination: "/api/health" },
     ]
   },
-})
+  webpack: (config) => {
+    config.module.rules.push({
+      test: /\.(mp3)$/,
+      use: {
+        loader: "file-loader",
+        options: {
+          publicPath: "/_next/static/sounds/",
+          outputPath: "static/sounds/",
+          name: "[name].[hash].[ext]",
+          esModule: false,
+        },
+      },
+    })
+    return config
+  },
+}
+
+const config = withPlugins([[withBundleAnalyzer({ enabled: env.ANALYZE })]], nextConfig)
 
 export default config

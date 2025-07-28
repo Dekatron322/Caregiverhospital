@@ -15,6 +15,10 @@ import { RxCross2 } from "react-icons/rx"
 import FormatAlignLeftIcon from "@mui/icons-material/FormatAlignLeft"
 import Link from "next/link"
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"
+import useSound from "use-sound"
+
+const NOTIFICATION_SOUND = "/notify.mp3"
+const SOUND_INTERVAL = 5000 // Play sound every 5 seconds while unread exists
 
 interface Notification {
   id: string
@@ -58,31 +62,74 @@ const CashierNav: React.FC = () => {
   const [notificationAnchorEl, setNotificationAnchorEl] = useState<HTMLElement | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [hasUnreadMessages, setHasUnreadMessages] = useState(false)
-  const [messagePollingInterval, setMessagePollingInterval] = useState<NodeJS.Timeout>()
+  const [soundEnabled, setSoundEnabled] = useState(true)
+  const [soundInterval, setSoundInterval] = useState<NodeJS.Timeout>()
+
+  // Sound initialization with error handling
+  const [playNotificationSound, { stop: stopSound }] = useSound(NOTIFICATION_SOUND, {
+    volume: 0.5,
+    interrupt: true,
+    onload: () => console.log("Notification sound loaded"),
+    // onerror: (e) => console.error("Sound error:", e),
+  })
 
   const dropdownRef = useRef<HTMLDivElement>(null)
   const navRef = useRef<HTMLDivElement>(null)
 
-  const toggleIcon = () => {
-    setIsMoonIcon(!isMoonIcon)
+  // Get current unread notifications
+  const getUnreadNotifications = () => {
+    return userDetails?.notifications?.filter((n) => n.status) || []
   }
 
+  // Play sound continuously while unread exists
+  const playContinuousSound = () => {
+    if (!soundEnabled) return
+
+    const unread = getUnreadNotifications()
+    if (unread.length > 0) {
+      try {
+        playNotificationSound()
+        console.log("Playing notification sound")
+      } catch (error) {
+        console.error("Failed to play notification sound:", error)
+      }
+    }
+  }
+
+  // Initialize component
   useEffect(() => {
     setMounted(true)
     fetchUserDetails()
     startMessagePolling()
 
-    return () => {
-      if (messagePollingInterval) {
-        clearInterval(messagePollingInterval)
+    // Start sound interval
+    const interval = setInterval(() => {
+      const unread = getUnreadNotifications()
+      if (unread.length > 0) {
+        playContinuousSound()
       }
+    }, SOUND_INTERVAL)
+    setSoundInterval(interval)
+
+    return () => {
+      stopSound()
+      if (soundInterval) clearInterval(soundInterval)
     }
   }, [])
 
+  // Handle sound playback when notifications change
+  useEffect(() => {
+    const unread = getUnreadNotifications()
+    if (unread.length > 0) {
+      // Play immediately when new notifications arrive
+      playContinuousSound()
+    }
+  }, [userDetails?.notifications])
+
   const startMessagePolling = () => {
     fetchMessages()
-    const interval = setInterval(fetchMessages, 30000)
-    setMessagePollingInterval(interval)
+    const interval = setInterval(fetchMessages, 30000) // Poll every 30 seconds
+    return interval
   }
 
   const fetchMessages = async () => {
@@ -94,8 +141,7 @@ const CashierNav: React.FC = () => {
         )
         if (response.data) {
           setMessages(response.data)
-          const unread = response.data.some((message) => !message.is_read)
-          setHasUnreadMessages(unread)
+          setHasUnreadMessages(response.data.some((message) => !message.is_read))
         }
       }
     } catch (error) {
@@ -106,27 +152,67 @@ const CashierNav: React.FC = () => {
   const fetchUserDetails = async () => {
     try {
       const userId = localStorage.getItem("id")
-      if (userId) {
-        const response = await axios.get<UserDetails>(
-          `https://api2.caregiverhospital.com/app_user/get-user-detail/${userId}/`
-        )
-        if (response.data) {
-          setUserDetails(response.data)
-        } else {
-          setError("User details not found.")
-          router.push("/signin")
-        }
+      if (!userId) throw new Error("User ID not found")
+
+      const response = await axios.get<UserDetails>(
+        `https://api2.caregiverhospital.com/app_user/get-user-detail/${userId}/`
+      )
+
+      if (response.data) {
+        setUserDetails(response.data)
       } else {
-        setError("User ID not found.")
-        router.push("/signin")
+        throw new Error("User details not found")
       }
     } catch (error) {
-      setError("Failed to load user details.")
-      console.error("Error fetching user details:", error)
+      setError(error instanceof Error ? error.message : "Failed to load user details")
+      console.error("Error:", error)
       router.push("/signin")
     } finally {
       setLoading(false)
     }
+  }
+
+  const markNotificationAsRead = async (notificationId: string) => {
+    if (!userDetails) return
+
+    try {
+      // Optimistic update
+      const updatedNotifications = userDetails.notifications.map((n) =>
+        n.id === notificationId ? { ...n, status: false } : n
+      )
+
+      setUserDetails({
+        ...userDetails,
+        notifications: updatedNotifications,
+      })
+
+      await axios.put(`https://api2.caregiverhospital.com/notification/notification/${notificationId}/`, {
+        status: false,
+        pub_date: new Date().toISOString(),
+      })
+    } catch (error) {
+      console.error("Error marking notification as read:", error)
+      // Revert on error
+      setUserDetails({
+        ...userDetails,
+        notifications: userDetails.notifications,
+      })
+    }
+  }
+
+  const toggleSound = () => {
+    setSoundEnabled(!soundEnabled)
+    if (!soundEnabled && getUnreadNotifications().length > 0) {
+      playContinuousSound()
+    }
+  }
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    })
   }
 
   useEffect(() => {
@@ -144,39 +230,6 @@ const CashierNav: React.FC = () => {
       document.removeEventListener("mousedown", handleClickOutside)
     }
   }, [isDropdownOpen, isNavOpen])
-
-  const markNotificationAsRead = async (notificationId: string) => {
-    try {
-      // Optimistically update the UI first
-      if (userDetails) {
-        const updatedNotifications = userDetails.notifications.map((notification) =>
-          notification.id === notificationId ? { ...notification, status: false } : notification
-        )
-
-        setUserDetails({
-          ...userDetails,
-          notifications: updatedNotifications,
-        })
-      }
-
-      // Then make the API call
-      await axios.put(`https://api2.caregiverhospital.com/notification/notification/${notificationId}/`, {
-        title: "Updated Notification",
-        detail: "Marked as read",
-        status: false,
-        pub_date: new Date().toISOString(),
-      })
-    } catch (error) {
-      console.error("Error marking notification as read:", error)
-      // Revert the UI change if the API call fails
-      if (userDetails) {
-        setUserDetails({
-          ...userDetails,
-          notifications: userDetails.notifications,
-        })
-      }
-    }
-  }
 
   if (!mounted) {
     return null
@@ -237,20 +290,11 @@ const CashierNav: React.FC = () => {
     setNotificationAnchorEl(null)
   }
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    })
-  }
-
   const notificationOpen = Boolean(notificationAnchorEl)
   const notificationId = notificationOpen ? "notifications-popover" : undefined
 
   // Get only unread notifications (status: true)
-  const unreadNotifications = userDetails?.notifications?.filter((n) => n.status) || []
+  const unreadNotifications = getUnreadNotifications()
 
   return (
     <>
@@ -270,6 +314,7 @@ const CashierNav: React.FC = () => {
                 onClick={handleNotificationClick}
               >
                 <IoIosNotificationsOutline />
+                {unreadNotifications.length > 0 && <span className="ml-1 text-xs">{unreadNotifications.length}</span>}
               </div>
             </Tooltip>
 
@@ -287,11 +332,16 @@ const CashierNav: React.FC = () => {
                 horizontal: "right",
               }}
             >
-              <div className="w-64 ">
+              <div className="w-64">
                 <div className="border-b pb-2">
-                  <h3 className="p-2 text-center font-semibold">Notifications</h3>
+                  <div className="flex items-center justify-between p-2">
+                    <h3 className="font-semibold">Notifications</h3>
+                    <button onClick={toggleSound} className="rounded bg-gray-100 px-2 py-1 text-xs">
+                      {soundEnabled ? "Mute" : "Unmute"}
+                    </button>
+                  </div>
                 </div>
-                <div className="max-h-60 overflow-y-auto ">
+                <div className="max-h-60 overflow-y-auto">
                   {unreadNotifications.length > 0 ? (
                     unreadNotifications.map((notification) => (
                       <div key={notification.id} className="border-b bg-[#27AE6026] px-2 py-2">
@@ -324,6 +374,7 @@ const CashierNav: React.FC = () => {
                 }`}
               >
                 <BiMessageDetail />
+                {hasUnreadMessages && <span className="ml-1 text-xs">!</span>}
               </div>
             </Tooltip>
 
@@ -339,7 +390,7 @@ const CashierNav: React.FC = () => {
           </div>
         </div>
       </nav>
-      <nav className="block border-b  px-16 py-4 max-md:px-3 md:hidden">
+      <nav className="block border-b px-16 py-4 max-md:px-3 md:hidden">
         <div className="flex items-center justify-between">
           <FormatAlignLeftIcon onClick={toggleNav} style={{ cursor: "pointer" }} />
           <Link href="/" className="icon-style content-center">
@@ -383,31 +434,12 @@ const CashierNav: React.FC = () => {
               <p className="mt-1">Dashboard</p>
             </Link>
 
-            <Link href="/medicines" className={`flex items-center gap-2 pb-4 ${getNavLinkClass("/medicines")}`}>
-              <Image
-                src={getNavImageSrc("/medicines", "/departments.svg", "/departments-active.svg")}
-                width={20}
-                height={20}
-                alt="avatar"
-              />
-              <p className="mt-1">List of Medicines</p>
-            </Link>
             <Link
-              href="/medicine-categories"
-              className={`flex items-center gap-2 pb-4 ${getNavLinkClass("/medicine-categories")}`}
+              href="/cashoer-dashboard"
+              className={`flex items-center gap-2 pb-4 ${getNavLinkClass("/cashoer-dashboard")}`}
             >
               <Image
-                src={getNavImageSrc("/medicine-categories", "/appointments.svg", "/appointments-active.svg")}
-                width={20}
-                height={20}
-                alt="avatar"
-              />
-              <p className="mt-1">Medicine Categories</p>
-            </Link>
-
-            <Link href="/issue-request" className={`flex items-center gap-2 pb-4 ${getNavLinkClass("/issue-request")}`}>
-              <Image
-                src={getNavImageSrc("/issue-request", "/admin.svg", "/admin-active.svg")}
+                src={getNavImageSrc("/cashoer-dashboard", "/admin.svg", "/admin-active.svg")}
                 width={20}
                 height={20}
                 alt="avatar"
@@ -416,16 +448,26 @@ const CashierNav: React.FC = () => {
             </Link>
 
             <Link
-              href="/pharmacy-patients"
-              className={`flex items-center gap-2 pb-4 ${getNavLinkClass("/pharmacy-patients")}`}
+              href="/laboratory-payment"
+              className={`flex items-center gap-2 pb-4 ${getNavLinkClass("/laboratory-payment")}`}
             >
               <Image
-                src={getNavImageSrc("/pharmacy-patients", "/appointments.svg", "/appointments-active.svg")}
+                src={getNavImageSrc("/laboratory-payment", "/appointments.svg", "/appointments-active.svg")}
                 width={20}
                 height={20}
                 alt="avatar"
               />
-              <p className="mt-1">Patients</p>
+              <p className="mt-1">Laboratory Payment</p>
+            </Link>
+
+            <Link href="/down-payment" className={`flex items-center gap-2 pb-4 ${getNavLinkClass("/down-payment")}`}>
+              <Image
+                src={getNavImageSrc("/down-payment", "/appointments.svg", "/appointments-active.svg")}
+                width={20}
+                height={20}
+                alt="avatar"
+              />
+              <p className="mt-1">Down Payment</p>
             </Link>
 
             <button

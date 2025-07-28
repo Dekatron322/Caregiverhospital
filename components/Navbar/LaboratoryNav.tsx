@@ -15,6 +15,10 @@ import { RxCross2 } from "react-icons/rx"
 import FormatAlignLeftIcon from "@mui/icons-material/FormatAlignLeft"
 import Link from "next/link"
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"
+import useSound from "use-sound"
+
+const NOTIFICATION_SOUND = "/notify.mp3"
+const SOUND_INTERVAL = 5000 // Play sound every 5 seconds while unread exists
 
 interface Notification {
   id: string
@@ -58,7 +62,16 @@ const LaboratoryNav: React.FC = () => {
   const [notificationAnchorEl, setNotificationAnchorEl] = useState<HTMLElement | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [hasUnreadMessages, setHasUnreadMessages] = useState(false)
-  const [messagePollingInterval, setMessagePollingInterval] = useState<NodeJS.Timeout>()
+  const [soundEnabled, setSoundEnabled] = useState(true)
+  const [soundInterval, setSoundInterval] = useState<NodeJS.Timeout>()
+
+  // Sound initialization with error handling
+  const [playNotificationSound, { stop: stopSound }] = useSound(NOTIFICATION_SOUND, {
+    volume: 0.5,
+    interrupt: true,
+    onload: () => console.log("Notification sound loaded"),
+    // onerror: (e) => console.error("Sound error:", e),
+  })
 
   const dropdownRef = useRef<HTMLDivElement>(null)
   const navRef = useRef<HTMLDivElement>(null)
@@ -67,22 +80,59 @@ const LaboratoryNav: React.FC = () => {
     setIsMoonIcon(!isMoonIcon)
   }
 
+  // Get current unread notifications
+  const getUnreadNotifications = () => {
+    return userDetails?.notifications?.filter((n) => n.status) || []
+  }
+
+  // Play sound continuously while unread exists
+  const playContinuousSound = () => {
+    if (!soundEnabled) return
+
+    const unread = getUnreadNotifications()
+    if (unread.length > 0) {
+      try {
+        playNotificationSound()
+        console.log("Playing notification sound")
+      } catch (error) {
+        console.error("Failed to play notification sound:", error)
+      }
+    }
+  }
+
   useEffect(() => {
     setMounted(true)
     fetchUserDetails()
     startMessagePolling()
 
-    return () => {
-      if (messagePollingInterval) {
-        clearInterval(messagePollingInterval)
+    // Start sound interval
+    const interval = setInterval(() => {
+      const unread = getUnreadNotifications()
+      if (unread.length > 0) {
+        playContinuousSound()
       }
+    }, SOUND_INTERVAL)
+    setSoundInterval(interval)
+
+    return () => {
+      stopSound()
+      if (soundInterval) clearInterval(soundInterval)
     }
   }, [])
+
+  // Handle sound playback when notifications change
+  useEffect(() => {
+    const unread = getUnreadNotifications()
+    if (unread.length > 0) {
+      // Play immediately when new notifications arrive
+      playContinuousSound()
+    }
+  }, [userDetails?.notifications])
 
   const startMessagePolling = () => {
     fetchMessages()
     const interval = setInterval(fetchMessages, 30000)
-    setMessagePollingInterval(interval)
+    return interval
   }
 
   const fetchMessages = async () => {
@@ -129,22 +179,6 @@ const LaboratoryNav: React.FC = () => {
     }
   }
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false)
-      }
-      if (navRef.current && !navRef.current.contains(event.target as Node)) {
-        setIsNavOpen(false)
-      }
-    }
-
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
-  }, [isDropdownOpen, isNavOpen])
-
   const markNotificationAsRead = async (notificationId: string) => {
     try {
       // Optimistically update the UI first
@@ -177,6 +211,29 @@ const LaboratoryNav: React.FC = () => {
       }
     }
   }
+
+  const toggleSound = () => {
+    setSoundEnabled(!soundEnabled)
+    if (!soundEnabled && getUnreadNotifications().length > 0) {
+      playContinuousSound()
+    }
+  }
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false)
+      }
+      if (navRef.current && !navRef.current.contains(event.target as Node)) {
+        setIsNavOpen(false)
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [isDropdownOpen, isNavOpen])
 
   if (!mounted) {
     return null
@@ -250,7 +307,7 @@ const LaboratoryNav: React.FC = () => {
   const notificationId = notificationOpen ? "notifications-popover" : undefined
 
   // Get only unread notifications (status: true)
-  const unreadNotifications = userDetails?.notifications?.filter((n) => n.status) || []
+  const unreadNotifications = getUnreadNotifications()
 
   return (
     <section>
@@ -270,6 +327,7 @@ const LaboratoryNav: React.FC = () => {
                 onClick={handleNotificationClick}
               >
                 <IoIosNotificationsOutline />
+                {unreadNotifications.length > 0 && <span className="ml-1 text-xs">{unreadNotifications.length}</span>}
               </div>
             </Tooltip>
 
@@ -287,11 +345,16 @@ const LaboratoryNav: React.FC = () => {
                 horizontal: "right",
               }}
             >
-              <div className="w-64 ">
+              <div className="w-64">
                 <div className="border-b pb-2">
-                  <h3 className="p-2 text-center font-semibold">Notifications</h3>
+                  <div className="flex items-center justify-between p-2">
+                    <h3 className="font-semibold">Notifications</h3>
+                    <button onClick={toggleSound} className="rounded bg-gray-100 px-2 py-1 text-xs">
+                      {soundEnabled ? "Mute" : "Unmute"}
+                    </button>
+                  </div>
                 </div>
-                <div className="max-h-60 overflow-y-auto ">
+                <div className="max-h-60 overflow-y-auto">
                   {unreadNotifications.length > 0 ? (
                     unreadNotifications.map((notification) => (
                       <div key={notification.id} className="border-b bg-[#27AE6026] px-2 py-2">
@@ -324,6 +387,7 @@ const LaboratoryNav: React.FC = () => {
                 }`}
               >
                 <BiMessageDetail />
+                {hasUnreadMessages && <span className="ml-1 text-xs">!</span>}
               </div>
             </Tooltip>
 
@@ -339,7 +403,7 @@ const LaboratoryNav: React.FC = () => {
           </div>
         </div>
       </nav>
-      <nav className="block border-b  px-16 py-4 max-md:px-3 md:hidden">
+      <nav className="block border-b px-16 py-4 max-md:px-3 md:hidden">
         <div className="flex items-center justify-between">
           <FormatAlignLeftIcon onClick={toggleNav} style={{ cursor: "pointer" }} />
           <Link href="/" className="icon-style content-center">
