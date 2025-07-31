@@ -303,8 +303,8 @@ export default function PatientDetailPage() {
                   </div>
                   <div className="sidebar flex w-full flex-col items-center justify-center rounded-md border py-3 shadow-md ">
                     <Image src="/pt-dashboard-03.svg" height={40} width={40} alt="" />
-                    <h3 className="py-2 font-bold">Glucose Level</h3>
-                    <p>{patientDetail.glucose_level || "N/A"} mg/dl</p>
+                    <h3 className="py-2 font-bold">SPO2</h3>
+                    <p>{patientDetail.glucose_level || "N/A"} %</p>
                   </div>
                   <div className="sidebar flex w-full flex-col items-center justify-center rounded-md border py-3 shadow-md ">
                     <Image src="/pt-dashboard-04.svg" height={40} width={40} alt="" />
