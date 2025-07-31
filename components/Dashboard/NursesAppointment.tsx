@@ -149,10 +149,10 @@ const NursesAppointments = () => {
           className=" hover:text-[#46ffa6] dark:text-gray-400 dark:hover:text-[#46ffa6]"
           onClick={() => handleAppointmentClick(appointment.patient_id)}
         />
-        <DeleteForeverIcon
+        {/* <DeleteForeverIcon
           className=" hover:text-[#F2B8B5]  dark:hover:text-[#F2B8B5]"
           onClick={() => handleDeleteClick(appointment.id)}
-        />
+        /> */}
       </div>
     </div>
   )
@@ -217,7 +217,6 @@ const NursesAppointments = () => {
                   <div className="h-3 w-16 animate-pulse rounded bg-gray-200"></div>
                 </div>
                 <div className="flex gap-2">
-                  <div className="h-6 w-6 animate-pulse rounded bg-gray-200"></div>
                   <div className="h-6 w-6 animate-pulse rounded bg-gray-200"></div>
                 </div>
               </div>
