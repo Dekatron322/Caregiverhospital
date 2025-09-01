@@ -3,12 +3,10 @@ import { Popover, Skeleton, Tooltip } from "@mui/material"
 import React, { useEffect, useRef, useState } from "react"
 import axios from "axios"
 import Image from "next/image"
-import { useTheme } from "next-themes"
 import { usePathname, useRouter } from "next/navigation"
 import { MdAccountCircle } from "react-icons/md"
 import { RiLogoutCircleRLine } from "react-icons/ri"
-import { BiMessageDetail } from "react-icons/bi"
-import { IoIosArrowDown, IoIosNotificationsOutline, IoMdAddCircleOutline, IoMdLock, IoMdSearch } from "react-icons/io"
+import { IoIosArrowDown, IoIosNotificationsOutline, IoMdLock, IoMdSearch } from "react-icons/io"
 import LogoutModal from "components/Modals/LogoutModal"
 import Search from "components/Search/Search"
 import { RxCross2 } from "react-icons/rx"
@@ -18,7 +16,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"
 import useSound from "use-sound"
 
 const NOTIFICATION_SOUND = "/notify.mp3"
-const SOUND_INTERVAL = 5000 // Play sound every 5 seconds while unread exists
+const SOUND_INTERVAL = 5000
 
 interface Notification {
   id: string
@@ -26,13 +24,6 @@ interface Notification {
   detail: string
   status: boolean
   pub_date: string
-}
-
-interface Message {
-  id: string
-  content: string
-  is_read: boolean
-  created_at: string
 }
 
 interface UserDetails {
@@ -48,8 +39,6 @@ interface UserDetails {
 const DoctorNav: React.FC = () => {
   const pathname = usePathname()
   const router = useRouter()
-  const [isMoonIcon, setIsMoonIcon] = useState(true)
-  const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
@@ -57,35 +46,23 @@ const DoctorNav: React.FC = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isNavOpen, setIsNavOpen] = useState(false)
-  const [isUtilitiesOpen, setIsUtilitiesOpen] = useState(false)
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false)
   const [notificationAnchorEl, setNotificationAnchorEl] = useState<HTMLElement | null>(null)
-  const [messages, setMessages] = useState<Message[]>([])
-  const [hasUnreadMessages, setHasUnreadMessages] = useState(false)
   const [soundEnabled, setSoundEnabled] = useState(true)
   const [soundInterval, setSoundInterval] = useState<NodeJS.Timeout>()
 
-  // Sound initialization with error handling
   const [playNotificationSound, { stop: stopSound }] = useSound(NOTIFICATION_SOUND, {
     volume: 0.5,
     interrupt: true,
-    onload: () => console.log("Notification sound loaded"),
-    // onerror: (e) => console.error("Sound error:", e),
   })
 
   const dropdownRef = useRef<HTMLDivElement>(null)
   const navRef = useRef<HTMLDivElement>(null)
 
-  const toggleIcon = () => {
-    setIsMoonIcon(!isMoonIcon)
-  }
-
-  // Get current unread notifications
   const getUnreadNotifications = () => {
     return userDetails?.notifications?.filter((n) => n.status) || []
   }
 
-  // Play sound continuously while unread exists
   const playContinuousSound = () => {
     if (!soundEnabled) return
 
@@ -93,7 +70,6 @@ const DoctorNav: React.FC = () => {
     if (unread.length > 0) {
       try {
         playNotificationSound()
-        console.log("Playing notification sound")
       } catch (error) {
         console.error("Failed to play notification sound:", error)
       }
@@ -103,9 +79,7 @@ const DoctorNav: React.FC = () => {
   useEffect(() => {
     setMounted(true)
     fetchUserDetails()
-    startMessagePolling()
 
-    // Start sound interval
     const interval = setInterval(() => {
       const unread = getUnreadNotifications()
       if (unread.length > 0) {
@@ -120,38 +94,12 @@ const DoctorNav: React.FC = () => {
     }
   }, [])
 
-  // Handle sound playback when notifications change
   useEffect(() => {
     const unread = getUnreadNotifications()
     if (unread.length > 0) {
-      // Play immediately when new notifications arrive
       playContinuousSound()
     }
   }, [userDetails?.notifications])
-
-  const startMessagePolling = () => {
-    fetchMessages()
-    const interval = setInterval(fetchMessages, 30000)
-    return interval
-  }
-
-  const fetchMessages = async () => {
-    try {
-      const userId = localStorage.getItem("id")
-      if (userId) {
-        const response = await axios.get<Message[]>(
-          `https://api2.caregiverhospital.com/app_user/get-messages/${userId}/`
-        )
-        if (response.data) {
-          setMessages(response.data)
-          const unread = response.data.some((message) => !message.is_read)
-          setHasUnreadMessages(unread)
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching messages:", error)
-    }
-  }
 
   const fetchUserDetails = async () => {
     try {
@@ -181,7 +129,6 @@ const DoctorNav: React.FC = () => {
 
   const markNotificationAsRead = async (notificationId: string) => {
     try {
-      // Optimistically update the UI first
       if (userDetails) {
         const updatedNotifications = userDetails.notifications.map((notification) =>
           notification.id === notificationId ? { ...notification, status: false } : notification
@@ -193,7 +140,6 @@ const DoctorNav: React.FC = () => {
         })
       }
 
-      // Then make the API call
       await axios.put(`https://api2.caregiverhospital.com/notification/notification/${notificationId}/`, {
         title: "Updated Notification",
         detail: "Marked as read",
@@ -202,7 +148,6 @@ const DoctorNav: React.FC = () => {
       })
     } catch (error) {
       console.error("Error marking notification as read:", error)
-      // Revert the UI change if the API call fails
       if (userDetails) {
         setUserDetails({
           ...userDetails,
@@ -239,21 +184,10 @@ const DoctorNav: React.FC = () => {
     return null
   }
 
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen)
-  }
-
-  const toggleNav = () => {
-    setIsNavOpen(!isNavOpen)
-  }
-
-  const closeDropdown = () => {
-    setIsDropdownOpen(false)
-  }
-
-  const handleProfileClick = () => {
-    toggleDropdown()
-  }
+  const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen)
+  const toggleNav = () => setIsNavOpen(!isNavOpen)
+  const closeDropdown = () => setIsDropdownOpen(false)
+  const handleProfileClick = () => toggleDropdown()
 
   const handleLogoutClick = () => {
     setIsLogoutModalOpen(true)
@@ -270,13 +204,7 @@ const DoctorNav: React.FC = () => {
     setIsLogoutModalOpen(false)
   }
 
-  const isDashboardPage = pathname.includes("/dashboard")
-
   const firstLetter = userDetails?.username.charAt(0).toUpperCase() || "M"
-
-  const toggleUtilities = () => {
-    setIsUtilitiesOpen(!isUtilitiesOpen)
-  }
 
   const getNavLinkClass = (path: string) => {
     return pathname === path ? "text-[#46ffa6]" : "text-white"
@@ -304,9 +232,6 @@ const DoctorNav: React.FC = () => {
   }
 
   const notificationOpen = Boolean(notificationAnchorEl)
-  const notificationId = notificationOpen ? "notifications-popover" : undefined
-
-  // Get only unread notifications (status: true)
   const unreadNotifications = getUnreadNotifications()
 
   return (
@@ -332,18 +257,11 @@ const DoctorNav: React.FC = () => {
             </Tooltip>
 
             <Popover
-              id={notificationId}
               open={notificationOpen}
               anchorEl={notificationAnchorEl}
               onClose={handleNotificationClose}
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "right",
-              }}
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
+              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+              transformOrigin={{ vertical: "top", horizontal: "right" }}
             >
               <div className="w-[500px]">
                 <div className="border-b pb-2">
@@ -380,17 +298,6 @@ const DoctorNav: React.FC = () => {
               </div>
             </Popover>
 
-            <Tooltip title="Messages">
-              <div
-                className={`flex h-8 cursor-pointer items-center rounded border px-2 py-1 ${
-                  hasUnreadMessages ? "border-[#D82E2E] bg-[#D82E2E]" : "border-[#CFDBD5]"
-                }`}
-              >
-                <BiMessageDetail />
-                {hasUnreadMessages && <span className="ml-1 text-xs">!</span>}
-              </div>
-            </Tooltip>
-
             <div className="flex cursor-pointer items-center gap-1">
               <div
                 className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46ffa6]"
@@ -403,6 +310,7 @@ const DoctorNav: React.FC = () => {
           </div>
         </div>
       </nav>
+
       <nav className="block border-b px-16 py-4 max-md:px-3 md:hidden">
         <div className="flex items-center justify-between">
           <FormatAlignLeftIcon onClick={toggleNav} style={{ cursor: "pointer" }} />
@@ -483,6 +391,7 @@ const DoctorNav: React.FC = () => {
           </div>
         </div>
       </nav>
+
       {isDropdownOpen && (
         <div
           ref={dropdownRef}
@@ -517,6 +426,7 @@ const DoctorNav: React.FC = () => {
           </div>
         </div>
       )}
+
       {isLogoutModalOpen && (
         <LogoutModal open={isLogoutModalOpen} handleClose={handleLogoutCancel} handleConfirm={handleLogoutConfirm} />
       )}

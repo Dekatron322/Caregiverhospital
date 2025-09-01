@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import styles from "./modal.module.css"
 import { HiMiniStar } from "react-icons/hi2"
-import { toast } from "sonner" // Import Sonner toast
+import { toast } from "sonner"
 import CustomDropdown from "components/Patient/CustomDropdown"
 import CancelDelete from "public/svgs/cancel-delete"
 
@@ -76,8 +76,13 @@ interface ReviewModalProps {
   isOpen: boolean
   onSubmitSuccess: () => void
   onClose: () => void
-  patientDetail: PatientDetail // Add this line
+  patientDetail: PatientDetail
   patientId: string
+}
+
+interface Doctor {
+  id: string
+  name: string
 }
 
 const AppointmentModal: React.FC<ReviewModalProps> = ({
@@ -87,10 +92,10 @@ const AppointmentModal: React.FC<ReviewModalProps> = ({
   patientId,
   patientDetail,
 }) => {
-  const [doctor, setDoctor] = useState<string>("") // Store doctor's name
+  const [doctor, setDoctor] = useState<string>("")
   const [detail, setDetail] = useState<string>("")
   const [loading, setLoading] = useState(false)
-  const [doctors, setDoctors] = useState<{ id: string; name: string }[]>([])
+  const [doctors, setDoctors] = useState<Doctor[]>([])
 
   useEffect(() => {
     if (isOpen) {
@@ -99,18 +104,68 @@ const AppointmentModal: React.FC<ReviewModalProps> = ({
   }, [isOpen])
 
   const fetchDoctors = async () => {
+    // Check if doctors data exists in localStorage
+    const storedDoctors = localStorage.getItem("doctorsData")
+    const storedTimestamp = localStorage.getItem("doctorsTimestamp")
+
+    // Use cached data if it's less than 1 hour old
+    if (storedDoctors && storedTimestamp) {
+      const oneHourAgo = Date.now() - 60 * 60 * 1000
+      if (parseInt(storedTimestamp) > oneHourAgo) {
+        try {
+          // Parse and validate the stored data
+          const parsedDoctors: unknown = JSON.parse(storedDoctors)
+
+          // Type guard to ensure it's an array of doctors
+          if (
+            Array.isArray(parsedDoctors) &&
+            parsedDoctors.every((doc) => typeof doc === "object" && doc !== null && "id" in doc && "name" in doc)
+          ) {
+            setDoctors(parsedDoctors as Doctor[])
+            return
+          }
+        } catch (e) {
+          console.error("Error parsing stored doctors data", e)
+          // If parsing fails, continue to fetch from API
+        }
+      }
+    }
+
     try {
       const response = await fetch("https://api2.caregiverhospital.com/app_user/all/")
       const data = (await response.json()) as any[]
-      const filteredDoctors = data
+      const filteredDoctors: Doctor[] = data
         .filter((user: any) => user.account_type === "Doctors")
         .map((doc) => ({
           id: doc.id,
           name: doc.username,
         }))
+
+      // Store doctors data and timestamp in localStorage
+      localStorage.setItem("doctorsData", JSON.stringify(filteredDoctors))
+      localStorage.setItem("doctorsTimestamp", Date.now().toString())
+
       setDoctors(filteredDoctors)
     } catch (error) {
       console.error("Error fetching doctors", error)
+      // If API fails, try to use cached data even if it's old
+      if (storedDoctors) {
+        try {
+          const parsedDoctors: unknown = JSON.parse(storedDoctors)
+          if (
+            Array.isArray(parsedDoctors) &&
+            parsedDoctors.every((doc) => typeof doc === "object" && doc !== null && "id" in doc && "name" in doc)
+          ) {
+            setDoctors(parsedDoctors as Doctor[])
+            toast.info("Using cached doctors data", {
+              description: "Could not fetch latest doctors list.",
+              duration: 3000,
+            })
+          }
+        } catch (e) {
+          console.error("Error parsing stored doctors data", e)
+        }
+      }
     }
   }
 
@@ -128,9 +183,9 @@ const AppointmentModal: React.FC<ReviewModalProps> = ({
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            patient_id: patientId, // Include patient_id
-            patient_name: patientDetail.name, // Include patient_name
-            doctor: doctors.find((doc) => doc.id === doctor)?.name || "", // Doctor's name
+            patient_id: patientId,
+            patient_name: patientDetail.name,
+            doctor: doctors.find((doc) => doc.id === doctor)?.name || "",
             detail,
           }),
         }
@@ -146,7 +201,7 @@ const AppointmentModal: React.FC<ReviewModalProps> = ({
             label: "Close",
             onClick: () => {},
           },
-        }) // Sonner success toast
+        })
       } else {
         console.error("Failed to submit form", await response.text())
         toast.error("Appointment booking failed", {
@@ -156,7 +211,7 @@ const AppointmentModal: React.FC<ReviewModalProps> = ({
             label: "Close",
             onClick: () => {},
           },
-        }) // Sonner error toast
+        })
       }
     } catch (error) {
       console.error("Error submitting form", error)
@@ -167,7 +222,7 @@ const AppointmentModal: React.FC<ReviewModalProps> = ({
           label: "Close",
           onClick: () => {},
         },
-      }) // Sonner error toast
+      })
     } finally {
       setLoading(false)
     }
@@ -191,7 +246,7 @@ const AppointmentModal: React.FC<ReviewModalProps> = ({
               <CustomDropdown
                 options={doctors.map((doc) => ({ id: doc.id, name: doc.name }))}
                 selectedOption={doctor}
-                onChange={(selectedDoctorName) => setDoctor(selectedDoctorName)} // Ensure name is set
+                onChange={(selectedDoctorId) => setDoctor(selectedDoctorId)}
                 placeholder="Select Doctor"
               />
             </div>
@@ -215,7 +270,7 @@ const AppointmentModal: React.FC<ReviewModalProps> = ({
             <button
               className="button-primary h-[50px] w-full rounded-sm max-sm:h-[45px]"
               onClick={submitForm}
-              disabled={!doctor || !detail}
+              disabled={!doctor || !detail || loading}
             >
               {loading ? "Registering..." : "REGISTER"}
             </button>

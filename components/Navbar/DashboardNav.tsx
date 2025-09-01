@@ -27,13 +27,6 @@ interface Notification {
   pub_date: string
 }
 
-interface Message {
-  id: string
-  content: string
-  is_read: boolean
-  created_at: string
-}
-
 interface UserDetails {
   id: number
   username: string
@@ -58,9 +51,6 @@ const DashboardNav: React.FC = () => {
   const [isNavOpen, setIsNavOpen] = useState(false)
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false)
   const [notificationAnchorEl, setNotificationAnchorEl] = useState<HTMLElement | null>(null)
-  const [messages, setMessages] = useState<Message[]>([])
-  const [hasUnreadMessages, setHasUnreadMessages] = useState(false)
-  const [messagePollingInterval, setMessagePollingInterval] = useState<NodeJS.Timeout>()
   const [soundInterval, setSoundInterval] = useState<NodeJS.Timeout>()
   const [lastSoundPlayTime, setLastSoundPlayTime] = useState<number>(0)
   const [soundEnabled, setSoundEnabled] = useState(true)
@@ -114,7 +104,6 @@ const DashboardNav: React.FC = () => {
     }
 
     fetchUserDetails()
-    const messageInterval = startMessagePolling()
 
     // Start sound interval
     const soundIntvl = setInterval(playContinuousSound, SOUND_INTERVAL)
@@ -122,7 +111,6 @@ const DashboardNav: React.FC = () => {
 
     return () => {
       stopSound()
-      clearInterval(messageInterval)
       clearInterval(soundIntvl)
     }
   }, [])
@@ -139,30 +127,6 @@ const DashboardNav: React.FC = () => {
       localStorage.removeItem("hasUnreadNotifications")
     }
   }, [userDetails?.notifications])
-
-  const startMessagePolling = () => {
-    fetchMessages()
-    const interval = setInterval(fetchMessages, 30000) // Poll every 30 seconds
-    setMessagePollingInterval(interval)
-    return interval
-  }
-
-  const fetchMessages = async () => {
-    try {
-      const userId = localStorage.getItem("id")
-      if (userId) {
-        const response = await axios.get<Message[]>(
-          `https://api2.caregiverhospital.com/app_user/get-messages/${userId}/`
-        )
-        if (response.data) {
-          setMessages(response.data)
-          setHasUnreadMessages(response.data.some((message) => !message.is_read))
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching messages:", error)
-    }
-  }
 
   const fetchUserDetails = async () => {
     try {
@@ -309,17 +273,6 @@ const DashboardNav: React.FC = () => {
                 </div>
               </div>
             </Popover>
-
-            <Tooltip title="Messages">
-              <div
-                className={`flex h-8 cursor-pointer items-center rounded border px-2 py-1 ${
-                  hasUnreadMessages ? "border-[#D82E2E] bg-[#D82E2E]" : "border-[#CFDBD5]"
-                }`}
-              >
-                <BiMessageDetail />
-                {hasUnreadMessages && <span className="ml-1 text-xs">!</span>}
-              </div>
-            </Tooltip>
 
             <div className="flex cursor-pointer items-center gap-1" onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46ffa6]">

@@ -7,8 +7,7 @@ import { useTheme } from "next-themes"
 import { usePathname, useRouter } from "next/navigation"
 import { MdAccountCircle } from "react-icons/md"
 import { RiLogoutCircleRLine } from "react-icons/ri"
-import { BiMessageDetail } from "react-icons/bi"
-import { IoIosArrowDown, IoIosNotificationsOutline, IoMdAddCircleOutline, IoMdLock, IoMdSearch } from "react-icons/io"
+import { IoIosArrowDown, IoIosNotificationsOutline, IoMdLock, IoMdSearch } from "react-icons/io"
 import LogoutModal from "components/Modals/LogoutModal"
 import Search from "components/Search/Search"
 import { RxCross2 } from "react-icons/rx"
@@ -26,13 +25,6 @@ interface Notification {
   detail: string
   status: boolean
   pub_date: string
-}
-
-interface Message {
-  id: string
-  content: string
-  is_read: boolean
-  created_at: string
 }
 
 interface UserDetails {
@@ -60,8 +52,6 @@ const CashierNav: React.FC = () => {
   const [isUtilitiesOpen, setIsUtilitiesOpen] = useState(false)
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false)
   const [notificationAnchorEl, setNotificationAnchorEl] = useState<HTMLElement | null>(null)
-  const [messages, setMessages] = useState<Message[]>([])
-  const [hasUnreadMessages, setHasUnreadMessages] = useState(false)
   const [soundEnabled, setSoundEnabled] = useState(true)
   const [soundInterval, setSoundInterval] = useState<NodeJS.Timeout>()
 
@@ -100,7 +90,6 @@ const CashierNav: React.FC = () => {
   useEffect(() => {
     setMounted(true)
     fetchUserDetails()
-    startMessagePolling()
 
     // Start sound interval
     const interval = setInterval(() => {
@@ -125,29 +114,6 @@ const CashierNav: React.FC = () => {
       playContinuousSound()
     }
   }, [userDetails?.notifications])
-
-  const startMessagePolling = () => {
-    fetchMessages()
-    const interval = setInterval(fetchMessages, 30000) // Poll every 30 seconds
-    return interval
-  }
-
-  const fetchMessages = async () => {
-    try {
-      const userId = localStorage.getItem("id")
-      if (userId) {
-        const response = await axios.get<Message[]>(
-          `https://api2.caregiverhospital.com/app_user/get-messages/${userId}/`
-        )
-        if (response.data) {
-          setMessages(response.data)
-          setHasUnreadMessages(response.data.some((message) => !message.is_read))
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching messages:", error)
-    }
-  }
 
   const fetchUserDetails = async () => {
     try {
@@ -366,17 +332,6 @@ const CashierNav: React.FC = () => {
                 </div>
               </div>
             </Popover>
-
-            <Tooltip title="Messages">
-              <div
-                className={`flex h-8 cursor-pointer items-center rounded border px-2 py-1 ${
-                  hasUnreadMessages ? "border-[#D82E2E] bg-[#D82E2E]" : "border-[#CFDBD5]"
-                }`}
-              >
-                <BiMessageDetail />
-                {hasUnreadMessages && <span className="ml-1 text-xs">!</span>}
-              </div>
-            </Tooltip>
 
             <div className="flex cursor-pointer items-center gap-1">
               <div

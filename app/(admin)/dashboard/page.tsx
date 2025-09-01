@@ -19,6 +19,16 @@ interface PatientCountResponse {
   total: number
 }
 
+interface CachedData {
+  departmentCount: number
+  staffCount: number
+  totalPatients: number
+  timestamp: number
+}
+
+// Cache expiration time (1 hour)
+const CACHE_EXPIRY = 60 * 60 * 1000
+
 export default function Dashboard() {
   const [departmentCount, setDepartmentCount] = useState(0)
   const [staffCount, setStaffCount] = useState(0)
@@ -26,9 +36,31 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
+  // Check if cached data is still valid
+  const isCacheValid = (cachedData: CachedData): boolean => {
+    return Date.now() - cachedData.timestamp < CACHE_EXPIRY
+  }
+
   // Fetch all required data in a single function
   const fetchData = useCallback(async () => {
     try {
+      // Check if we have valid cached data
+      const cachedDataStr = localStorage.getItem("dashboardStatistics")
+
+      if (cachedDataStr) {
+        const cachedData: CachedData = JSON.parse(cachedDataStr) as any
+
+        if (isCacheValid(cachedData)) {
+          // Use cached data
+          setDepartmentCount(cachedData.departmentCount)
+          setStaffCount(cachedData.staffCount)
+          setTotalPatients(cachedData.totalPatients)
+          setLoading(false)
+          return
+        }
+      }
+
+      // Fetch fresh data if no valid cache exists
       // Fetch patient count
       const patientResponse = await fetch(
         "https://api2.caregiverhospital.com/patient/patient/fetch/count/get-patient-count/"
@@ -48,9 +80,28 @@ export default function Dashboard() {
       if (!staffResponse.ok) throw new Error("Failed to fetch staff count")
       const staffData = (await staffResponse.json()) as Staff[]
       setStaffCount(staffData.length)
+
+      // Cache the new data
+      const dataToCache: CachedData = {
+        departmentCount: departmentData.length,
+        staffCount: staffData.length,
+        totalPatients: patientData.total,
+        timestamp: Date.now(),
+      }
+      localStorage.setItem("dashboardStatistics", JSON.stringify(dataToCache))
     } catch (err) {
       console.error("Error fetching data:", err)
-      setError("Failed to load data. Please try again later.")
+
+      // Try to use cached data even if it's expired as a fallback
+      const cachedDataStr = localStorage.getItem("dashboardStatistics")
+      if (cachedDataStr) {
+        const cachedData: CachedData = JSON.parse(cachedDataStr) as any
+        setDepartmentCount(cachedData.departmentCount)
+        setStaffCount(cachedData.staffCount)
+        setTotalPatients(cachedData.totalPatients)
+      } else {
+        setError("Failed to load data. Please try again later.")
+      }
     } finally {
       setLoading(false)
     }

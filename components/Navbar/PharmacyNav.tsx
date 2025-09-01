@@ -28,13 +28,6 @@ interface Notification {
   pub_date: string
 }
 
-interface Message {
-  id: string
-  content: string
-  is_read: boolean
-  created_at: string
-}
-
 interface UserDetails {
   id: number
   username: string
@@ -60,7 +53,6 @@ const PharmacyNav: React.FC = () => {
   const [isUtilitiesOpen, setIsUtilitiesOpen] = useState(false)
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false)
   const [notificationAnchorEl, setNotificationAnchorEl] = useState<HTMLElement | null>(null)
-  const [messages, setMessages] = useState<Message[]>([])
   const [hasUnreadMessages, setHasUnreadMessages] = useState(false)
   const [soundEnabled, setSoundEnabled] = useState(true)
   const [soundInterval, setSoundInterval] = useState<NodeJS.Timeout>()
@@ -103,7 +95,6 @@ const PharmacyNav: React.FC = () => {
   useEffect(() => {
     setMounted(true)
     fetchUserDetails()
-    startMessagePolling()
 
     // Start sound interval
     const interval = setInterval(() => {
@@ -128,30 +119,6 @@ const PharmacyNav: React.FC = () => {
       playContinuousSound()
     }
   }, [userDetails?.notifications])
-
-  const startMessagePolling = () => {
-    fetchMessages()
-    const interval = setInterval(fetchMessages, 30000)
-    return interval
-  }
-
-  const fetchMessages = async () => {
-    try {
-      const userId = localStorage.getItem("id")
-      if (userId) {
-        const response = await axios.get<Message[]>(
-          `https://api2.caregiverhospital.com/app_user/get-messages/${userId}/`
-        )
-        if (response.data) {
-          setMessages(response.data)
-          const unread = response.data.some((message) => !message.is_read)
-          setHasUnreadMessages(unread)
-        }
-      }
-    } catch (error) {
-      console.error("Error fetching messages:", error)
-    }
-  }
 
   const fetchUserDetails = async () => {
     try {
