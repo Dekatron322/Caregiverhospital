@@ -188,6 +188,10 @@ const PatientDetails: React.FC<PatientDetailsProps> = ({ patientDetail }) => {
             <p className="text-sm font-bold">{prescription.name}</p>
             <small className="text-xm ">Medication name</small>
           </div>
+          <div className="w-full">
+            <p className="text-sm font-bold">{formatDateTime(prescription.pub_date)}</p>
+            <small className="text-xm ">Date</small>
+          </div>
           <div className="w-full max-md:hidden">
             <p className="text-sm font-bold">{prescription.category}</p>
             <small className="text-xm ">Category</small>
