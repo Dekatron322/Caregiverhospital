@@ -50,6 +50,12 @@ const getDepartmentUrl = (departmentName: string): string => {
       return "laboratory"
     case "doctors":
       return "medical-consultant"
+    case "nurses":
+      return "nurses"
+    case "cashier":
+      return "cashier"
+    case "admin":
+      return "admin"
     default:
       return ""
   }

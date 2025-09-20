@@ -173,7 +173,7 @@ export default function MedicalConsultants() {
       // Filter users with account_type "Doctor" (case-insensitive)
       const doctorsData = usersData.filter((user) => {
         const role = user.account_type?.toLowerCase().trim()
-        return role === "pharmacy" || role === "pharmacy"
+        return role === "nurses" || role === "nurses"
       })
 
       // Update state only if this is not a background update
@@ -287,10 +287,10 @@ export default function MedicalConsultants() {
             <DashboardNav />
 
             <div className="flex items-center justify-between border-b px-16 py-4 max-sm:px-3">
-              <p className="text-2xl font-medium max-sm:text-lg">Pharmacists</p>
+              <p className="text-2xl font-medium max-sm:text-lg">Nurses</p>
               <div className="flex gap-2">
                 <Link href="/staff/add-staff" className="button-primary h-[36px] w-full rounded-sm max-sm:h-[45px]">
-                  Add Pharmacist
+                  Add Nurse
                 </Link>
               </div>
             </div>
@@ -341,7 +341,7 @@ export default function MedicalConsultants() {
                             <div className="flex items-center gap-2">
                               <div className="flex items-center gap-1">
                                 <span className="text-grey-400">Role:</span>
-                                <span className="font-medium">Pharmacist</span>
+                                <span className="font-medium">Nurse</span>
                               </div>
                             </div>
 
