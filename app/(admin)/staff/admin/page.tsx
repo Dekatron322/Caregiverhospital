@@ -173,7 +173,7 @@ export default function MedicalConsultants() {
       // Filter users with account_type "Doctor" (case-insensitive)
       const doctorsData = usersData.filter((user) => {
         const role = user.account_type?.toLowerCase().trim()
-        return role === "cashier" || role === "cashier"
+        return role === "admin" || role === "admin"
       })
 
       // Update state only if this is not a background update
