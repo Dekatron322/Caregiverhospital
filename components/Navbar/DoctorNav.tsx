@@ -50,6 +50,7 @@ const DoctorNav: React.FC = () => {
   const [notificationAnchorEl, setNotificationAnchorEl] = useState<HTMLElement | null>(null)
   const [soundEnabled, setSoundEnabled] = useState(true)
   const [soundInterval, setSoundInterval] = useState<NodeJS.Timeout>()
+  const [lastSoundPlayTime, setLastSoundPlayTime] = useState<number>(0)
 
   const [playNotificationSound, { stop: stopSound }] = useSound(NOTIFICATION_SOUND, {
     volume: 0.5,
@@ -68,24 +69,32 @@ const DoctorNav: React.FC = () => {
 
     const unread = getUnreadNotifications()
     if (unread.length > 0) {
-      try {
-        playNotificationSound()
-      } catch (error) {
-        console.error("Failed to play notification sound:", error)
+      const now = Date.now()
+      if (now - lastSoundPlayTime > SOUND_INTERVAL - 1000) {
+        try {
+          playNotificationSound()
+          setLastSoundPlayTime(now)
+          localStorage.setItem("hasUnreadNotifications", "true")
+        } catch (error) {
+          console.error("Failed to play notification sound:", error)
+        }
       }
+    } else {
+      localStorage.removeItem("hasUnreadNotifications")
     }
   }
 
   useEffect(() => {
     setMounted(true)
+    // Check localStorage for existing unread state
+    const hasUnread = localStorage.getItem("hasUnreadNotifications") === "true"
+    if (hasUnread) {
+      setLastSoundPlayTime(Date.now())
+    }
+
     fetchUserDetails()
 
-    const interval = setInterval(() => {
-      const unread = getUnreadNotifications()
-      if (unread.length > 0) {
-        playContinuousSound()
-      }
-    }, SOUND_INTERVAL)
+    const interval = setInterval(playContinuousSound, SOUND_INTERVAL)
     setSoundInterval(interval)
 
     return () => {
@@ -98,6 +107,9 @@ const DoctorNav: React.FC = () => {
     const unread = getUnreadNotifications()
     if (unread.length > 0) {
       playContinuousSound()
+    } else {
+      setLastSoundPlayTime(0)
+      localStorage.removeItem("hasUnreadNotifications")
     }
   }, [userDetails?.notifications])
 
@@ -110,6 +122,10 @@ const DoctorNav: React.FC = () => {
         )
         if (response.data) {
           setUserDetails(response.data)
+          // Check for existing unread notifications
+          if (response.data.notifications.some((n) => n.status)) {
+            playContinuousSound()
+          }
         } else {
           setError("User details not found.")
           router.push("/signin")
@@ -127,12 +143,11 @@ const DoctorNav: React.FC = () => {
     }
   }
 
-  const markNotificationAsRead = async (notificationId: string) => {
+  const deleteNotification = async (notificationId: string) => {
     try {
       if (userDetails) {
-        const updatedNotifications = userDetails.notifications.map((notification) =>
-          notification.id === notificationId ? { ...notification, status: false } : notification
-        )
+        // Optimistic update - remove the notification from the list immediately
+        const updatedNotifications = userDetails.notifications.filter((n) => n.id !== notificationId)
 
         setUserDetails({
           ...userDetails,
@@ -140,19 +155,13 @@ const DoctorNav: React.FC = () => {
         })
       }
 
-      await axios.put(`https://api2.caregiverhospital.com/notification/notification/${notificationId}/`, {
-        title: "Updated Notification",
-        detail: "Marked as read",
-        status: false,
-        pub_date: new Date().toISOString(),
-      })
+      // Call the DELETE endpoint
+      await axios.delete(`https://api2.caregiverhospital.com/notification/notification/${notificationId}/`)
     } catch (error) {
-      console.error("Error marking notification as read:", error)
+      console.error("Error deleting notification:", error)
+      // Revert on error - refetch the user details to get the original state
       if (userDetails) {
-        setUserDetails({
-          ...userDetails,
-          notifications: userDetails.notifications,
-        })
+        fetchUserDetails()
       }
     }
   }
@@ -280,11 +289,11 @@ const DoctorNav: React.FC = () => {
                           <h4 className="font-medium">{notification.title}</h4>
                           <span className="text-xs text-gray-500">{formatDate(notification.pub_date)}</span>
                         </div>
-                        <div className="flex justify-between">
+                        <div className="flex w-full items-center justify-between">
                           <p className="text-sm">{notification.detail}</p>
                           <button
                             className="text-sm text-blue-600 hover:underline"
-                            onClick={() => markNotificationAsRead(notification.id)}
+                            onClick={() => deleteNotification(notification.id)}
                           >
                             Mark as read
                           </button>

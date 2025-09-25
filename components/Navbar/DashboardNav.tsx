@@ -155,31 +155,24 @@ const DashboardNav: React.FC = () => {
     }
   }
 
-  const markNotificationAsRead = async (notificationId: string) => {
+  const deleteNotification = async (notificationId: string) => {
     if (!userDetails) return
 
     try {
-      // Optimistic update
-      const updatedNotifications = userDetails.notifications.map((n) =>
-        n.id === notificationId ? { ...n, status: false } : n
-      )
+      // Optimistic update - remove the notification from the list immediately
+      const updatedNotifications = userDetails.notifications.filter((n) => n.id !== notificationId)
 
       setUserDetails({
         ...userDetails,
         notifications: updatedNotifications,
       })
 
-      await axios.put(`https://api2.caregiverhospital.com/notification/notification/${notificationId}/`, {
-        status: false,
-        pub_date: new Date().toISOString(),
-      })
+      // Call the DELETE endpoint
+      await axios.delete(`https://api2.caregiverhospital.com/notification/notification/${notificationId}/`)
     } catch (error) {
-      console.error("Error marking notification as read:", error)
-      // Revert on error
-      setUserDetails({
-        ...userDetails,
-        notifications: userDetails.notifications,
-      })
+      console.error("Error deleting notification:", error)
+      // Revert on error - refetch the user details to get the original state
+      fetchUserDetails()
     }
   }
 
@@ -260,7 +253,7 @@ const DashboardNav: React.FC = () => {
                           <p className="text-sm">{notification.detail}</p>
                           <button
                             className="text-sm text-blue-600 hover:underline"
-                            onClick={() => markNotificationAsRead(notification.id)}
+                            onClick={() => deleteNotification(notification.id)}
                           >
                             Mark as read
                           </button>

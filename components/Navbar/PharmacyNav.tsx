@@ -56,6 +56,7 @@ const PharmacyNav: React.FC = () => {
   const [hasUnreadMessages, setHasUnreadMessages] = useState(false)
   const [soundEnabled, setSoundEnabled] = useState(true)
   const [soundInterval, setSoundInterval] = useState<NodeJS.Timeout>()
+  const [lastSoundPlayTime, setLastSoundPlayTime] = useState<number>(0)
 
   // Sound initialization with error handling
   const [playNotificationSound, { stop: stopSound }] = useSound(NOTIFICATION_SOUND, {
@@ -83,26 +84,34 @@ const PharmacyNav: React.FC = () => {
 
     const unread = getUnreadNotifications()
     if (unread.length > 0) {
-      try {
-        playNotificationSound()
-        console.log("Playing notification sound")
-      } catch (error) {
-        console.error("Failed to play notification sound:", error)
+      const now = Date.now()
+      if (now - lastSoundPlayTime > SOUND_INTERVAL - 1000) {
+        try {
+          playNotificationSound()
+          setLastSoundPlayTime(now)
+          localStorage.setItem("hasUnreadNotifications", "true")
+          console.log("Playing notification sound")
+        } catch (error) {
+          console.error("Failed to play notification sound:", error)
+        }
       }
+    } else {
+      localStorage.removeItem("hasUnreadNotifications")
     }
   }
 
   useEffect(() => {
     setMounted(true)
+    // Check localStorage for existing unread state
+    const hasUnread = localStorage.getItem("hasUnreadNotifications") === "true"
+    if (hasUnread) {
+      setLastSoundPlayTime(Date.now())
+    }
+
     fetchUserDetails()
 
     // Start sound interval
-    const interval = setInterval(() => {
-      const unread = getUnreadNotifications()
-      if (unread.length > 0) {
-        playContinuousSound()
-      }
-    }, SOUND_INTERVAL)
+    const interval = setInterval(playContinuousSound, SOUND_INTERVAL)
     setSoundInterval(interval)
 
     return () => {
@@ -117,6 +126,10 @@ const PharmacyNav: React.FC = () => {
     if (unread.length > 0) {
       // Play immediately when new notifications arrive
       playContinuousSound()
+    } else {
+      // Clear last play time when all are read
+      setLastSoundPlayTime(0)
+      localStorage.removeItem("hasUnreadNotifications")
     }
   }, [userDetails?.notifications])
 
@@ -129,6 +142,10 @@ const PharmacyNav: React.FC = () => {
         )
         if (response.data) {
           setUserDetails(response.data)
+          // Check for existing unread notifications
+          if (response.data.notifications.some((n) => n.status)) {
+            playContinuousSound()
+          }
         } else {
           setError("User details not found.")
           router.push("/signin")
@@ -146,13 +163,11 @@ const PharmacyNav: React.FC = () => {
     }
   }
 
-  const markNotificationAsRead = async (notificationId: string) => {
+  const deleteNotification = async (notificationId: string) => {
     try {
       // Optimistically update the UI first
       if (userDetails) {
-        const updatedNotifications = userDetails.notifications.map((notification) =>
-          notification.id === notificationId ? { ...notification, status: false } : notification
-        )
+        const updatedNotifications = userDetails.notifications.filter((n) => n.id !== notificationId)
 
         setUserDetails({
           ...userDetails,
@@ -160,21 +175,13 @@ const PharmacyNav: React.FC = () => {
         })
       }
 
-      // Then make the API call
-      await axios.put(`https://api2.caregiverhospital.com/notification/notification/${notificationId}/`, {
-        title: "Updated Notification",
-        detail: "Marked as read",
-        status: false,
-        pub_date: new Date().toISOString(),
-      })
+      // Call the DELETE endpoint
+      await axios.delete(`https://api2.caregiverhospital.com/notification/notification/${notificationId}/`)
     } catch (error) {
-      console.error("Error marking notification as read:", error)
+      console.error("Error deleting notification:", error)
       // Revert the UI change if the API call fails
       if (userDetails) {
-        setUserDetails({
-          ...userDetails,
-          notifications: userDetails.notifications,
-        })
+        fetchUserDetails()
       }
     }
   }
@@ -329,11 +336,11 @@ const PharmacyNav: React.FC = () => {
                           <h4 className="font-medium">{notification.title}</h4>
                           <span className="text-xs text-gray-500">{formatDate(notification.pub_date)}</span>
                         </div>
-                        <div className="flex justify-between">
+                        <div className="flex w-full items-center justify-between">
                           <p className="text-sm">{notification.detail}</p>
                           <button
                             className="text-sm text-blue-600 hover:underline"
-                            onClick={() => markNotificationAsRead(notification.id)}
+                            onClick={() => deleteNotification(notification.id)}
                           >
                             Mark as read
                           </button>
