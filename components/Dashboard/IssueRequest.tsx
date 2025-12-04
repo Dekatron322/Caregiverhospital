@@ -71,6 +71,9 @@ interface Procedure {
 type ApiResponse = Patient[]
 type ProcedureResponse = Procedure[]
 
+const ISSUE_REQUEST_PATIENTS_KEY = "issue-request-patients"
+const ISSUE_REQUEST_PROCEDURES_KEY = "issue-request-procedures"
+
 const SkeletonLoader = () => {
   return (
     <div className="flex flex-col gap-2">
@@ -130,6 +133,29 @@ const IssueRequest = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [selectedPrescriptionId, setSelectedPrescriptionId] = useState<string | null>(null)
 
+  useEffect(() => {
+    try {
+      const cachedPatients = localStorage.getItem(ISSUE_REQUEST_PATIENTS_KEY)
+      if (cachedPatients) {
+        const parsed = JSON.parse(cachedPatients) as Patient[]
+        setPatients(parsed)
+      }
+    } catch (error) {
+      console.error("Error reading issue request patients from localStorage:", error)
+    }
+
+    try {
+      const cachedProcedures = localStorage.getItem(ISSUE_REQUEST_PROCEDURES_KEY)
+      if (cachedProcedures) {
+        const parsed = JSON.parse(cachedProcedures) as Procedure[]
+        const map = new Map(parsed.map((procedure) => [procedure.name, procedure]))
+        setProceduresMap(map)
+      }
+    } catch (error) {
+      console.error("Error reading issue request procedures from localStorage:", error)
+    }
+  }, [])
+
   const fetchPatients = async () => {
     setIsLoading(true)
     try {
@@ -160,6 +186,12 @@ const IssueRequest = () => {
       })
 
       setPatients(processedPatients)
+
+      try {
+        localStorage.setItem(ISSUE_REQUEST_PATIENTS_KEY, JSON.stringify(processedPatients))
+      } catch (error) {
+        console.error("Error saving issue request patients to localStorage:", error)
+      }
     } catch (error) {
       console.error("Error fetching patients:", error)
     } finally {
@@ -173,6 +205,12 @@ const IssueRequest = () => {
       const data = (await response.json()) as ProcedureResponse
       const proceduresMap = new Map(data.map((procedure) => [procedure.name, procedure]))
       setProceduresMap(proceduresMap)
+
+      try {
+        localStorage.setItem(ISSUE_REQUEST_PROCEDURES_KEY, JSON.stringify(data))
+      } catch (error) {
+        console.error("Error saving issue request procedures to localStorage:", error)
+      }
     } catch (error) {
       console.error("Error fetching procedures:", error)
     }

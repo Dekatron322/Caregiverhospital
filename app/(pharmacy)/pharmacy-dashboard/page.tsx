@@ -38,6 +38,8 @@ interface Metrics {
   totalMedicinePrice: number
 }
 
+const PHARMACY_DASHBOARD_STORAGE_KEY = "pharmacy-dashboard"
+
 export default function PharmacyDashboard() {
   const [pharmacyData, setPharmacyData] = useState<Category[]>([])
   const [loading, setLoading] = useState<boolean>(true)
@@ -51,12 +53,48 @@ export default function PharmacyDashboard() {
   })
 
   useEffect(() => {
+    try {
+      const cached = localStorage.getItem(PHARMACY_DASHBOARD_STORAGE_KEY)
+      if (cached) {
+        const parsed = JSON.parse(cached) as { data: Category[]; metrics: Metrics }
+        if (parsed?.data && parsed?.metrics) {
+          setPharmacyData(parsed.data)
+          setMetrics(parsed.metrics)
+          setLoading(false)
+        }
+      }
+    } catch (error) {
+      console.error("Error reading pharmacy dashboard from localStorage:", error)
+    }
+
     axios
       .get<Category[]>("https://api2.caregiverhospital.com/medicine-category/medicine-category/")
       .then((response) => {
-        setPharmacyData(response.data)
+        const data = response.data
+        const newMetrics = calculateMetrics(data)
+        const payload = { data, metrics: newMetrics }
+
+        let shouldUpdate = true
+        try {
+          const cached = localStorage.getItem(PHARMACY_DASHBOARD_STORAGE_KEY)
+          if (cached && cached === JSON.stringify(payload)) {
+            shouldUpdate = false
+          }
+        } catch (error) {
+          console.error("Error comparing pharmacy dashboard cache:", error)
+        }
+
+        if (shouldUpdate) {
+          setPharmacyData(data)
+          setMetrics(newMetrics)
+          try {
+            localStorage.setItem(PHARMACY_DASHBOARD_STORAGE_KEY, JSON.stringify(payload))
+          } catch (error) {
+            console.error("Error saving pharmacy dashboard to localStorage:", error)
+          }
+        }
+
         setLoading(false)
-        calculateMetrics(response.data)
       })
       .catch((error) => {
         console.error("There was an error fetching the pharmacy data!", error)
@@ -64,7 +102,7 @@ export default function PharmacyDashboard() {
       })
   }, [])
 
-  const calculateMetrics = (data: Category[]) => {
+  const calculateMetrics = (data: Category[]): Metrics => {
     const today: any = new Date().toISOString().split("T")[0]
     let totalMedicines = 0
     let medicinesAvailable = 0
@@ -91,14 +129,14 @@ export default function PharmacyDashboard() {
       })
     })
 
-    setMetrics({
+    return {
       totalMedicines,
       medicinesAvailable,
       medicineShortage,
       medicinesExpiring,
       totalCategories,
       totalMedicinePrice,
-    })
+    }
   }
 
   if (loading) {
