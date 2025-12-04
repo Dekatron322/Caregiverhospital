@@ -26,6 +26,27 @@ export default function PharmacyDashboard() {
   const [notApprovedTests, setNotApprovedTests] = useState(0)
 
   useEffect(() => {
+    const storageKey = "lab-tests"
+
+    try {
+      const cached = localStorage.getItem(storageKey)
+      if (cached) {
+        const labTests = JSON.parse(cached) as LabTest[]
+        setPharmacyData(labTests)
+
+        const total = labTests.length
+        const approved = labTests.filter((test) => test.status_note === "Approved").length
+        const notApproved = labTests.filter((test) => test.status_note === "Not Approved").length
+
+        setTotalTests(total)
+        setApprovedTests(approved)
+        setNotApprovedTests(notApproved)
+        return
+      }
+    } catch (error) {
+      console.error("Error reading lab tests from localStorage:", error)
+    }
+
     fetch("https://api2.caregiverhospital.com/lab-test/lab-test/")
       .then((response) => response.json())
       .then((data: unknown) => {
@@ -38,6 +59,12 @@ export default function PharmacyDashboard() {
         setTotalTests(total)
         setApprovedTests(approved)
         setNotApprovedTests(notApproved)
+
+        try {
+          localStorage.setItem(storageKey, JSON.stringify(labTests))
+        } catch (error) {
+          console.error("Error saving lab tests to localStorage:", error)
+        }
       })
       .catch((error) => console.error("Error fetching lab test data:", error))
   }, [])

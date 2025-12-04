@@ -49,6 +49,8 @@ export interface Patients {
   discount_value: string
 }
 
+const LAB_PATIENTS_STORAGE_KEY = "lab-patients"
+
 export default function Patients() {
   const pathname = usePathname()
   const [loading, setLoading] = useState(true)
@@ -63,12 +65,15 @@ export default function Patients() {
   const [showEditedNotification, setShowEditedNotification] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [patientToEdit, setPatientToEdit] = useState<Patients | null>(null)
+  const [initialized, setInitialized] = useState(false)
 
   const patientsPerPage = 100
 
   // Fetch patients
   const fetchPatients = useCallback(async (page: number, query: string = "") => {
-    setLoading(true)
+    if (patients.length === 0) {
+      setLoading(true)
+    }
     const start = (page - 1) * patientsPerPage + 1
     const stop = page * patientsPerPage
 
@@ -97,16 +102,37 @@ export default function Patients() {
 
       const sortedData = data.sort((a, b) => a.name.localeCompare(b.name))
       setPatients(sortedData)
+
+      try {
+        localStorage.setItem(LAB_PATIENTS_STORAGE_KEY, JSON.stringify(sortedData))
+      } catch (error) {
+        console.error("Error saving patients to localStorage:", error)
+      }
     } catch (error) {
       console.error("Error fetching Patients:", error)
     } finally {
       setLoading(false)
     }
+  }, [patients.length])
+
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem(LAB_PATIENTS_STORAGE_KEY)
+      if (cached) {
+        const parsed = JSON.parse(cached) as Patients[]
+        setPatients(parsed)
+        setLoading(false)
+      }
+    } catch (error) {
+      console.error("Error reading patients from localStorage:", error)
+    }
+    setInitialized(true)
   }, [])
 
   useEffect(() => {
+    if (!initialized) return
     fetchPatients(currentPage, searchQuery)
-  }, [currentPage, searchQuery, fetchPatients])
+  }, [currentPage, searchQuery, fetchPatients, initialized])
 
   // Handle search
   const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -288,7 +314,7 @@ export default function Patients() {
             </div>
 
             <div className="mb-4 flex h-full flex-col gap-2 px-16 max-sm:px-4">
-              {loading ? (
+              {loading && filteredPatients.length === 0 ? (
                 <div className="loading-text flex h-full items-center justify-center">
                   {"loading...".split("").map((letter, index) => (
                     <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>

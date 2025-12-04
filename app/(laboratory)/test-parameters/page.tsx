@@ -30,6 +30,8 @@ interface Category {
   parameters: Medicine[]
 }
 
+const TEST_PARAMETERS_STORAGE_KEY = "lab-test-parameters"
+
 export default function Medicines() {
   const [searchQuery, setSearchQuery] = useState<string>("")
   const [currentPage, setCurrentPage] = useState<number>(1)
@@ -39,9 +41,27 @@ export default function Medicines() {
   const router = useRouter()
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
   const [selectedMedicine, setSelectedMedicine] = useState<Medicine | null>(null)
+  const [initialized, setInitialized] = useState(false)
+
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem(TEST_PARAMETERS_STORAGE_KEY)
+      if (cached) {
+        const parsed = JSON.parse(cached) as Medicine[]
+        setMedicines(parsed)
+        setLoading(false)
+      }
+    } catch (error) {
+      console.error("Error reading test parameters from localStorage:", error)
+    }
+    setInitialized(true)
+  }, [])
 
   useEffect(() => {
     const fetchMedicines = async () => {
+      if (medicines.length === 0) {
+        setLoading(true)
+      }
       try {
         const response = await fetch("https://api2.caregiverhospital.com/testt/testt/")
         if (!response.ok) {
@@ -51,14 +71,19 @@ export default function Medicines() {
         const extractedMedicines: Medicine[] = data.flatMap((category) =>
           category.parameters.map((medicine) => ({
             ...medicine,
-            category: category.title, // Assign category name to each medicine
+            category: category.title,
           }))
         )
 
-        // Sort medicines alphabetically by name
         extractedMedicines.sort((a, b) => a.param_title.localeCompare(b.param_title))
 
         setMedicines(extractedMedicines)
+
+        try {
+          localStorage.setItem(TEST_PARAMETERS_STORAGE_KEY, JSON.stringify(extractedMedicines))
+        } catch (error) {
+          console.error("Error saving test parameters to localStorage:", error)
+        }
       } catch (error) {
         console.error("Error fetching medicines:", error)
       } finally {
@@ -66,8 +91,9 @@ export default function Medicines() {
       }
     }
 
+    if (!initialized) return
     fetchMedicines()
-  }, [])
+  }, [initialized, medicines.length])
 
   const medicinesPerPage = 100
 
@@ -195,7 +221,7 @@ export default function Medicines() {
             )}
 
             <div className="flex h-full flex-col gap-2 px-16 max-sm:px-3">
-              {loading ? (
+              {loading && currentMedicines.length === 0 ? (
                 <div className="loading-text flex h-full items-center justify-center">
                   {"loading...".split("").map((letter, index) => (
                     <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>
