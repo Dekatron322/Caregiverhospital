@@ -30,6 +30,8 @@ interface Category {
   medicines: Medicine[]
 }
 
+const PHARMACY_MEDICINES_STORAGE_KEY = "pharmacy-medicines"
+
 export default function Medicines() {
   const [searchQuery, setSearchQuery] = useState<string>("")
   const [currentPage, setCurrentPage] = useState<number>(1)
@@ -37,9 +39,27 @@ export default function Medicines() {
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
+  const [initialized, setInitialized] = useState(false)
+
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem(PHARMACY_MEDICINES_STORAGE_KEY)
+      if (cached) {
+        const parsed = JSON.parse(cached) as Medicine[]
+        setMedicines(parsed)
+        setLoading(false)
+      }
+    } catch (error) {
+      console.error("Error reading pharmacy medicines from localStorage:", error)
+    }
+    setInitialized(true)
+  }, [])
 
   useEffect(() => {
     const fetchMedicines = async () => {
+      if (medicines.length === 0) {
+        setLoading(true)
+      }
       try {
         const response = await fetch("https://api2.caregiverhospital.com/medicine-category/medicine-category/")
         if (!response.ok) {
@@ -49,14 +69,19 @@ export default function Medicines() {
         const extractedMedicines: Medicine[] = data.flatMap((category) =>
           category.medicines.map((medicine) => ({
             ...medicine,
-            category: category.name, // Assign category name to each medicine
+            category: category.name,
           }))
         )
 
-        // Sort medicines alphabetically by name
         extractedMedicines.sort((a, b) => a.name.localeCompare(b.name))
 
         setMedicines(extractedMedicines)
+
+        try {
+          localStorage.setItem(PHARMACY_MEDICINES_STORAGE_KEY, JSON.stringify(extractedMedicines))
+        } catch (error) {
+          console.error("Error saving pharmacy medicines to localStorage:", error)
+        }
       } catch (error) {
         console.error("Error fetching medicines:", error)
       } finally {
@@ -64,8 +89,9 @@ export default function Medicines() {
       }
     }
 
+    if (!initialized) return
     fetchMedicines()
-  }, [])
+  }, [initialized, medicines.length])
 
   const handlePatientClick = (medicineId: string) => {
     if (!medicineId) {
@@ -153,7 +179,7 @@ export default function Medicines() {
             )}
 
             <div className="flex h-full flex-col gap-2 px-16 max-sm:px-3">
-              {loading ? (
+              {loading && currentMedicines.length === 0 ? (
                 <div className="loading-text flex h-full items-center justify-center">
                   {"loading...".split("").map((letter, index) => (
                     <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>

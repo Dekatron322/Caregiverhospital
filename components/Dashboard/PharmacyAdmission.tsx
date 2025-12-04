@@ -21,6 +21,8 @@ interface Admission {
   status: "checkout" | "checkin"
 }
 
+const PHARMACY_ADMISSIONS_STORAGE_KEY = "pharmacy-admissions"
+
 const PharmacyAdmission: React.FC = () => {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<"all" | "checkout" | "checkin">("all")
@@ -31,7 +33,23 @@ const PharmacyAdmission: React.FC = () => {
   const [endDate, setEndDate] = useState<Dayjs | null>(dayjs())
 
   useEffect(() => {
+    try {
+      const cached = localStorage.getItem(PHARMACY_ADMISSIONS_STORAGE_KEY)
+      if (cached) {
+        const parsed = JSON.parse(cached) as Admission[]
+        setAdmissions(parsed)
+        setIsLoading(false)
+      }
+    } catch (error) {
+      console.error("Error reading pharmacy admissions from localStorage:", error)
+    }
+  }, [])
+
+  useEffect(() => {
     const fetchAdmissions = async () => {
+      if (admissions.length === 0) {
+        setIsLoading(true)
+      }
       try {
         const start = startDate ? startDate.format("YYYY-MM-DD") : ""
         const end = endDate ? endDate.format("YYYY-MM-DD") : ""
@@ -59,7 +77,9 @@ const PharmacyAdmission: React.FC = () => {
         )
 
         // Sort by pub_date descending (newest first)
-        const sortedData = formattedData.sort((a, b) => new Date(b.pub_date).getTime() - new Date(a.pub_date).getTime())
+        const sortedData = formattedData.sort(
+          (a, b) => new Date(b.pub_date).getTime() - new Date(a.pub_date).getTime()
+        )
 
         // Keep only the most recent admission per patient_id
         const uniqueMostRecent = sortedData.filter(
@@ -67,6 +87,12 @@ const PharmacyAdmission: React.FC = () => {
         )
 
         setAdmissions(uniqueMostRecent)
+
+        try {
+          localStorage.setItem(PHARMACY_ADMISSIONS_STORAGE_KEY, JSON.stringify(uniqueMostRecent))
+        } catch (error) {
+          console.error("Error saving pharmacy admissions to localStorage:", error)
+        }
       } catch (error) {
         console.error("Error fetching admissions:", error)
       } finally {
@@ -75,7 +101,7 @@ const PharmacyAdmission: React.FC = () => {
     }
 
     fetchAdmissions()
-  }, [startDate, endDate])
+  }, [startDate, endDate, admissions.length])
 
   const handlePatientClick = (patientId: string) => {
     localStorage.setItem("selectedAdmissionId", patientId)
@@ -151,7 +177,7 @@ const PharmacyAdmission: React.FC = () => {
 
   return (
     <div className="flex h-full flex-col">
-      {isLoading ? (
+      {isLoading && admissions.length === 0 ? (
         <div className="grid gap-2">
           <div className="flex justify-between">
             <div className="h-10 w-64 animate-pulse rounded bg-gray-200"></div>

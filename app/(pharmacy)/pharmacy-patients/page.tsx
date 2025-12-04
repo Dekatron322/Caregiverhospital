@@ -49,6 +49,8 @@ export interface Patients {
   discount_value: string
 }
 
+const PHARMACY_PATIENTS_STORAGE_KEY = "pharmacy-patients"
+
 export default function Patients() {
   const pathname = usePathname()
   const [loading, setLoading] = useState(true)
@@ -64,11 +66,15 @@ export default function Patients() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [patientToEdit, setPatientToEdit] = useState<Patients | null>(null)
 
-  const patientsPerPage = 100
+  const [initialized, setInitialized] = useState(false)
+
+  const patientsPerPage = 50
 
   // Fetch patients
   const fetchPatients = useCallback(async (page: number, query: string = "") => {
-    setLoading(true)
+    if (patients.length === 0) {
+      setLoading(true)
+    }
     const start = (page - 1) * patientsPerPage + 1
     const stop = page * patientsPerPage
 
@@ -94,19 +100,39 @@ export default function Patients() {
         if (!response.ok) throw new Error("Failed to fetch patients")
         data = (await response.json()) as Patients[]
       }
-
       const sortedData = data.sort((a, b) => a.name.localeCompare(b.name))
       setPatients(sortedData)
+
+      try {
+        localStorage.setItem(PHARMACY_PATIENTS_STORAGE_KEY, JSON.stringify(sortedData))
+      } catch (error) {
+        console.error("Error saving pharmacy patients to localStorage:", error)
+      }
     } catch (error) {
       console.error("Error fetching Patients:", error)
     } finally {
       setLoading(false)
     }
+  }, [patients.length])
+
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem(PHARMACY_PATIENTS_STORAGE_KEY)
+      if (cached) {
+        const parsed = JSON.parse(cached) as Patients[]
+        setPatients(parsed)
+        setLoading(false)
+      }
+    } catch (error) {
+      console.error("Error reading pharmacy patients from localStorage:", error)
+    }
+    setInitialized(true)
   }, [])
 
   useEffect(() => {
+    if (!initialized) return
     fetchPatients(currentPage, searchQuery)
-  }, [currentPage, searchQuery, fetchPatients])
+  }, [currentPage, searchQuery, fetchPatients, initialized])
 
   // Handle search
   const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -287,8 +313,8 @@ export default function Patients() {
               </Link> */}
             </div>
 
-            <div className="mb-4 flex h-full flex-col gap-2 px-16 max-sm:px-4">
-              {loading ? (
+            <div className="flex h-full flex-col gap-2 px-16 max-sm:px-3">
+              {loading && filteredPatients.length === 0 ? (
                 <div className="loading-text flex h-full items-center justify-center">
                   {"loading...".split("").map((letter, index) => (
                     <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>

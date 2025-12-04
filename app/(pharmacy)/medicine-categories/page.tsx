@@ -34,6 +34,8 @@ interface MedicineCategory {
   pub_date: string
 }
 
+const MEDICINE_CATEGORIES_STORAGE_KEY = "pharmacy-medicine-categories"
+
 export default function MedicineCategories() {
   const pathname = usePathname()
   const [searchQuery, setSearchQuery] = useState<string>("")
@@ -56,6 +58,19 @@ export default function MedicineCategories() {
     fetchCategories()
   }, [])
 
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem(MEDICINE_CATEGORIES_STORAGE_KEY)
+      if (cached) {
+        const parsed = JSON.parse(cached) as MedicineCategory[]
+        setMedicineCategories(parsed)
+        setLoading(false)
+      }
+    } catch (error) {
+      console.error("Error reading medicine categories from localStorage:", error)
+    }
+  }, [])
+
   const fetchCategories = async () => {
     try {
       const response = await fetch("https://api2.caregiverhospital.com/medicine-category/medicine-category/")
@@ -64,6 +79,12 @@ export default function MedicineCategories() {
       }
       const data = (await response.json()) as MedicineCategory[]
       setMedicineCategories(data)
+
+      try {
+        localStorage.setItem(MEDICINE_CATEGORIES_STORAGE_KEY, JSON.stringify(data))
+      } catch (error) {
+        console.error("Error saving medicine categories to localStorage:", error)
+      }
     } catch (error) {
       console.error("Error fetching medicine categories:", error)
       setError("Failed to fetch medicine categories")
@@ -202,7 +223,7 @@ export default function MedicineCategories() {
             )}
 
             <div className="flex h-full flex-col gap-2 px-16 max-sm:px-3">
-              {loading ? (
+              {loading && filteredPatients.length === 0 ? (
                 <div className="loading-text flex h-full items-center justify-center">
                   {"loading...".split("").map((letter, index) => (
                     <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>
