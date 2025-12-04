@@ -23,6 +23,8 @@ interface Appointment {
   complain: string
 }
 
+const DOCTORS_APPOINTMENTS_STORAGE_KEY = "doctors-appointments"
+
 const DoctorsAppointments: React.FC = () => {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<"all" | "pending" | "done">("all")
@@ -33,6 +35,7 @@ const DoctorsAppointments: React.FC = () => {
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<number | null>(null)
   const [startDate, setStartDate] = useState<Dayjs | null>(dayjs().subtract(1, "day"))
   const [endDate, setEndDate] = useState<Dayjs | null>(dayjs())
+  const [initialized, setInitialized] = useState(false)
 
   // Handlers
   const handleAppointmentClick = (appointmentId: number) => {
@@ -67,7 +70,9 @@ const DoctorsAppointments: React.FC = () => {
 
   // Fetch functions
   const fetchAppointments = async () => {
-    setIsLoading(true)
+    if (appointments.length === 0) {
+      setIsLoading(true)
+    }
     try {
       const start = startDate ? startDate.format("YYYY-MM-DD") : ""
       const end = endDate ? endDate.format("YYYY-MM-DD") : ""
@@ -75,6 +80,11 @@ const DoctorsAppointments: React.FC = () => {
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
       const data = (await response.json()) as Appointment[]
       setAppointments(data)
+      try {
+        localStorage.setItem(DOCTORS_APPOINTMENTS_STORAGE_KEY, JSON.stringify(data))
+      } catch (error) {
+        console.error("Error saving doctors appointments to localStorage:", error)
+      }
     } catch (error) {
       console.error("Error fetching appointments:", error)
     } finally {
@@ -83,8 +93,23 @@ const DoctorsAppointments: React.FC = () => {
   }
 
   useEffect(() => {
+    try {
+      const cached = localStorage.getItem(DOCTORS_APPOINTMENTS_STORAGE_KEY)
+      if (cached) {
+        const parsed = JSON.parse(cached) as Appointment[]
+        setAppointments(parsed)
+        setIsLoading(false)
+      }
+    } catch (error) {
+      console.error("Error reading doctors appointments from localStorage:", error)
+    }
+    setInitialized(true)
+  }, [])
+
+  useEffect(() => {
+    if (!initialized) return
     fetchAppointments()
-  }, [startDate, endDate])
+  }, [startDate, endDate, initialized])
 
   useEffect(() => {
     const storedPatientId = localStorage.getItem("selectedAppointmentId")

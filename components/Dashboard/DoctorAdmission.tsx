@@ -33,9 +33,26 @@ const AllAdmission: React.FC = () => {
   const [admissionToDelete, setAdmissionToDelete] = useState<Admission | null>(null)
   const [startDate, setStartDate] = useState<Dayjs | null>(dayjs().subtract(1, "month"))
   const [endDate, setEndDate] = useState<Dayjs | null>(dayjs())
+  const DOCTOR_ADMISSIONS_STORAGE_KEY = "doctor-admissions"
+
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem(DOCTOR_ADMISSIONS_STORAGE_KEY)
+      if (cached) {
+        const parsed = JSON.parse(cached) as Admission[]
+        setAdmissions(parsed)
+        setIsLoading(false)
+      }
+    } catch (error) {
+      console.error("Error reading doctor admissions from localStorage:", error)
+    }
+  }, [])
 
   useEffect(() => {
     const fetchAdmissions = async () => {
+      if (admissions.length === 0) {
+        setIsLoading(true)
+      }
       try {
         const start = startDate ? startDate.format("YYYY-MM-DD") : ""
         const end = endDate ? endDate.format("YYYY-MM-DD") : ""
@@ -65,7 +82,9 @@ const AllAdmission: React.FC = () => {
         )
 
         // Sort by pub_date descending (newest first)
-        const sortedData = formattedData.sort((a, b) => new Date(b.pub_date).getTime() - new Date(a.pub_date).getTime())
+        const sortedData = formattedData.sort(
+          (a, b) => new Date(b.pub_date).getTime() - new Date(a.pub_date).getTime()
+        )
 
         // Keep only the most recent admission per patient_id
         const uniqueMostRecent = sortedData.filter(
@@ -73,6 +92,12 @@ const AllAdmission: React.FC = () => {
         )
 
         setAdmissions(uniqueMostRecent)
+
+        try {
+          localStorage.setItem(DOCTOR_ADMISSIONS_STORAGE_KEY, JSON.stringify(uniqueMostRecent))
+        } catch (error) {
+          console.error("Error saving doctor admissions to localStorage:", error)
+        }
       } catch (error) {
         console.error("Error fetching admissions:", error)
       } finally {
@@ -81,7 +106,7 @@ const AllAdmission: React.FC = () => {
     }
 
     fetchAdmissions()
-  }, [startDate, endDate])
+  }, [startDate, endDate, admissions.length])
 
   const handlePatientClick = (patientId: string) => {
     localStorage.setItem("selectedAdmissionId", patientId)
@@ -97,7 +122,14 @@ const AllAdmission: React.FC = () => {
       })
 
       if (response.ok) {
-        setAdmissions(admissions.filter((a) => a.id !== admissionToDelete.id))
+        const updated = admissions.filter((a) => a.id !== admissionToDelete.id)
+        setAdmissions(updated)
+
+        try {
+          localStorage.setItem(DOCTOR_ADMISSIONS_STORAGE_KEY, JSON.stringify(updated))
+        } catch (error) {
+          console.error("Error updating doctor admissions in localStorage after delete:", error)
+        }
         setShowDeleteModal(false)
       } else {
         console.error("Failed to delete admission")
@@ -185,7 +217,7 @@ const AllAdmission: React.FC = () => {
 
   return (
     <div className="flex h-full flex-col">
-      {isLoading ? (
+      {isLoading && admissions.length === 0 ? (
         <div className="grid gap-2">
           <div className="flex justify-between">
             <div className="h-10 w-64 animate-pulse rounded bg-gray-200"></div>

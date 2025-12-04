@@ -13,6 +13,9 @@ import { GoPlus } from "react-icons/go"
 import { IoAddCircleSharp } from "react-icons/io5"
 import DeletePatientModal from "components/Modals/DeletePatientModal"
 import EditPatientModal from "components/Modals/EditPatientModal"
+import NursesNav from "components/Navbar/NursesNav"
+import LaboratoryNav from "components/Navbar/LaboratoryNav"
+import DoctorNav from "components/Navbar/DoctorNav"
 
 export interface Patients {
   id: string
@@ -47,6 +50,8 @@ export interface Patients {
   discount_value: string
 }
 
+const LAB_PATIENTS_STORAGE_KEY = "lab-patients"
+
 export default function Patients() {
   const pathname = usePathname()
   const [loading, setLoading] = useState(true)
@@ -61,12 +66,15 @@ export default function Patients() {
   const [showEditedNotification, setShowEditedNotification] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [patientToEdit, setPatientToEdit] = useState<Patients | null>(null)
+  const [initialized, setInitialized] = useState(false)
 
   const patientsPerPage = 100
 
   // Fetch patients
   const fetchPatients = useCallback(async (page: number, query: string = "") => {
-    setLoading(true)
+    if (patients.length === 0) {
+      setLoading(true)
+    }
     const start = (page - 1) * patientsPerPage + 1
     const stop = page * patientsPerPage
 
@@ -95,16 +103,37 @@ export default function Patients() {
 
       const sortedData = data.sort((a, b) => a.name.localeCompare(b.name))
       setPatients(sortedData)
+
+      try {
+        localStorage.setItem(LAB_PATIENTS_STORAGE_KEY, JSON.stringify(sortedData))
+      } catch (error) {
+        console.error("Error saving patients to localStorage:", error)
+      }
     } catch (error) {
       console.error("Error fetching Patients:", error)
     } finally {
       setLoading(false)
     }
+  }, [patients.length])
+
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem(LAB_PATIENTS_STORAGE_KEY)
+      if (cached) {
+        const parsed = JSON.parse(cached) as Patients[]
+        setPatients(parsed)
+        setLoading(false)
+      }
+    } catch (error) {
+      console.error("Error reading patients from localStorage:", error)
+    }
+    setInitialized(true)
   }, [])
 
   useEffect(() => {
+    if (!initialized) return
     fetchPatients(currentPage, searchQuery)
-  }, [currentPage, searchQuery, fetchPatients])
+  }, [currentPage, searchQuery, fetchPatients, initialized])
 
   // Handle search
   const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -178,7 +207,7 @@ export default function Patients() {
   const handlePatientClick = useCallback(
     (patientId: string) => {
       localStorage.setItem("selectedPatientId", patientId)
-      router.push(`/doctor-patient/patient`)
+      router.push(`/doctor-patients/patient`)
     },
     [router]
   )
@@ -240,14 +269,12 @@ export default function Patients() {
     return age
   }, [])
 
-  // Filter patients by name, email, or membership number
   const filteredPatients = patients.filter((patient) => {
     const query = searchQuery.toLowerCase()
     const nameMatch = patient.name.toLowerCase().includes(query)
     const emailMatch = patient.email_address.toLowerCase().includes(query)
     const membershipMatch = patient.membership_no.toLowerCase().includes(query)
 
-    // Split the search query into parts for names with spaces
     const queryParts = query.split(" ")
     const namePartsMatch = queryParts.every((part) => patient.name.toLowerCase().includes(part))
 
@@ -259,10 +286,10 @@ export default function Patients() {
       <div className="h-full">
         <div className="flex min-h-screen">
           <div className="flex w-screen flex-col">
-            <DashboardNav />
+            <DoctorNav />
 
             <div className="flex items-center gap-2 px-16 pt-4 max-md:px-3">
-              <p className="font-bold">Admin Dashboard</p>
+              <p className="font-bold">Doctors Dashboard</p>
               <IoIosArrowForward />
               <p className="capitalize">{pathname.split("/").pop()}</p>
             </div>
@@ -281,14 +308,14 @@ export default function Patients() {
                   onChange={handleSearch}
                 />
               </div>
-              {/* <Link href="/patients/add" className="add-button">
+              {/* <Link href="/laboratory-dashboard/add" className="add-button">
                 <p className="text-[12px]">Add Patient</p>
                 <GoPlus />
               </Link> */}
             </div>
 
             <div className="mb-4 flex h-full flex-col gap-2 px-16 max-sm:px-4">
-              {loading ? (
+              {loading && filteredPatients.length === 0 ? (
                 <div className="loading-text flex h-full items-center justify-center">
                   {"loading...".split("").map((letter, index) => (
                     <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>
@@ -356,7 +383,7 @@ export default function Patients() {
                         </div>
                         <div className="flex gap-2">
                           <RemoveRedEyeIcon className="text-[#46FFA6]" onClick={() => handlePatientClick(patient.id)} />
-                          {/* <BorderColorOutlinedIcon onClick={() => handleEditClick(patient)} /> */}
+                          <BorderColorOutlinedIcon onClick={() => handleEditClick(patient)} />
                           <DeleteForeverIcon className="text-[#F2B8B5]" onClick={() => openModal(patient)} />
                         </div>
                       </div>
