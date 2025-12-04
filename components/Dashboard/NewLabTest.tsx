@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react"
 import axios from "axios"
+import dayjs, { Dayjs } from "dayjs"
+import { DatePicker } from "@mui/x-date-pickers/DatePicker"
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
 import { useRouter } from "next/navigation"
 import TestModal from "components/Modals/TestModal"
 import Image from "next/image"
@@ -53,6 +57,8 @@ interface ModalProps {
   diagnosis?: Diagnosis
 }
 
+const NEW_LAB_TESTS_STORAGE_KEY = "new-lab-tests"
+
 const NewLabTests = () => {
   const router = useRouter()
   const [isDone, setIsDone] = useState<boolean>(false)
@@ -71,14 +77,36 @@ const NewLabTests = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [selectedLabTestId, setSelectedLabTestId] = useState<string | null>(null)
   const resultsPerPage = 20
+  const [initialized, setInitialized] = useState(false)
+  const [startDate, setStartDate] = useState<Dayjs | null>(dayjs().subtract(1, "day"))
+  const [endDate, setEndDate] = useState<Dayjs | null>(dayjs())
+
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem(NEW_LAB_TESTS_STORAGE_KEY)
+      if (cached) {
+        const parsed = JSON.parse(cached) as LabTestResult[]
+        setLabTestResults(parsed)
+        setIsLoading(false)
+      }
+    } catch (error) {
+      console.error("Error reading new lab tests from localStorage:", error)
+    }
+    setInitialized(true)
+  }, [])
 
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true)
+      if (labTestResults.length === 0) {
+        setIsLoading(true)
+      }
       try {
+        const start = startDate ? startDate.format("YYYY-MM-DD") : ""
+        const end = endDate ? endDate.format("YYYY-MM-DD") : ""
+
         // Explicitly specify the type for the API response
         const labTestResponse = await axios.get<LabTestResult[]>(
-          "https://api2.caregiverhospital.com/lab-test/lab-test/"
+          `https://api2.caregiverhospital.com/lab-test/filter-lab-test/${start}/${end}/`
         )
         const diagnosisResponse = await axios.get<Diagnosis[]>(
           "https://api2.caregiverhospital.com/diagnosis/diagnosis/"
@@ -99,6 +127,12 @@ const NewLabTests = () => {
               return { ...test, diagnosis }
             })
           setLabTestResults(filteredTests)
+
+          try {
+            localStorage.setItem(NEW_LAB_TESTS_STORAGE_KEY, JSON.stringify(filteredTests))
+          } catch (error) {
+            console.error("Error saving new lab tests to localStorage:", error)
+          }
         } else {
           console.error("Unexpected response format for lab test results")
         }
@@ -109,8 +143,9 @@ const NewLabTests = () => {
       }
     }
 
+    if (!initialized) return
     fetchData()
-  }, [refresh])
+  }, [refresh, initialized, labTestResults.length, startDate, endDate])
 
   const handleCardClick = (results: LabTestResult) => {
     setClickedCard(results)
@@ -279,7 +314,7 @@ const NewLabTests = () => {
   return (
     <>
       <div className="flex w-full flex-col">
-        {isLoading ? (
+        {isLoading && labTestResults.length === 0 ? (
           <div className="loading-text flex h-full items-center justify-center">
             {"loading...".split("").map((letter, index) => (
               <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>
@@ -290,7 +325,7 @@ const NewLabTests = () => {
         ) : (
           <>
             <div>
-              <div>
+              <div className="flex w-full flex-col justify-between gap-4 md:flex-row md:items-center">
                 <div className="search-bg mb-4 flex h-10 items-center justify-between gap-2 rounded border border-[#CFDBD5] px-3 py-1 max-md:w-[180px] lg:w-[300px]">
                   <Image className="icon-style" src="/icons.svg" width={16} height={16} alt="dekalo" />
                   <Image className="dark-icon-style" src="/search-dark.svg" width={16} height={16} alt="dekalo" />
@@ -302,8 +337,26 @@ const NewLabTests = () => {
                     className="w-full bg-transparent text-xs outline-none focus:outline-none"
                   />
                 </div>
-                {renderResults(filterLogic[activeTab])}
+                <div className="bg-white p-4">
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <div className="flex flex-col gap-4 md:flex-row md:items-center">
+                      <DatePicker
+                        label="Start Date"
+                        value={startDate}
+                        onChange={(newValue) => setStartDate(newValue)}
+                        maxDate={endDate || undefined}
+                      />
+                      <DatePicker
+                        label="End Date"
+                        value={endDate}
+                        onChange={(newValue) => setEndDate(newValue)}
+                        minDate={startDate || undefined}
+                      />
+                    </div>
+                  </LocalizationProvider>
+                </div>
               </div>
+              {renderResults(filterLogic[activeTab])}
             </div>
           </>
         )}

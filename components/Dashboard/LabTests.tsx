@@ -70,6 +70,8 @@ const filterLogic = {
   notApproved: (result: LabTestResult) => result.payment_status === false,
 }
 
+const LAB_TESTS_STORAGE_KEY = "lab-test-results"
+
 const SkeletonLoader = () => (
   <div className="flex w-full animate-pulse items-center justify-between rounded-lg border border-gray-200 p-2 dark:border-gray-700">
     <div className="flex items-center gap-1 text-sm font-bold md:w-[20%]">
@@ -214,6 +216,21 @@ const LabTests = () => {
   const [endDate, setEndDate] = useState<Dayjs | null>(dayjs())
   const resultsPerPage = 20
   const maxVisiblePages = 5
+  const [initialized, setInitialized] = useState(false)
+
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem(LAB_TESTS_STORAGE_KEY)
+      if (cached) {
+        const parsed = JSON.parse(cached) as LabTestResult[]
+        setLabTestResults(parsed as any)
+        setIsLoading(false)
+      }
+    } catch (error) {
+      console.error("Error reading lab test results from localStorage:", error)
+    }
+    setInitialized(true)
+  }, [])
 
   // Debounce search input
   useEffect(() => {
@@ -227,7 +244,9 @@ const LabTests = () => {
   }, [searchQuery])
 
   const fetchData = useCallback(async () => {
-    setIsLoading(true)
+    if (labTestResults.length === 0) {
+      setIsLoading(true)
+    }
     const cancelTokenSource = axios.CancelToken.source()
 
     try {
@@ -264,6 +283,12 @@ const LabTests = () => {
         .sort((a, b) => new Date(b.pub_date).getTime() - new Date(a.pub_date).getTime())
 
       setLabTestResults(tests as any)
+
+      try {
+        localStorage.setItem(LAB_TESTS_STORAGE_KEY, JSON.stringify(tests))
+      } catch (error) {
+        console.error("Error saving lab test results to localStorage:", error)
+      }
     } catch (error) {
       if (!axios.isCancel(error)) {
         console.error("Error fetching data:", error)
@@ -273,11 +298,12 @@ const LabTests = () => {
     }
 
     return () => cancelTokenSource.cancel()
-  }, [currentPage, diagnosisData.length, refresh, startDate, endDate])
+  }, [currentPage, diagnosisData.length, refresh, startDate, endDate, labTestResults.length])
 
   useEffect(() => {
+    if (!initialized) return
     fetchData()
-  }, [fetchData])
+  }, [fetchData, initialized])
 
   const handleCardClick = useCallback((results: LabTestResult) => {
     setClickedCard(results)
@@ -451,7 +477,7 @@ const LabTests = () => {
   return (
     <>
       <div className="flex w-full flex-col">
-        {isLoading ? (
+        {isLoading && labTestResults.length === 0 ? (
           <div className="grid gap-2">
             {Array.from({ length: Math.min(6, resultsPerPage) }).map((_, i) => (
               <SkeletonLoader key={i} />
