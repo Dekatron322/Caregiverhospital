@@ -3,6 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import axios from "axios"
 import { useRouter } from "next/navigation"
+import Image from "next/image"
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
 import DeleteTestModal from "components/Modals/DeleteTestModal"
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye"
@@ -23,6 +24,8 @@ interface Appointment {
   complain: string
 }
 
+const APPOINTMENTS_STORAGE_KEY = "appointments"
+
 const Appointments = () => {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<"all" | "pending" | "done">("all")
@@ -34,12 +37,33 @@ const Appointments = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const [startDate, setStartDate] = useState<Dayjs | null>(dayjs().subtract(1, "day"))
   const [endDate, setEndDate] = useState<Dayjs | null>(dayjs())
+  const [initialized, setInitialized] = useState(false)
 
   useEffect(() => {
+    try {
+      const cached = localStorage.getItem(APPOINTMENTS_STORAGE_KEY)
+      if (cached) {
+        const parsed = JSON.parse(cached) as Appointment[]
+        setAppointments(parsed)
+        setIsLoading(false)
+      }
+    } catch (error) {
+      console.error("Error reading appointments from localStorage:", error)
+    }
+    setInitialized(true)
+  }, [])
+
+  useEffect(() => {
+    if (!initialized) return
+
     const controller = new AbortController()
 
     const fetchAppointments = async () => {
       try {
+        if (appointments.length === 0) {
+          setIsLoading(true)
+        }
+
         const start = startDate ? startDate.format("YYYY-MM-DD") : ""
         const end = endDate ? endDate.format("YYYY-MM-DD") : ""
 
@@ -50,6 +74,12 @@ const Appointments = () => {
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`)
         const data = (await response.json()) as Appointment[]
         setAppointments(data)
+
+        try {
+          localStorage.setItem(APPOINTMENTS_STORAGE_KEY, JSON.stringify(data))
+        } catch (error) {
+          console.error("Error saving appointments to localStorage:", error)
+        }
       } catch (error: any) {
         if (error.name !== "AbortError") console.error("Error fetching appointments:", error)
       } finally {
@@ -59,7 +89,7 @@ const Appointments = () => {
 
     fetchAppointments()
     return () => controller.abort() // Cleanup fetch on unmount
-  }, [startDate, endDate])
+  }, [startDate, endDate, initialized, appointments.length])
 
   const handleAppointmentClick = useCallback(
     (appointmentId: string) => {
@@ -252,6 +282,13 @@ const Appointments = () => {
           onConfirm={deleteLabTest}
           onCancel={() => setIsDeleteModalOpen(false)}
         />
+      )}
+
+      {notification === "success" && (
+        <div className="animation-fade-in absolute bottom-16 m-5 flex h-[50px] w-[339px] items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514] md:right-16">
+          <Image src="/check-circle.svg" width={16} height={16} alt="success" priority />
+          <span className="text-sm text-[#0F920F]">Appointment Deleted</span>
+        </div>
       )}
     </div>
   )
