@@ -29,6 +29,8 @@ interface User {
   account_type: string
 }
 
+const DEPARTMENTS_STORAGE_KEY = "departments"
+
 const getDepartmentImage = (departmentName: string): string => {
   switch (departmentName.toLowerCase()) {
     case "pharmacy":
@@ -68,10 +70,27 @@ export default function Staff() {
   const [isAddDepartmentOpen, setIsAddDepartmentOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [departmentToDelete, setDepartmentToDelete] = useState<number | null>(null)
+  const [initialized, setInitialized] = useState(false)
 
   useEffect(() => {
-    fetchDepartments()
+    try {
+      const cached = localStorage.getItem(DEPARTMENTS_STORAGE_KEY)
+      if (cached) {
+        const parsed = JSON.parse(cached) as Department[]
+        setDepartments(parsed)
+        setLoading(false)
+      }
+    } catch (error) {
+      console.error("Error reading departments from localStorage:", error)
+    }
+    setInitialized(true)
   }, [])
+
+  useEffect(() => {
+    if (!initialized) return
+
+    fetchDepartments()
+  }, [initialized])
 
   const fetchDepartments = async () => {
     try {
@@ -96,6 +115,12 @@ export default function Staff() {
 
       setDepartments(departmentsWithStaffCount)
       setLoading(false)
+
+      try {
+        localStorage.setItem(DEPARTMENTS_STORAGE_KEY, JSON.stringify(departmentsWithStaffCount))
+      } catch (error) {
+        console.error("Error saving departments to localStorage:", error)
+      }
     } catch (error) {
       console.error("Error fetching data:", error)
     }
