@@ -73,14 +73,35 @@ const CashierLabTests = () => {
   const [startDate, setStartDate] = useState<Dayjs | null>(dayjs().subtract(1, "day"))
   const [endDate, setEndDate] = useState<Dayjs | null>(dayjs())
   const resultsPerPage = 20
+  const LOCAL_STORAGE_KEY_PREFIX = "cashierLabTests_"
 
   useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true)
-      try {
-        const formattedStartDate = startDate?.format("YYYY-MM-DD") || ""
-        const formattedEndDate = endDate?.format("YYYY-MM-DD") || ""
+    const formattedStartDate = startDate?.format("YYYY-MM-DD") || ""
+    const formattedEndDate = endDate?.format("YYYY-MM-DD") || ""
+    const cacheKey = `${LOCAL_STORAGE_KEY_PREFIX}${formattedStartDate}_${formattedEndDate}`
 
+    let hasCached = false
+
+    if (typeof window !== "undefined") {
+      const cached = localStorage.getItem(cacheKey)
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached) as LabTestResult[]
+          setLabTestResults(parsed)
+          setIsLoading(false)
+          hasCached = true
+        } catch (e) {
+          console.error("Failed to parse cached lab test results", e)
+        }
+      }
+    }
+
+    const fetchData = async (options?: { silent?: boolean }) => {
+      if (!options?.silent) {
+        setIsLoading(true)
+      }
+
+      try {
         const labTestResponse = await axios.get(
           `https://api2.caregiverhospital.com/lab-test/filter-lab-test/${formattedStartDate}/${formattedEndDate}/`
         )
@@ -99,17 +120,27 @@ const CashierLabTests = () => {
             }
           })
           setLabTestResults(tests)
+
+          if (typeof window !== "undefined") {
+            try {
+              localStorage.setItem(cacheKey, JSON.stringify(tests))
+            } catch (e) {
+              console.error("Failed to save lab test results to localStorage", e)
+            }
+          }
         } else {
           console.error("Unexpected response format for lab test results")
         }
       } catch (error) {
         console.error("Error fetching data:", error)
       } finally {
-        setIsLoading(false)
+        if (!options?.silent) {
+          setIsLoading(false)
+        }
       }
     }
 
-    fetchData()
+    fetchData(hasCached ? { silent: true } : undefined)
   }, [refresh, startDate, endDate])
 
   const handlePaymentClick = (results: LabTestResult) => {

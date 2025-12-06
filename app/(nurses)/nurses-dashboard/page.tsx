@@ -49,6 +49,8 @@ export interface Patients {
   discount_value: string
 }
 
+const NURSES_PATIENTS_STORAGE_KEY = "nurses-patients"
+
 export default function Patients() {
   const pathname = usePathname()
   const [loading, setLoading] = useState(true)
@@ -64,7 +66,23 @@ export default function Patients() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [patientToEdit, setPatientToEdit] = useState<Patients | null>(null)
 
-  const patientsPerPage = 100
+  const [initialized, setInitialized] = useState(false)
+
+  const patientsPerPage = 50
+
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem(NURSES_PATIENTS_STORAGE_KEY)
+      if (cached) {
+        const parsed = JSON.parse(cached) as Patients[]
+        setPatients(parsed)
+        setLoading(false)
+      }
+    } catch (error) {
+      console.error("Error reading nurses patients from localStorage:", error)
+    }
+    setInitialized(true)
+  }, [])
 
   // Fetch patients
   const fetchPatients = useCallback(async (page: number, query: string = "") => {
@@ -97,6 +115,12 @@ export default function Patients() {
 
       const sortedData = data.sort((a, b) => a.name.localeCompare(b.name))
       setPatients(sortedData)
+
+      try {
+        localStorage.setItem(NURSES_PATIENTS_STORAGE_KEY, JSON.stringify(sortedData))
+      } catch (error) {
+        console.error("Error saving nurses patients to localStorage:", error)
+      }
     } catch (error) {
       console.error("Error fetching Patients:", error)
     } finally {
@@ -105,8 +129,10 @@ export default function Patients() {
   }, [])
 
   useEffect(() => {
+    if (!initialized) return
+
     fetchPatients(currentPage, searchQuery)
-  }, [currentPage, searchQuery, fetchPatients])
+  }, [currentPage, searchQuery, fetchPatients, initialized])
 
   // Handle search
   const handleSearch = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
