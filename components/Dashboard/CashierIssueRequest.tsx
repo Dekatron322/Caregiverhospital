@@ -127,6 +127,8 @@ const IssueRequest = () => {
   const [refresh, setRefresh] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
 
+  const LOCAL_STORAGE_KEY_PREFIX = "cashierIssuePatients_"
+
   const handleDeleteClick = (id: string) => {
     setSelectedPrescriptionId(id)
     setIsDeleteModalOpen(true)
@@ -147,8 +149,11 @@ const IssueRequest = () => {
     }
   }
 
-  const fetchPatients = async () => {
-    setIsLoading(true)
+  const fetchPatients = async (options?: { silent?: boolean }) => {
+    if (!options?.silent) {
+      setIsLoading(true)
+    }
+
     try {
       const start = startDate ? startDate.format("YYYY-MM-DD") : ""
       const end = endDate ? endDate.format("YYYY-MM-DD") : ""
@@ -163,10 +168,26 @@ const IssueRequest = () => {
       })
 
       setPatients(newPatients)
+
+      const cacheKey = `${LOCAL_STORAGE_KEY_PREFIX}${start}_${end}`
+      if (typeof window !== "undefined") {
+        try {
+          // Avoid exceeding localStorage quota by skipping very large payloads
+          if (newPatients.length < 200) {
+            localStorage.setItem(cacheKey, JSON.stringify(newPatients))
+          } else {
+            console.warn("Skipping patients cache due to large size:", newPatients.length)
+          }
+        } catch (e) {
+          console.error("Failed to save patients to localStorage", e)
+        }
+      }
     } catch (error) {
       console.error("Error fetching patients:", error)
     } finally {
-      setIsLoading(false)
+      if (!options?.silent) {
+        setIsLoading(false)
+      }
     }
   }
 
@@ -182,7 +203,29 @@ const IssueRequest = () => {
   }
 
   useEffect(() => {
-    fetchPatients()
+    const start = startDate ? startDate.format("YYYY-MM-DD") : ""
+    const end = endDate ? endDate.format("YYYY-MM-DD") : ""
+    const cacheKey = `${LOCAL_STORAGE_KEY_PREFIX}${start}_${end}`
+
+    let hasCached = false
+
+    if (typeof window !== "undefined") {
+      console.log("Using cacheKey", cacheKey)
+      const cached = localStorage.getItem(cacheKey)
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached) as Patient[]
+          console.log("Loaded from cache", parsed.length)
+          setPatients(parsed)
+          setIsLoading(false)
+          hasCached = true
+        } catch (e) {
+          console.error("Failed to parse cached patients", e)
+        }
+      }
+    }
+
+    fetchPatients(hasCached ? { silent: true } : undefined)
     fetchProcedures()
   }, [refresh, startDate, endDate])
 

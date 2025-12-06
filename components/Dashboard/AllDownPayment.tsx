@@ -40,6 +40,8 @@ const AllDownPayment: React.FC = () => {
   const [filteredPatients, setFilteredPatients] = useState<Patient[]>([])
   const [searchQuery, setSearchQuery] = useState<string>("")
 
+  const LOCAL_STORAGE_KEY = "allDownPaymentPatients"
+
   const handleRegisterPayment = async () => {
     if (!selectedPatient || !paymentAmount) return
 
@@ -71,11 +73,23 @@ const AllDownPayment: React.FC = () => {
     }
   }
 
-  const fetchPatients = async () => {
+  const fetchPatients = async (options?: { silent?: boolean }) => {
     try {
-      setLoading(true)
+      if (!options?.silent) {
+        setLoading(true)
+      }
+
+      const today = new Date()
+      const startDate = new Date()
+      startDate.setDate(today.getDate() - 30)
+
+      const formatDate = (date: Date) => date.toISOString().split("T")[0]
+
+      const start = formatDate(startDate)
+      const stop = formatDate(today)
+
       const response = await fetch(
-        `https://api2.caregiverhospital.com/patient/patient-with-payment/{start}/{stop}/payment/`,
+        `https://api2.caregiverhospital.com/patient/filter/patient-with-payment/${start}/${stop}/payment/`,
         {
           method: "GET",
           headers: {
@@ -108,10 +122,20 @@ const AllDownPayment: React.FC = () => {
 
       setPatients(uniquePatients)
       setFilteredPatients(uniquePatients)
+
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(uniquePatients))
+        } catch (e) {
+          console.error("Failed to save patients to localStorage", e)
+        }
+      }
     } catch (err: any) {
       setError(err.message || "An unexpected error occurred.")
     } finally {
-      setLoading(false)
+      if (!options?.silent) {
+        setLoading(false)
+      }
     }
   }
 
@@ -132,7 +156,24 @@ const AllDownPayment: React.FC = () => {
   }
 
   useEffect(() => {
-    fetchPatients()
+    let hasCached = false
+
+    if (typeof window !== "undefined") {
+      const cached = localStorage.getItem(LOCAL_STORAGE_KEY)
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached) as Patient[]
+          setPatients(parsed)
+          setFilteredPatients(parsed)
+          setLoading(false)
+          hasCached = true
+        } catch (e) {
+          console.error("Failed to parse cached patients", e)
+        }
+      }
+    }
+
+    fetchPatients(hasCached ? { silent: true } : undefined)
   }, [])
 
   useEffect(() => {
@@ -213,7 +254,7 @@ const AllDownPayment: React.FC = () => {
     setPaymentAmount("")
   }
 
-  if (loading) return <p>Loading...</p>
+  if (loading && patients.length === 0) return <p>Loading...</p>
 
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
