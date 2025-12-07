@@ -29,6 +29,9 @@ interface PatientData {
   body_temperature: string
   glucose_level: string
   blood_pressure: string
+  height: string
+  weight: string
+  bmi: string
   status: boolean
   pub_date: string
   discount_value?: string
@@ -47,6 +50,9 @@ const UpdateVitalsModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubm
   const [bodyTemperature, setBodyTemperature] = useState<string>("")
   const [glucoseLevel, setGlucoseLevel] = useState<string>("")
   const [bloodPressure, setBloodPressure] = useState<string>("")
+  const [height, setHeight] = useState<string>("")
+  const [weight, setWeight] = useState<string>("")
+  const [bmi, setBmi] = useState<string>("")
   const [loading, setLoading] = useState(false)
 
   const fetchPatientData = async () => {
@@ -58,6 +64,9 @@ const UpdateVitalsModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubm
       setBodyTemperature(data.body_temperature || "")
       setGlucoseLevel(data.glucose_level || "")
       setBloodPressure(data.blood_pressure || "")
+      setHeight(data.height || "")
+      setWeight(data.weight || "")
+      setBmi(data.bmi || "")
     } catch (error) {
       console.error("Error fetching patient data", error)
     }
@@ -70,6 +79,24 @@ const UpdateVitalsModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubm
   }, [isOpen, patientId])
 
   if (!isOpen) return null
+
+  const calculateBmi = (heightValue: string, weightValue: string) => {
+    const parsedHeightCm = parseFloat(heightValue)
+    const parsedWeightKg = parseFloat(weightValue)
+
+    if (!parsedHeightCm || !parsedWeightKg || parsedHeightCm <= 0) {
+      setBmi("")
+      return
+    }
+
+    const heightInMeters = parsedHeightCm / 100
+    const bmiValue = parsedWeightKg / (heightInMeters * heightInMeters)
+    if (Number.isFinite(bmiValue)) {
+      setBmi(bmiValue.toFixed(2))
+    } else {
+      setBmi("")
+    }
+  }
 
   const submitForm = async (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): Promise<void> => {
     event.preventDefault()
@@ -86,6 +113,9 @@ const UpdateVitalsModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubm
         body_temperature: bodyTemperature,
         glucose_level: glucoseLevel,
         blood_pressure: bloodPressure,
+        height,
+        weight,
+        bmi,
         hmo: patientData.hmo.id, // Only include the HMO ID
       }
 
@@ -203,11 +233,55 @@ const UpdateVitalsModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubm
             </div>
           </div>
 
+          <div className="my-2 grid grid-cols-3 gap-2 max-sm:grid-cols-1">
+            <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+              <input
+                type="text"
+                id="height"
+                placeholder="Height (cm)"
+                className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
+                value={height}
+                onChange={(e) => {
+                  const value = e.target.value
+                  setHeight(value)
+                  calculateBmi(value, weight)
+                }}
+              />
+            </div>
+
+            <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+              <input
+                type="text"
+                id="weight"
+                placeholder="Weight (kg)"
+                className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
+                value={weight}
+                onChange={(e) => {
+                  const value = e.target.value
+                  setWeight(value)
+                  calculateBmi(height, value)
+                }}
+              />
+            </div>
+
+            <div className="search-bg flex h-[50px] w-[100%] items-center justify-between gap-3 rounded px-3 py-1 hover:border-[#5378F6] focus:border-[#5378F6] focus:bg-[#FBFAFC] max-sm:mb-2">
+              <input
+                type="text"
+                id="bmi"
+                placeholder="BMI (kg/m²)"
+                className="h-[50px] w-full bg-transparent text-xs outline-none focus:outline-none"
+                value={bmi}
+                readOnly
+                disabled
+              />
+            </div>
+          </div>
+
           <div className="mt-4 flex w-full gap-6">
             <button
               className="button-primary h-[50px] w-full rounded-sm max-sm:h-[45px]"
               onClick={submitForm}
-              disabled={!heartRate || !bodyTemperature || !glucoseLevel || !bloodPressure}
+              disabled={!heartRate || !bodyTemperature || !glucoseLevel || !bloodPressure || !height || !weight || !bmi}
             >
               {loading ? "Updating..." : "UPDATE VITALS"}
             </button>

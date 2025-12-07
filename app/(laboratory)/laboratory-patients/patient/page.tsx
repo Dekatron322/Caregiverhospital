@@ -22,6 +22,9 @@ interface PatientDetail {
   body_temperature?: string
   glucose_level?: string
   blood_pressure?: string
+  height?: string
+  weight?: string
+  bmi?: string
   address: string
   phone_no: string
   dob: string
@@ -210,6 +213,26 @@ export default function PatientDetailPage() {
                       <Image src="/pt-dashboard-04.svg" height={40} width={40} alt="" />
                       <h3 className="py-2 font-bold">Blood Pressure</h3>
                       <p>{patientDetail.blood_pressure || "N/A"} mmHg</p>
+                    </div>
+                  </div>
+                  <div className="mb-3 grid w-full grid-cols-3 gap-2 max-sm:grid-cols-1">
+                    <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
+                      <Image src="/inventory-status.svg" height={40} width={40} alt="" />
+                      <h3 className="py-2 font-bold">Height</h3>
+                      <p>{patientDetail.height || "N/A"} cm</p>
+                    </div>
+                    <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
+                      <Image src="/medicines-available.svg" height={40} width={40} alt="" />
+                      <h3 className="py-2 font-bold">Weight</h3>
+                      <p>{patientDetail.weight || "N/A"} kg</p>
+                    </div>
+                    <div className="flex w-full flex-col items-center justify-center rounded border py-3 ">
+                      <Image src="/Graph.svg" height={40} width={40} alt="" />
+                      <h3 className="py-2 font-bold">BMI</h3>
+                      <p>
+                        {patientDetail.bmi ? Number(patientDetail.bmi).toFixed(2) : "N/A"}
+                        {patientDetail.bmi && <small> kg/m²</small>}
+                      </p>
                     </div>
                   </div>
                   <div className="flex justify-between gap-2 max-md:flex-col">
