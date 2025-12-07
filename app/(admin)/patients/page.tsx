@@ -1,5 +1,4 @@
-"use client" // Mark this as a client component
-
+"use client"
 import DashboardNav from "components/Navbar/DashboardNav"
 import Footer from "components/Footer/Footer"
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io"
@@ -14,9 +13,8 @@ import { GoPlus } from "react-icons/go"
 import { IoAddCircleSharp } from "react-icons/io5"
 import DeletePatientModal from "components/Modals/DeletePatientModal"
 import EditPatientModal from "components/Modals/EditPatientModal"
-import { toast, Toaster } from "sonner" // Import Sonner
-import MedicalServicesOutlinedIcon from "@mui/icons-material/MedicalServicesOutlined"
-import EditHmoModal from "components/Modals/EditHmoModal"
+import NursesNav from "components/Navbar/NursesNav"
+import LaboratoryNav from "components/Navbar/LaboratoryNav"
 
 export interface Patients {
   id: string
@@ -51,7 +49,7 @@ export interface Patients {
   discount_value: string
 }
 
-const PATIENTS_STORAGE_KEY = "patients"
+const LAB_PATIENTS_STORAGE_KEY = "lab-patients"
 
 export default function Patients() {
   const pathname = usePathname()
@@ -63,19 +61,66 @@ export default function Patients() {
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [patientToDelete, setPatientToDelete] = useState<Patients | null>(null)
+  const [showSuccessNotification, setShowSuccessNotification] = useState(false)
+  const [showEditedNotification, setShowEditedNotification] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [patientToEdit, setPatientToEdit] = useState<Patients | null>(null)
-
-  const [isHmoModalOpen, setIsHmoModalOpen] = useState(false)
-  const [patientToEditHmo, setPatientToEditHmo] = useState<Patients | null>(null)
-
   const [initialized, setInitialized] = useState(false)
 
   const patientsPerPage = 100
 
+  // Fetch patients
+  const fetchPatients = useCallback(
+    async (page: number, query: string = "") => {
+      if (patients.length === 0) {
+        setLoading(true)
+      }
+      const start = (page - 1) * patientsPerPage + 1
+      const stop = page * patientsPerPage
+
+      try {
+        let data: Patients[] = []
+
+        if (query) {
+          const queryParts = query.split(" ")
+          for (const part of queryParts) {
+            const encodedQueryPart = encodeURIComponent(part)
+            const searchResponse = await fetch(
+              `https://api2.caregiverhospital.com/patient/patient/search/search-patients/by-name/${encodedQueryPart}/`
+            )
+
+            if (searchResponse.ok) {
+              const partData = (await searchResponse.json()) as Patients[]
+              data = [...data, ...partData]
+            }
+          }
+          data = Array.from(new Set(data.map((p) => p.id))).map((id) => data.find((p) => p.id === id)!)
+        } else {
+          const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${start}/${stop}`)
+          if (!response.ok) throw new Error("Failed to fetch patients")
+          data = (await response.json()) as Patients[]
+        }
+
+        const sortedData = data.sort((a, b) => a.name.localeCompare(b.name))
+        setPatients(sortedData)
+
+        try {
+          localStorage.setItem(LAB_PATIENTS_STORAGE_KEY, JSON.stringify(sortedData))
+        } catch (error) {
+          console.error("Error saving patients to localStorage:", error)
+        }
+      } catch (error) {
+        console.error("Error fetching Patients:", error)
+      } finally {
+        setLoading(false)
+      }
+    },
+    [patients.length]
+  )
+
   useEffect(() => {
     try {
-      const cached = localStorage.getItem(PATIENTS_STORAGE_KEY)
+      const cached = localStorage.getItem(LAB_PATIENTS_STORAGE_KEY)
       if (cached) {
         const parsed = JSON.parse(cached) as Patients[]
         setPatients(parsed)
@@ -87,53 +132,8 @@ export default function Patients() {
     setInitialized(true)
   }, [])
 
-  // Fetch patients
-  const fetchPatients = useCallback(async (page: number, query: string = "") => {
-    setLoading(true)
-    const start = (page - 1) * patientsPerPage + 1
-    const stop = page * patientsPerPage
-
-    try {
-      let data: Patients[] = []
-
-      if (query) {
-        const queryParts = query.split(" ")
-        for (const part of queryParts) {
-          const encodedQueryPart = encodeURIComponent(part)
-          const searchResponse = await fetch(
-            `https://api2.caregiverhospital.com/patient/patient/search/search-patients/by-name/${encodedQueryPart}/`
-          )
-
-          if (searchResponse.ok) {
-            const partData = (await searchResponse.json()) as Patients[]
-            data = [...data, ...partData]
-          }
-        }
-        data = Array.from(new Set(data.map((p) => p.id))).map((id) => data.find((p) => p.id === id)!)
-      } else {
-        const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${start}/${stop}`)
-        if (!response.ok) throw new Error("Failed to fetch patients")
-        data = (await response.json()) as Patients[]
-      }
-
-      const sortedData = data.sort((a, b) => a.name.localeCompare(b.name))
-      setPatients(sortedData)
-
-      try {
-        localStorage.setItem(PATIENTS_STORAGE_KEY, JSON.stringify(sortedData))
-      } catch (error) {
-        console.error("Error saving patients to localStorage:", error)
-      }
-    } catch (error) {
-      console.error("Error fetching Patients:", error)
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
   useEffect(() => {
     if (!initialized) return
-
     fetchPatients(currentPage, searchQuery)
   }, [currentPage, searchQuery, fetchPatients, initialized])
 
@@ -195,28 +195,10 @@ export default function Patients() {
             prevPatients.map((patient) => (patient.id === updatedPatientData.id ? updatedPatientData : patient))
           )
           closeEditModal()
-
-          // Show success toast
-          toast.success("Patient Updated", {
-            description: "The patient has been successfully updated.",
-            duration: 5000,
-            cancel: {
-              label: "Close",
-              onClick: () => {},
-            },
-          })
+          setShowEditedNotification(true)
+          setTimeout(() => setShowEditedNotification(false), 5000)
         } catch (error) {
           console.error("Error updating patient:", error)
-
-          // Show error toast
-          toast.error("Update Failed", {
-            description: "Failed to update the patient. Please try again.",
-            duration: 5000,
-            cancel: {
-              label: "Close",
-              onClick: () => {},
-            },
-          })
         }
       }
     },
@@ -265,27 +247,12 @@ export default function Patients() {
         // Close the modal
         closeModal()
 
-        // Show success toast
-        toast.success("Patient Deleted", {
-          description: "The patient has been successfully deleted.",
-          duration: 5000,
-          cancel: {
-            label: "Close",
-            onClick: () => {},
-          },
-        })
+        // Show success notification
+        setShowSuccessNotification(true)
+        setTimeout(() => setShowSuccessNotification(false), 5000)
       } catch (error) {
         console.error("Error deleting patient:", error)
-
-        // Show error toast
-        toast.error("Delete Failed", {
-          description: "Failed to delete the patient. Please try again.",
-          duration: 5000,
-          cancel: {
-            label: "Close",
-            onClick: () => {},
-          },
-        })
+        // Optionally, show an error notification to the user
       }
     }
   }, [patientToDelete, closeModal])
@@ -304,35 +271,17 @@ export default function Patients() {
     return age
   }, [])
 
-  // Filter patients by name, email, or membership number
   const filteredPatients = patients.filter((patient) => {
     const query = searchQuery.toLowerCase()
     const nameMatch = patient.name.toLowerCase().includes(query)
     const emailMatch = patient.email_address.toLowerCase().includes(query)
     const membershipMatch = patient.membership_no.toLowerCase().includes(query)
 
-    // Split the search query into parts for names with spaces
     const queryParts = query.split(" ")
     const namePartsMatch = queryParts.every((part) => patient.name.toLowerCase().includes(part))
 
     return nameMatch || emailMatch || membershipMatch || namePartsMatch
   })
-
-  const handleEditHmoClick = useCallback((patient: Patients) => {
-    setPatientToEditHmo(patient)
-    setIsHmoModalOpen(true)
-  }, [])
-
-  const closeHmoModal = useCallback(() => {
-    setPatientToEditHmo(null)
-    setIsHmoModalOpen(false)
-  }, [])
-
-  const handleHmoUpdateSuccess = useCallback((updatedPatient: Patients) => {
-    setPatients((prevPatients) =>
-      prevPatients.map((patient) => (patient.id === updatedPatient.id ? updatedPatient : patient))
-    )
-  }, [])
 
   return (
     <section>
@@ -361,48 +310,19 @@ export default function Patients() {
                   onChange={handleSearch}
                 />
               </div>
-              <Link href="/patients/add" className="add-button">
+              {/* <Link href="/laboratory-dashboard/add" className="add-button">
                 <p className="text-[12px]">Add Patient</p>
                 <GoPlus />
-              </Link>
+              </Link> */}
             </div>
 
             <div className="mb-4 flex h-full flex-col gap-2 px-16 max-sm:px-4">
-              {loading ? (
-                // Loading state with animate-pulse
-                <div className="grid gap-2">
-                  {[1, 2, 3, 4, 5, 6].map((_, index) => (
-                    <div key={index} className="sidebar flex w-full items-center justify-between rounded-lg border p-2">
-                      <div className="flex items-center gap-1 text-sm font-bold md:w-[20%]">
-                        <div className="h-8 w-8 animate-pulse rounded-full bg-gray-200 max-sm:hidden"></div>
-                      </div>
-                      <div className="flex w-full items-center gap-1 text-sm font-bold">
-                        <div>
-                          <div className="h-4 w-24 animate-pulse rounded bg-gray-200"></div>
-                          <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
-                        </div>
-                      </div>
-                      <div className="w-full max-md:hidden">
-                        <div className="h-4 w-16 animate-pulse rounded bg-gray-200"></div>
-                        <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
-                      </div>
-                      <div className="w-full max-md:hidden">
-                        <div className="h-4 w-16 animate-pulse rounded bg-gray-200"></div>
-                        <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
-                      </div>
-                      <div className="w-full">
-                        <div className="h-4 w-16 animate-pulse rounded bg-gray-200"></div>
-                        <div className="mt-1 h-3 w-16 animate-pulse rounded bg-gray-200"></div>
-                      </div>
-                      <div className="w-full max-md:hidden">
-                        <div className="h-6 w-16 animate-pulse rounded bg-gray-200"></div>
-                      </div>
-                      <div className="flex gap-2">
-                        <div className="h-6 w-6 animate-pulse rounded-full bg-gray-200"></div>
-                        <div className="h-6 w-6 animate-pulse rounded-full bg-gray-200"></div>
-                        <div className="h-6 w-6 animate-pulse rounded-full bg-gray-200"></div>
-                      </div>
-                    </div>
+              {loading && filteredPatients.length === 0 ? (
+                <div className="loading-text flex h-full items-center justify-center">
+                  {"loading...".split("").map((letter, index) => (
+                    <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>
+                      {letter}
+                    </span>
                   ))}
                 </div>
               ) : filteredPatients.length === 0 ? (
@@ -424,7 +344,7 @@ export default function Patients() {
                     {filteredPatients.map((patient) => (
                       <div
                         key={patient.id}
-                        className="sidebar mb-2 flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
+                        className="mb-2 flex w-full cursor-pointer items-center justify-between rounded-lg border p-2"
                       >
                         <div className="flex items-center gap-1 text-sm font-bold md:w-[20%]">
                           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#46FFA6] max-sm:hidden">
@@ -466,7 +386,6 @@ export default function Patients() {
                         <div className="flex gap-2">
                           <RemoveRedEyeIcon className="text-[#46FFA6]" onClick={() => handlePatientClick(patient.id)} />
                           <BorderColorOutlinedIcon onClick={() => handleEditClick(patient)} />
-                          <MedicalServicesOutlinedIcon onClick={() => handleEditHmoClick(patient)} />
                           <DeleteForeverIcon className="text-[#F2B8B5]" onClick={() => openModal(patient)} />
                         </div>
                       </div>
@@ -482,24 +401,25 @@ export default function Patients() {
                       <IoIosArrowBack />
                     </button>
                     <p>Page {currentPage}</p>
-                    <button
-                      onClick={() => setCurrentPage((prev) => prev + 1)}
-                      className="rounded bg-[#46ffac] p-2 text-black"
-                    >
+                    <button onClick={() => setCurrentPage((prev) => prev + 1)} className="rounded bg-[#46ffac] p-2">
                       <IoIosArrowForward />
                     </button>
                   </div>
                 </div>
               )}
+
+              <Footer />
             </div>
           </div>
         </div>
+
         <DeletePatientModal
           isOpen={isModalOpen}
           onClose={closeModal}
           onConfirm={confirmDelete}
           patientName={patientToDelete?.name || ""}
         />
+
         {patientToEdit && (
           <EditPatientModal
             isOpen={isEditModalOpen}
@@ -508,17 +428,21 @@ export default function Patients() {
             patient={patientToEdit}
           />
         )}
-        {patientToEditHmo && (
-          <EditHmoModal
-            isOpen={isHmoModalOpen}
-            onClose={closeHmoModal}
-            patient={patientToEditHmo}
-            onUpdateSuccess={handleHmoUpdateSuccess}
-          />
+
+        {showSuccessNotification && (
+          <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
+            <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
+            <span className="clash-font text-sm text-[#0F920F]">Deleted Successfully</span>
+          </div>
         )}
-        <Toaster position="top-center" richColors /> {/* Add Toaster component */}
+
+        {showEditedNotification && (
+          <div className="animation-fade-in absolute bottom-16 right-16 flex h-[50px] w-[339px] transform items-center justify-center gap-2 rounded-md border border-[#0F920F] bg-[#F2FDF2] text-[#0F920F] shadow-[#05420514]">
+            <Image src="/check-circle.svg" width={16} height={16} alt="dekalo" />
+            <span className="clash-font text-sm text-[#0F920F]">Updated Successfully</span>
+          </div>
+        )}
       </div>
-      <Footer />
     </section>
   )
 }
