@@ -13,6 +13,8 @@ import { GoPlus } from "react-icons/go"
 import { IoAddCircleSharp } from "react-icons/io5"
 import DeletePatientModal from "components/Modals/DeletePatientModal"
 import EditPatientModal from "components/Modals/EditPatientModal"
+import EditHmoModal from "components/Modals/EditHmoModal"
+import MedicalServicesOutlinedIcon from "@mui/icons-material/MedicalServicesOutlined"
 import NursesNav from "components/Navbar/NursesNav"
 import LaboratoryNav from "components/Navbar/LaboratoryNav"
 
@@ -67,6 +69,9 @@ export default function Patients() {
   const [patientToEdit, setPatientToEdit] = useState<Patients | null>(null)
   const [initialized, setInitialized] = useState(false)
 
+  const [isHmoModalOpen, setIsHmoModalOpen] = useState(false)
+  const [patientToEditHmo, setPatientToEditHmo] = useState<Patients | null>(null)
+
   const patientsPerPage = 100
 
   // Fetch patients
@@ -82,19 +87,16 @@ export default function Patients() {
         let data: Patients[] = []
 
         if (query) {
-          const queryParts = query.split(" ")
-          for (const part of queryParts) {
-            const encodedQueryPart = encodeURIComponent(part)
-            const searchResponse = await fetch(
-              `https://api2.caregiverhospital.com/patient/patient/search/search-patients/by-name/${encodedQueryPart}/`
-            )
+          const encodedQuery = encodeURIComponent(` ${query.trim()}`)
+          const searchResponse = await fetch(
+            `https://api2.caregiverhospital.com/patient/patient/search/search-patients/by-name/${encodedQuery}/`
+          )
 
-            if (searchResponse.ok) {
-              const partData = (await searchResponse.json()) as Patients[]
-              data = [...data, ...partData]
-            }
+          if (!searchResponse.ok) {
+            throw new Error("Failed to search patients")
           }
-          data = Array.from(new Set(data.map((p) => p.id))).map((id) => data.find((p) => p.id === id)!)
+
+          data = (await searchResponse.json()) as Patients[]
         } else {
           const response = await fetch(`https://api2.caregiverhospital.com/patient/patient/${start}/${stop}`)
           if (!response.ok) throw new Error("Failed to fetch patients")
@@ -153,6 +155,20 @@ export default function Patients() {
   const closeEditModal = useCallback(() => {
     setPatientToEdit(null)
     setIsEditModalOpen(false)
+  }, [])
+
+  const handleEditHmoClick = useCallback((patient: Patients) => {
+    setPatientToEditHmo(patient)
+    setIsHmoModalOpen(true)
+  }, [])
+
+  const closeHmoModal = useCallback(() => {
+    setPatientToEditHmo(null)
+    setIsHmoModalOpen(false)
+  }, [])
+
+  const handleHmoUpdateSuccess = useCallback((updatedPatient: Patients) => {
+    setPatients((prev) => prev.map((p) => (p.id === updatedPatient.id ? updatedPatient : p)))
   }, [])
 
   // Preprocess patient data for updates
@@ -325,6 +341,14 @@ export default function Patients() {
                     </span>
                   ))}
                 </div>
+              ) : filteredPatients.length === 0 && searchQuery ? (
+                <div className="loading-text flex h-full items-center justify-center">
+                  {"loading...".split("").map((letter, index) => (
+                    <span key={index} style={{ animationDelay: `${index * 0.1}s` }}>
+                      {letter}
+                    </span>
+                  ))}
+                </div>
               ) : filteredPatients.length === 0 ? (
                 <div className="mt-auto flex h-full w-full items-center justify-center">
                   <div>
@@ -386,6 +410,7 @@ export default function Patients() {
                         <div className="flex gap-2">
                           <RemoveRedEyeIcon className="text-[#46FFA6]" onClick={() => handlePatientClick(patient.id)} />
                           <BorderColorOutlinedIcon onClick={() => handleEditClick(patient)} />
+                          <MedicalServicesOutlinedIcon onClick={() => handleEditHmoClick(patient)} />
                           <DeleteForeverIcon className="text-[#F2B8B5]" onClick={() => openModal(patient)} />
                         </div>
                       </div>
@@ -426,6 +451,15 @@ export default function Patients() {
             onClose={closeEditModal}
             onConfirm={confirmEdit}
             patient={patientToEdit}
+          />
+        )}
+
+        {patientToEditHmo && (
+          <EditHmoModal
+            isOpen={isHmoModalOpen}
+            onClose={closeHmoModal}
+            patient={patientToEditHmo}
+            onUpdateSuccess={handleHmoUpdateSuccess}
           />
         )}
 
