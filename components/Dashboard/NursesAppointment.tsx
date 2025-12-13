@@ -37,7 +37,7 @@ const NursesAppointments = () => {
 
   const handleAppointmentClick = (appointmentId: number) => {
     localStorage.setItem("selectedAppointmentId", appointmentId.toString())
-    router.push(`/pharmacy-appointments/appointments/`)
+    router.push(`/all-appointments/appointments/`)
   }
 
   const fetchAppointments = async () => {
