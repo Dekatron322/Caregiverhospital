@@ -12,6 +12,7 @@ import AdministerDrugModal from "components/Modals/AdministerDrugModal"
 import { toast, Toaster } from "sonner"
 
 interface PatientDetail {
+  weight: string
   bmi: any
   height: string
   id: string
@@ -300,7 +301,7 @@ export default function PatientDetailPage() {
                     <div className="sidebar flex w-full flex-col items-center justify-center rounded-md border py-3 shadow-md ">
                       <Image src="/medicines-available.svg" height={40} width={40} alt="" />
                       <h3 className="py-2 font-bold">Weight</h3>
-                      <p>{patientDetail.height || "N/A"} kg</p>
+                      <p>{patientDetail.weight || "N/A"} kg</p>
                     </div>
                     <div className="sidebar flex w-full flex-col items-center justify-center rounded-md border py-3 shadow-md ">
                       <Image src="/Graph.svg" height={40} width={40} alt="" />
