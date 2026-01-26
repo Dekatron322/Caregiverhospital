@@ -1,6 +1,7 @@
 import "styles/tailwind.css"
 import { Metadata } from "next"
 import ThemeProviders from "components/ProvidersComponents/ThemeProviders"
+import { UserProvider } from "contexts/UserContext"
 import { Inter } from "next/font/google"
 
 const inter = Inter({
@@ -30,7 +31,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={inter.className}>
       <body>
-        <ThemeProviders>{children}</ThemeProviders>
+        <UserProvider>
+          <ThemeProviders>{children}</ThemeProviders>
+        </UserProvider>
       </body>
     </html>
   )

@@ -15,32 +15,17 @@ import FormatAlignLeftIcon from "@mui/icons-material/FormatAlignLeft"
 import Link from "next/link"
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"
 import useSound from "use-sound"
+import { useUser } from "contexts/UserContext"
+import { UserDetails } from "types/user"
 
 const NOTIFICATION_SOUND = "/notify.mp3"
 const SOUND_INTERVAL = 5000 // Play sound every 5 seconds while unread exists
-
-interface Notification {
-  id: string
-  title: string
-  detail: string
-  status: boolean
-  pub_date: string
-}
-
-interface UserDetails {
-  id: number
-  username: string
-  email: string
-  phone_number: string
-  address: string
-  account_type: string
-  notifications: Notification[]
-}
 
 const DashboardNav: React.FC = () => {
   const pathname = usePathname()
   const router = useRouter()
   const { theme, setTheme } = useTheme()
+  const { userDetails: contextUserDetails, loading: contextLoading, error: contextError, clearUserDetails } = useUser()
   const [mounted, setMounted] = useState(false)
 
   // State management
@@ -103,8 +88,6 @@ const DashboardNav: React.FC = () => {
       setLastSoundPlayTime(Date.now())
     }
 
-    fetchUserDetails()
-
     // Start sound interval
     const soundIntvl = setInterval(playContinuousSound, SOUND_INTERVAL)
     setSoundInterval(soundIntvl)
@@ -114,6 +97,20 @@ const DashboardNav: React.FC = () => {
       clearInterval(soundIntvl)
     }
   }, [])
+
+  // Update local state when context user details change
+  useEffect(() => {
+    if (contextUserDetails) {
+      setUserDetails(contextUserDetails)
+      setLoading(contextLoading)
+      setError(contextError)
+
+      // Check for existing unread notifications
+      if (contextUserDetails.notifications.some((n) => n.status)) {
+        playContinuousSound()
+      }
+    }
+  }, [contextUserDetails, contextLoading, contextError])
 
   // Handle sound playback when notifications change
   useEffect(() => {
@@ -127,33 +124,6 @@ const DashboardNav: React.FC = () => {
       localStorage.removeItem("hasUnreadNotifications")
     }
   }, [userDetails?.notifications])
-
-  const fetchUserDetails = async () => {
-    try {
-      const userId = localStorage.getItem("id")
-      if (!userId) throw new Error("User ID not found")
-
-      const response = await axios.get<UserDetails>(
-        `https://api2.caregiverhospital.com/app_user/get-user-detail/${userId}/`
-      )
-
-      if (response.data) {
-        setUserDetails(response.data)
-        // Check for existing unread notifications
-        if (response.data.notifications.some((n) => n.status)) {
-          playContinuousSound()
-        }
-      } else {
-        throw new Error("User details not found")
-      }
-    } catch (error) {
-      setError(error instanceof Error ? error.message : "Failed to load user details")
-      console.error("Error:", error)
-      router.push("/signin")
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const deleteNotification = async (notificationId: string) => {
     if (!userDetails) return
@@ -171,8 +141,8 @@ const DashboardNav: React.FC = () => {
       await axios.delete(`https://api2.caregiverhospital.com/notification/notification/${notificationId}/`)
     } catch (error) {
       console.error("Error deleting notification:", error)
-      // Revert on error - refetch the user details to get the original state
-      fetchUserDetails()
+      // Revert on error - the context will handle refetching if needed
+      console.error("Error deleting notification, will be handled by context")
     }
   }
 
@@ -431,6 +401,7 @@ const DashboardNav: React.FC = () => {
         handleConfirm={() => {
           localStorage.removeItem("id")
           localStorage.removeItem("token")
+          clearUserDetails() // Clear the cached user data
           router.push("/signin")
         }}
       />

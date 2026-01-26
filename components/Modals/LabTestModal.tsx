@@ -7,6 +7,7 @@ import Image from "next/image"
 import CustomDropdown from "components/Patient/CustomDropdown"
 import CustomDropdownTest from "../Patient/CustomDropdownTest"
 import CancelDelete from "public/svgs/cancel-delete"
+import { UserDetails } from "types/user"
 
 interface RequestTest {
   policy_id: any
@@ -27,15 +28,6 @@ interface ModalProps {
   onClose: () => void
   userId: string
   onPrescriptionSubmit: () => void
-}
-
-interface UserDetails {
-  id: number
-  username: string
-  email: string
-  phone_number: string
-  address: string
-  account_type: string
 }
 
 interface Diagnosis {

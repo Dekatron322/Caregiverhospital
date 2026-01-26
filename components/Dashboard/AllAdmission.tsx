@@ -27,7 +27,7 @@ const AllAdmission: React.FC = () => {
   const [admissions, setAdmissions] = useState<Admission[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
-  const [startDate, setStartDate] = useState<Dayjs | null>(dayjs().subtract(1, "month"))
+  const [startDate, setStartDate] = useState<Dayjs | null>(dayjs().subtract(3, "day"))
   const [endDate, setEndDate] = useState<Dayjs | null>(dayjs())
 
   useEffect(() => {

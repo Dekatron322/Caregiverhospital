@@ -29,7 +29,7 @@ const PharmacyAdmission: React.FC = () => {
   const [admissions, setAdmissions] = useState<Admission[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
-  const [startDate, setStartDate] = useState<Dayjs | null>(dayjs().subtract(1, "month"))
+  const [startDate, setStartDate] = useState<Dayjs | null>(dayjs().subtract(3, "day"))
   const [endDate, setEndDate] = useState<Dayjs | null>(dayjs())
 
   useEffect(() => {
@@ -77,9 +77,7 @@ const PharmacyAdmission: React.FC = () => {
         )
 
         // Sort by pub_date descending (newest first)
-        const sortedData = formattedData.sort(
-          (a, b) => new Date(b.pub_date).getTime() - new Date(a.pub_date).getTime()
-        )
+        const sortedData = formattedData.sort((a, b) => new Date(b.pub_date).getTime() - new Date(a.pub_date).getTime())
 
         // Keep only the most recent admission per patient_id
         const uniqueMostRecent = sortedData.filter(

@@ -15,27 +15,10 @@ import FormatAlignLeftIcon from "@mui/icons-material/FormatAlignLeft"
 import Link from "next/link"
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"
 import useSound from "use-sound"
+import { UserDetails } from "types/user"
 
 const NOTIFICATION_SOUND = "/notify.mp3"
 const SOUND_INTERVAL = 5000 // Play sound every 5 seconds while unread exists
-
-interface Notification {
-  id: string
-  title: string
-  detail: string
-  status: boolean
-  pub_date: string
-}
-
-interface UserDetails {
-  id: number
-  username: string
-  email: string
-  phone_number: string
-  address: string
-  account_type: string
-  notifications: Notification[]
-}
 
 const CashierNav: React.FC = () => {
   const pathname = usePathname()

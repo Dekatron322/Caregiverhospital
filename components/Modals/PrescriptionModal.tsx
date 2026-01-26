@@ -7,6 +7,7 @@ import Image from "next/image"
 import Select from "react-select"
 import { toast } from "sonner"
 import CancelDelete from "public/svgs/cancel-delete"
+import { UserDetails } from "types/user"
 
 interface AddPrescription {
   id: string
@@ -75,15 +76,6 @@ interface Category {
   medicines: Medicine[]
   status: boolean
   pub_date: string
-}
-
-interface UserDetails {
-  id: number
-  username: string
-  email: string
-  phone_number: string
-  address: string
-  account_type: string
 }
 
 interface Procedure {

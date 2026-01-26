@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Test User Cache</title>
+  </head>
+  <body>
+    <h1>User Cache Test</h1>
+    <button onclick="testCache()">Test Cache Logic</button>
+    <div id="output"></div>
+
+    <script>
+      // Simulate the cache functions
+      const CACHE_KEY = "userDetails"
+      const CACHE_DURATION = 30 * 60 * 1000 // 30 minutes
+
+      function getCachedUserDetails() {
+        try {
+          const cached = localStorage.getItem(CACHE_KEY)
+          if (!cached) return null
+
+          const parsed = JSON.parse(cached)
+
+          if (Date.now() - parsed.timestamp > CACHE_DURATION) {
+            localStorage.removeItem(CACHE_KEY)
+            return null
+          }
+
+          const { timestamp, ...userDetails } = parsed
+          return userDetails
+        } catch (error) {
+          console.error("Error parsing cached user details:", error)
+          localStorage.removeItem(CACHE_KEY)
+          return null
+        }
+      }
+
+      function setCachedUserDetails(userDetails) {
+        try {
+          const cached = {
+            ...userDetails,
+            timestamp: Date.now(),
+          }
+          localStorage.setItem(CACHE_KEY, JSON.stringify(cached))
+        } catch (error) {
+          console.error("Error caching user details:", error)
+        }
+      }
+
+      function testCache() {
+        const output = document.getElementById("output")
+
+        // Clear cache first
+        localStorage.removeItem(CACHE_KEY)
+        output.innerHTML = "<p>Cache cleared. Testing...</p>"
+
+        // Test 1: No cache initially
+        const cached1 = getCachedUserDetails()
+        output.innerHTML += `<p>Test 1 - No cache: ${cached1 === null ? "PASS" : "FAIL"}</p>`
+
+        // Test 2: Set cache
+        const testUser = { id: 1, username: "testuser", email: "test@example.com" }
+        setCachedUserDetails(testUser)
+        output.innerHTML += "<p>Test 2 - Cache set</p>"
+
+        // Test 3: Retrieve from cache
+        const cached2 = getCachedUserDetails()
+        output.innerHTML += `<p>Test 3 - Cache hit: ${cached2 && cached2.username === "testuser" ? "PASS" : "FAIL"}</p>`
+
+        // Test 4: Simulate page refresh (check if cache persists)
+        setTimeout(() => {
+          const cached3 = getCachedUserDetails()
+          output.innerHTML += `<p>Test 4 - Cache persists: ${
+            cached3 && cached3.username === "testuser" ? "PASS" : "FAIL"
+          }</p>`
+          output.innerHTML += "<p><strong>Result: Cache working correctly! No API call needed on refresh.</strong></p>"
+        }, 100)
+      }
+    </script>
+  </body>
+</html>

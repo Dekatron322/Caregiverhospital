@@ -31,7 +31,7 @@ const AllAdmission: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("")
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [admissionToDelete, setAdmissionToDelete] = useState<Admission | null>(null)
-  const [startDate, setStartDate] = useState<Dayjs | null>(dayjs().subtract(1, "month"))
+  const [startDate, setStartDate] = useState<Dayjs | null>(dayjs().subtract(3, "day"))
   const [endDate, setEndDate] = useState<Dayjs | null>(dayjs())
   const DOCTOR_ADMISSIONS_STORAGE_KEY = "doctor-admissions"
 
@@ -82,9 +82,7 @@ const AllAdmission: React.FC = () => {
         )
 
         // Sort by pub_date descending (newest first)
-        const sortedData = formattedData.sort(
-          (a, b) => new Date(b.pub_date).getTime() - new Date(a.pub_date).getTime()
-        )
+        const sortedData = formattedData.sort((a, b) => new Date(b.pub_date).getTime() - new Date(a.pub_date).getTime())
 
         // Keep only the most recent admission per patient_id
         const uniqueMostRecent = sortedData.filter(

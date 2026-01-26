@@ -212,7 +212,7 @@ const LabTests = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const [selectedLabTestId, setSelectedLabTestId] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<ActiveTab>("all")
-  const [startDate, setStartDate] = useState<Dayjs | null>(dayjs().subtract(1, "day"))
+  const [startDate, setStartDate] = useState<Dayjs | null>(dayjs().subtract(3, "day"))
   const [endDate, setEndDate] = useState<Dayjs | null>(dayjs())
   const resultsPerPage = 20
   const maxVisiblePages = 5

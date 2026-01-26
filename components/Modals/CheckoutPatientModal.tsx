@@ -3,6 +3,8 @@ import styles from "./modal.module.css"
 import { LiaTimesSolid } from "react-icons/lia"
 import axios from "axios"
 import { toast } from "sonner"
+import { useUser } from "contexts/UserContext"
+import { UserDetails } from "types/user"
 
 interface ReviewModalProps {
   isOpen: boolean
@@ -11,48 +13,13 @@ interface ReviewModalProps {
   patientId: string
 }
 
-interface UserDetails {
-  id: number
-  username: string
-  email: string
-  phone_number: string
-  address: string
-  account_type: string
-}
-
 const CheckoutPatientModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onSubmitSuccess, patientId }) => {
-  const [userDetails, setUserDetails] = useState<UserDetails | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
+  const { userDetails, loading, error } = useUser()
   const [checkAppId, setCheckAppId] = useState<string | null>(null)
 
   useEffect(() => {
-    fetchUserDetails()
     fetchCheckAppId()
   }, [])
-
-  const fetchUserDetails = async () => {
-    try {
-      const userId = localStorage.getItem("id")
-      if (userId) {
-        const response = await axios.get<UserDetails>(
-          `https://api2.caregiverhospital.com/app_user/get-user-detail/${userId}/`
-        )
-        if (response.data) {
-          setUserDetails(response.data)
-        } else {
-          console.log("User details not found.")
-        }
-      } else {
-        console.log("User ID not found.")
-      }
-    } catch (error) {
-      setError("Failed to load user details.")
-      console.error("Error fetching user details:", error)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const fetchCheckAppId = async () => {
     try {
@@ -139,3 +106,6 @@ const CheckoutPatientModal: React.FC<ReviewModalProps> = ({ isOpen, onClose, onS
 }
 
 export default CheckoutPatientModal
+function setError(arg0: string) {
+  throw new Error("Function not implemented.")
+}

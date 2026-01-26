@@ -14,32 +14,17 @@ import FormatAlignLeftIcon from "@mui/icons-material/FormatAlignLeft"
 import Link from "next/link"
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown"
 import useSound from "use-sound"
+import { useUser } from "contexts/UserContext"
+import { UserDetails } from "types/user"
 
 const NOTIFICATION_SOUND = "/notify.mp3"
 const SOUND_INTERVAL = 5000
-
-interface Notification {
-  id: string
-  title: string
-  detail: string
-  status: boolean
-  pub_date: string
-}
-
-interface UserDetails {
-  id: number
-  username: string
-  email: string
-  phone_number: string
-  address: string
-  account_type: string
-  notifications: Notification[]
-}
 
 const DoctorNav: React.FC = () => {
   const pathname = usePathname()
   const router = useRouter()
   const [mounted, setMounted] = useState(false)
+  const { userDetails: contextUserDetails, loading: contextLoading, error: contextError } = useUser()
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [userDetails, setUserDetails] = useState<UserDetails | null>(null)

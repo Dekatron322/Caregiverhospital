@@ -5,6 +5,7 @@ import axios from "axios"
 import CustomDropdown from "components/Patient/CustomDropdown"
 import { toast } from "sonner"
 import CancelDelete from "public/svgs/cancel-delete"
+import { UserDetails } from "types/user"
 
 interface RateIconProps {
   filled: boolean
@@ -28,15 +29,6 @@ interface ReviewModalProps {
   onSubmitSuccess: any
   onClose: () => void
   patientId: string
-}
-
-interface UserDetails {
-  id: number
-  username: string
-  email: string
-  phone_number: string
-  address: string
-  account_type: string
 }
 
 interface Medicine {

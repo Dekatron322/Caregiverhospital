@@ -3,6 +3,7 @@ import styles from "./modal.module.css"
 import { HiMiniStar } from "react-icons/hi2"
 import { LiaTimesSolid } from "react-icons/lia"
 import axios from "axios"
+import { UserDetails } from "types/user"
 
 interface RateIconProps {
   filled: boolean
@@ -26,15 +27,6 @@ interface PrescribeMedicationModalProps {
   onSubmitSuccess: () => void
   onClose: () => void
   patientId: string
-}
-
-interface UserDetails {
-  id: number
-  username: string
-  email: string
-  phone_number: string
-  address: string
-  account_type: string
 }
 
 const PrescribeMedicationModal: React.FC<PrescribeMedicationModalProps> = ({
