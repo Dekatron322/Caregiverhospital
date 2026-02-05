@@ -16,17 +16,7 @@ import { toast, Toaster } from "sonner" // Import Sonner
 interface Department {
   id: number
   name: string
-  staffCount: number
   slug: string
-}
-
-interface User {
-  id: number
-  username: string
-  email: string
-  phone_number: string | null
-  address: string | null
-  account_type: string
 }
 
 const DEPARTMENTS_STORAGE_KEY = "departments"
@@ -100,24 +90,11 @@ export default function Staff() {
       }
       const departmentsData = (await departmentResponse.json()) as Department[]
 
-      const userResponse = await fetch("https://api2.caregiverhospital.com/app_user/all/")
-      if (!userResponse.ok) {
-        throw new Error("Failed to fetch users")
-      }
-      const usersData = (await userResponse.json()) as User[]
-
-      const departmentsWithStaffCount = departmentsData.map((department) => {
-        const staffCount = usersData.filter(
-          (user) => user.account_type.toLowerCase() === department.name.toLowerCase()
-        ).length
-        return { ...department, staffCount }
-      })
-
-      setDepartments(departmentsWithStaffCount)
+      setDepartments(departmentsData)
       setLoading(false)
 
       try {
-        localStorage.setItem(DEPARTMENTS_STORAGE_KEY, JSON.stringify(departmentsWithStaffCount))
+        localStorage.setItem(DEPARTMENTS_STORAGE_KEY, JSON.stringify(departmentsData))
       } catch (error) {
         console.error("Error saving departments to localStorage:", error)
       }
@@ -213,10 +190,6 @@ export default function Staff() {
                     <div className="mb-4 flex justify-between">
                       <h6 className="font-bold">{department.name}</h6>
                       <Image src={getDepartmentImage(department.name)} height={48} width={48} alt={department.name} />
-                    </div>
-                    <div className="flex justify-between">
-                      <h6 className="font-bold">Registered Staff</h6>
-                      <h6 className="font-bold">{department.staffCount}</h6>
                     </div>
                     <div className="mt-4 flex w-full gap-2 lowercase">
                       <Link

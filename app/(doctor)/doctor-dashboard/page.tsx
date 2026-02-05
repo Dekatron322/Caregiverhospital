@@ -9,40 +9,9 @@ import axios from "axios"
 import DoctorNav from "components/Navbar/DoctorNav"
 
 export default function PharmacyDashboard() {
-  const [doctorCount, setDoctorCount] = useState(0)
+  const [doctorCount, setDoctorCount] = useState(6)
   const [appointmentCount, setAppointmentCount] = useState(0)
   const [checkAppCount, setCheckAppCount] = useState(0)
-
-  useEffect(() => {
-    const fetchDoctorCount = async () => {
-      try {
-        const response = await axios.get("https://api2.caregiverhospital.com/app_user/all/")
-        const doctors = response.data.filter((user: any) => user.account_type === "Doctors")
-        setDoctorCount(doctors.length)
-      } catch (error) {
-        console.error("Error fetching doctor count:", error)
-      }
-    }
-
-    const fetchPatientData = async () => {
-      try {
-        const response = await axios.get("https://api2.caregiverhospital.com/patient/patient/0/5000/")
-        let appointmentCount = 0
-        let checkAppCount = 0
-        response.data.forEach((patient: any) => {
-          appointmentCount += patient.appointments.length
-          checkAppCount += patient.check_apps.length
-        })
-        setAppointmentCount(appointmentCount)
-        setCheckAppCount(checkAppCount)
-      } catch (error) {
-        console.error("Error fetching patient data:", error)
-      }
-    }
-
-    fetchDoctorCount()
-    fetchPatientData()
-  }, [])
 
   return (
     <section>

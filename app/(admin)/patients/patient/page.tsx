@@ -386,9 +386,9 @@ export default function PatientDetailPage() {
                 </div>
               </div>
             )}
-            <Footer />
           </div>
         </div>
+        <Footer />
       </section>
       <AdmissionModal
         isOpen={isAdmissionOpen}

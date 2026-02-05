@@ -238,7 +238,7 @@ const AppointmentModal: React.FC<ReviewModalProps> = ({
               <CancelDelete />
             </div>
           </div>
-          <p>Books an appointment for {patientDetail.name}</p>
+          <p>Book an appointment for {patientDetail.name}</p>
 
           <div className="relative mt-6">
             <p className="mb-1 text-sm">Doctor</p>

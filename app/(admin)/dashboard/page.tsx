@@ -11,17 +11,12 @@ interface Department {
   name: string
 }
 
-interface Staff {
-  username: string
-}
-
 interface PatientCountResponse {
   total: number
 }
 
 interface CachedData {
   departmentCount: number
-  staffCount: number
   totalPatients: number
   timestamp: number
 }
@@ -31,7 +26,6 @@ const CACHE_EXPIRY = 60 * 60 * 1000
 
 export default function Dashboard() {
   const [departmentCount, setDepartmentCount] = useState(0)
-  const [staffCount, setStaffCount] = useState(0)
   const [totalPatients, setTotalPatients] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -53,7 +47,6 @@ export default function Dashboard() {
         if (isCacheValid(cachedData)) {
           // Use cached data
           setDepartmentCount(cachedData.departmentCount)
-          setStaffCount(cachedData.staffCount)
           setTotalPatients(cachedData.totalPatients)
           setLoading(false)
           return
@@ -75,16 +68,9 @@ export default function Dashboard() {
       const departmentData = (await departmentResponse.json()) as Department[]
       setDepartmentCount(departmentData.length)
 
-      // Fetch staff count
-      const staffResponse = await fetch("https://api2.caregiverhospital.com/app_user/all/")
-      if (!staffResponse.ok) throw new Error("Failed to fetch staff count")
-      const staffData = (await staffResponse.json()) as Staff[]
-      setStaffCount(staffData.length)
-
       // Cache the new data
       const dataToCache: CachedData = {
         departmentCount: departmentData.length,
-        staffCount: staffData.length,
         totalPatients: patientData.total,
         timestamp: Date.now(),
       }
@@ -97,7 +83,6 @@ export default function Dashboard() {
       if (cachedDataStr) {
         const cachedData: CachedData = JSON.parse(cachedDataStr) as any
         setDepartmentCount(cachedData.departmentCount)
-        setStaffCount(cachedData.staffCount)
         setTotalPatients(cachedData.totalPatients)
       } else {
         setError("Failed to load data. Please try again later.")
@@ -127,19 +112,13 @@ export default function Dashboard() {
         link: "/department",
       },
       {
-        title: "Staff",
-        value: staffCount,
-        icon: "/staff.svg",
-        link: "/staff",
-      },
-      {
         title: "Patients",
         value: totalPatients,
         icon: "/outpatient.svg",
         link: "/patients",
       },
     ],
-    [departmentCount, staffCount, totalPatients]
+    [departmentCount, totalPatients]
   )
 
   if (loading) {
