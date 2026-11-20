@@ -20,6 +20,8 @@ interface Department {
 }
 
 const DEPARTMENTS_STORAGE_KEY = "departments"
+const DEPARTMENTS_TIMESTAMP_KEY = "departmentsTimestamp"
+const CACHE_DURATION = 24 * 60 * 60 * 1000 // 24 hours
 
 const getDepartmentImage = (departmentName: string): string => {
   switch (departmentName.toLowerCase()) {
@@ -63,24 +65,28 @@ export default function Staff() {
   const [initialized, setInitialized] = useState(false)
 
   useEffect(() => {
+    let hasValidCache = false
     try {
       const cached = localStorage.getItem(DEPARTMENTS_STORAGE_KEY)
+      const storedTimestamp = localStorage.getItem(DEPARTMENTS_TIMESTAMP_KEY)
+
       if (cached) {
         const parsed = JSON.parse(cached) as Department[]
         setDepartments(parsed)
         setLoading(false)
+
+        if (storedTimestamp && Date.now() - parseInt(storedTimestamp, 10) < CACHE_DURATION) {
+          hasValidCache = true
+        }
       }
     } catch (error) {
       console.error("Error reading departments from localStorage:", error)
     }
-    setInitialized(true)
+
+    if (!hasValidCache) {
+      fetchDepartments()
+    }
   }, [])
-
-  useEffect(() => {
-    if (!initialized) return
-
-    fetchDepartments()
-  }, [initialized])
 
   const fetchDepartments = async () => {
     try {
@@ -95,6 +101,7 @@ export default function Staff() {
 
       try {
         localStorage.setItem(DEPARTMENTS_STORAGE_KEY, JSON.stringify(departmentsData))
+        localStorage.setItem(DEPARTMENTS_TIMESTAMP_KEY, Date.now().toString())
       } catch (error) {
         console.error("Error saving departments to localStorage:", error)
       }

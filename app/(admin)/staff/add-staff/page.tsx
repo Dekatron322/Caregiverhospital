@@ -11,6 +11,8 @@ import { IoMdArrowBack } from "react-icons/io"
 import Image from "next/image"
 import CustomDropdown from "components/Patient/CustomDropdown"
 import { toast, Toaster } from "sonner" // Import Sonner
+import { clearStaffCache } from "lib/staffCache"
+import { clearDoctorsCache } from "lib/doctorCache"
 
 interface RateIconProps {
   filled: boolean
@@ -86,6 +88,10 @@ const Page: React.FC = () => {
         qualification,
       })
       console.log("Response:", response.data)
+
+      // Invalidate cache so fresh staff list is fetched
+      clearStaffCache()
+      clearDoctorsCache()
 
       // Display success toast
       toast.success("User Registered", {

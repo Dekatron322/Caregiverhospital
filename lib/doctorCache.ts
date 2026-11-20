@@ -109,6 +109,16 @@ export const getDoctorsList = async (forceRefresh = false): Promise<Doctor[]> =>
 
       const data = (await response.json()) as any[]
 
+      // Also warm staff cache in localStorage
+      if (typeof window !== "undefined" && Array.isArray(data)) {
+        try {
+          localStorage.setItem("allStaffData", JSON.stringify(data))
+          localStorage.setItem("allStaffTimestamp", Date.now().toString())
+        } catch (e) {
+          console.error("Error caching staff data:", e)
+        }
+      }
+
       // Filter users who are doctors (handles "Doctor", "Doctors", with trimming and case-insensitivity)
       const filteredDoctors: Doctor[] = data
         .filter((user: any) => {

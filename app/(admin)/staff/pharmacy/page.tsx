@@ -9,31 +9,7 @@ import Link from "next/link"
 import { GoPlus } from "react-icons/go"
 import { RxDotsVertical } from "react-icons/rx"
 import { toast, Toaster } from "sonner"
-import Cookies from "js-cookie"
-
-interface User {
-  id: number
-  username: string
-  email: string
-  phone_number: string | null
-  address: string | null
-  account_type: string
-  notifications: any[]
-}
-
-// Type guards to validate cached/fetched data shapes at runtime
-const isUser = (obj: unknown): obj is User => {
-  if (!obj || typeof obj !== "object") return false
-  const u = obj as Record<string, unknown>
-  return (
-    typeof u.id === "number" &&
-    typeof u.username === "string" &&
-    typeof u.email === "string" &&
-    typeof u.account_type === "string"
-  )
-}
-
-const isUserArray = (data: unknown): data is User[] => Array.isArray(data) && data.every(isUser)
+import { getCachedStaffByRole, getStaffByRole, removeStaffFromCache, StaffUser as User } from "lib/staffCache"
 
 // Skeleton Loader Component
 const DoctorCardSkeleton = () => (
@@ -102,45 +78,40 @@ const DeleteConfirmationModal = ({
   )
 }
 
-export default function MedicalConsultants() {
+export default function PharmacyStaff() {
   const router = useRouter()
-  const [loading, setLoading] = useState(true)
-  const [doctors, setDoctors] = useState<User[]>([])
-  const [dataVersion, setDataVersion] = useState(0)
+  const [doctors, setDoctors] = useState<User[]>(() => getCachedStaffByRole("pharmacy") || [])
+  const [loading, setLoading] = useState<boolean>(() => {
+    const cached = getCachedStaffByRole("pharmacy")
+    return !cached || cached.length === 0
+  })
   const [openDropdownId, setOpenDropdownId] = useState<number | null>(null)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [doctorToDelete, setDoctorToDelete] = useState<{ id: number; name: string } | null>(null)
 
   useEffect(() => {
-    // Check if we have a cached version in cookies
-    const cachedDoctors = Cookies.get("doctorsData")
-    const cachedVersion = Cookies.get("doctorsDataVersion")
-
-    if (cachedDoctors && cachedVersion) {
-      try {
-        const parsed = JSON.parse(cachedDoctors) as unknown
-        const version = parseInt(cachedVersion)
-        if (isUserArray(parsed)) {
-          setDoctors(parsed)
-          setDataVersion(version)
-          setLoading(false)
-        } else {
-          // Fallback to fetching if cache is malformed
-          fetchDoctors()
-          return
-        }
-
-        // Still fetch fresh data in the background
-        fetchDoctors(true)
-      } catch (error) {
-        console.error("Error parsing cached data:", error)
-        // If parsing fails, fetch fresh data
-        fetchDoctors()
-      }
-    } else {
-      // No cached data, fetch fresh
-      fetchDoctors()
+    const cached = getCachedStaffByRole("pharmacy")
+    if (cached && cached.length > 0) {
+      setDoctors(cached)
+      setLoading(false)
+      return
     }
+
+    setLoading(true)
+    getStaffByRole("pharmacy")
+      .then((data) => {
+        setDoctors(data)
+      })
+      .catch((error) => {
+        console.error("Error fetching pharmacy data:", error)
+        toast.error("Error", {
+          description: "Failed to fetch pharmacy data.",
+          duration: 5000,
+        })
+      })
+      .finally(() => {
+        setLoading(false)
+      })
   }, [])
 
   useEffect(() => {
@@ -157,50 +128,6 @@ export default function MedicalConsultants() {
       document.removeEventListener("mousedown", handleClickOutside)
     }
   }, [openDropdownId])
-
-  const fetchDoctors = async (isBackgroundUpdate = false) => {
-    try {
-      if (!isBackgroundUpdate) {
-        setLoading(true)
-      }
-
-      const userResponse = await fetch("https://api2.caregiverhospital.com/app_user/all/")
-      if (!userResponse.ok) {
-        throw new Error("Failed to fetch users")
-      }
-      const usersData = (await userResponse.json()) as User[]
-
-      // Filter users with account_type "Doctor" (case-insensitive)
-      const doctorsData = usersData.filter((user) => {
-        const role = user.account_type?.toLowerCase().trim()
-        return role === "pharmacy" || role === "pharmacy"
-      })
-
-      // Update state only if this is not a background update
-      if (!isBackgroundUpdate) {
-        setDoctors(doctorsData)
-        setLoading(false)
-      }
-
-      // Always update cookies with fresh data
-      const newVersion = dataVersion + 1
-      Cookies.set("doctorsData", JSON.stringify(doctorsData), { expires: 1 }) // Expires in 1 day
-      Cookies.set("doctorsDataVersion", newVersion.toString(), { expires: 1 })
-
-      if (!isBackgroundUpdate) {
-        setDataVersion(newVersion)
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error)
-      if (!isBackgroundUpdate) {
-        toast.error("Error", {
-          description: "Failed to fetch doctors data.",
-          duration: 5000,
-        })
-        setLoading(false)
-      }
-    }
-  }
 
   const toggleDropdown = (id: number) => {
     setOpenDropdownId(openDropdownId === id ? null : id)
@@ -222,25 +149,20 @@ export default function MedicalConsultants() {
 
       if (response.ok) {
         toast.success("Success", {
-          description: "Doctor deleted successfully.",
+          description: "Pharmacy staff deleted successfully.",
           duration: 5000,
         })
 
-        // Remove the deleted doctor from state and update cache atomically
-        setDoctors((prev) => {
-          const updated = prev.filter((doctor) => doctor.id !== doctorToDelete.id)
-          Cookies.set("doctorsData", JSON.stringify(updated), { expires: 1 })
-          Cookies.set("doctorsDataVersion", (dataVersion + 1).toString(), { expires: 1 })
-          return updated
-        })
-        setDataVersion((v) => v + 1)
+        // Remove the deleted staff member from state and cache
+        removeStaffFromCache(doctorToDelete.id)
+        setDoctors((prev) => prev.filter((doctor) => doctor.id !== doctorToDelete.id))
       } else {
-        throw new Error("Failed to delete doctor")
+        throw new Error("Failed to delete pharmacy staff")
       }
     } catch (error) {
-      console.error("Error deleting doctor:", error)
+      console.error("Error deleting pharmacy staff:", error)
       toast.error("Error", {
-        description: "Failed to delete doctor.",
+        description: "Failed to delete pharmacy staff.",
         duration: 5000,
       })
     } finally {
@@ -262,7 +184,11 @@ export default function MedicalConsultants() {
 
   // Function to manually refresh data (e.g., when adding a new doctor)
   const refreshData = () => {
-    fetchDoctors()
+    setLoading(true)
+    getStaffByRole("pharmacy", true)
+      .then((data) => setDoctors(data))
+      .catch((err) => console.error("Error refreshing data:", err))
+      .finally(() => setLoading(false))
   }
 
   const getInitials = (name: string) => {
@@ -377,7 +303,7 @@ export default function MedicalConsultants() {
                       ))
                     ) : (
                       <div className="col-span-full flex w-full items-center justify-center rounded-lg border p-8">
-                        <p className="text-gray-500">No doctors found</p>
+                        <p className="text-gray-500">No pharmacy staff found</p>
                       </div>
                     )}
                   </div>
