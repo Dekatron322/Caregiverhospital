@@ -8,9 +8,16 @@ interface CustomDropdownProps {
   selectedOption: string
   onChange: (selected: string) => void
   placeholder: string
+  loading?: boolean
 }
 
-const CustomDropdown: React.FC<CustomDropdownProps> = ({ options, selectedOption, onChange, placeholder }) => {
+const CustomDropdown: React.FC<CustomDropdownProps> = ({
+  options,
+  selectedOption,
+  onChange,
+  placeholder,
+  loading = false,
+}) => {
   const [isOpen, setIsOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -51,7 +58,9 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({ options, selectedOption
   return (
     <div className={styles.dropdown} ref={dropdownRef}>
       <div className={styles.dropdownToggle} onClick={handleToggle}>
-        <span>{selectedOption ? options.find((option) => option.id === selectedOption)?.name : placeholder}</span>
+        <span className={loading && !selectedOption ? "animate-pulse opacity-70" : ""}>
+          {selectedOption ? options.find((option) => option.id === selectedOption)?.name : placeholder}
+        </span>
         <MdKeyboardArrowDown />
       </div>
       {isOpen && (
@@ -73,15 +82,21 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({ options, selectedOption
               </button>
             )}
           </div>
-          {filteredOptions.map((option) => (
-            <div
-              key={option.id}
-              className="cursor-pointer overflow-hidden px-4 py-2 hover:bg-[#747A80]"
-              onClick={() => handleOptionClick(option.id)}
-            >
-              {option.name}
+          {filteredOptions.length > 0 ? (
+            filteredOptions.map((option) => (
+              <div
+                key={option.id}
+                className="cursor-pointer overflow-hidden px-4 py-2 hover:bg-[#747A80]"
+                onClick={() => handleOptionClick(option.id)}
+              >
+                {option.name}
+              </div>
+            ))
+          ) : (
+            <div className="px-4 py-3 text-center text-xs text-gray-400">
+              {loading ? "Loading doctors..." : "No results found"}
             </div>
-          ))}
+          )}
         </div>
       )}
     </div>
